@@ -12,8 +12,9 @@
 #include "staticlib/httpserver/http_response_writer.hpp"
 
 #include "staticlib/config.hpp"
-#include "staticlib/serialization.hpp"
 
+#include "ResponseMetadata.hpp"
+#include "RequestMetadata.hpp"
 #include "StringPayloadHandler.hpp"
 
 namespace wilton {
@@ -22,7 +23,6 @@ namespace c {
 namespace { // anonymous
 
 namespace sc = staticlib::config;
-namespace ss = staticlib::serialization;
 namespace sh = staticlib::httpserver;
 
 }
@@ -37,8 +37,8 @@ public:
     req(std::move(req)),
     resp(std::move(resp)) { }
 
-    ss::JsonValue get_request_metadata() {
-        return {"httpMethod", req.get_method() };
+    RequestMetadata get_request_metadata() {
+        return RequestMetadata();
     }
     
     std::string& get_request_data() {
@@ -46,19 +46,8 @@ public:
     }
     
     // todo: medatada validation
-    void set_response_metadata(ss::JsonValue&& json) {
-        for (const auto& fi : json.get_object()) {
-            auto name = fi.get_name();
-            if ("statusCode" == name) {
-                resp.get_response().set_status_code(fi.get_uint32());
-            } else if ("statusMessage" == name) {
-                resp.get_response().set_status_code(fi.get_string());
-            } else if ("headers" == name) {
-                for (const auto& he : json.get_object()) {
-                    // todo
-                }
-            }
-        }
+    void set_response_metadata(ResponseMetadata rm) {
+        
     }
     
     void send_response(const char* data, uint32_t data_len) {

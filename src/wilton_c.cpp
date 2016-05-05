@@ -38,10 +38,10 @@ public:
 
 struct wilton_Request {
 private:
-    wc::Request delegate;
+    wc::Request& delegate;
 
 public:
-    wilton_Request(wc::Request&& delegate) :
+    wilton_Request(wc::Request& delegate) :
     delegate(std::move(delegate)) { }
 
     wc::Request& impl() {
@@ -56,21 +56,16 @@ void wilton_free(char* errmsg) {
 // TODO: fixme json copy
 char* wilton_Server_create(
         wilton_Server** server_out,
-        void* handler_provider_ctx,
-        int (*handler_provider_cb)(
-                void* ctx,
-                const char* handler_name,
-                int handler_name_len,
-                void** handler_ctx_out,
-                (*handler_out)(
-                        void* ctx,
-                        wilton_Request* request)*),
-                const char* conf_json,
-                int conf_json_len) /* noexcept */ {
+        void* handler_ctx,
+        (*handler)(
+                void* handler_ctx,
+                wilton_Request* request),
+        const char* conf_json,
+        int conf_json_len) /* noexcept */ {
     if (nullptr == server_out) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'server_out' parameter specified"));
-    if (nullptr == handler_provider_cb) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'handler_provider_cb' parameter specified"));
+    if (nullptr == handler) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'handler' parameter specified"));
     if (nullptr == conf_json) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'conf_json' parameter specified"));
     if (conf_json_len <= 0 ||
@@ -80,11 +75,11 @@ char* wilton_Server_create(
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
         std::string metadata{conf_json, conf_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(metadata);
-        
         wc::Server server{
-            [](const std::string& name) -> ws::Server::handler_type {
-                // call callback, wrap it into lambda and return
-            }
+            [handler_ctx, handler](Request& req) {
+                wilton_Request* req_ptr = new wilton_Request(req);
+                handler(handler_ctx, req_ptr);
+            },
             std::move(json)
         };
         return nullptr;

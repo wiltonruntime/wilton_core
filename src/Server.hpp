@@ -18,6 +18,7 @@
 #include "staticlib/httpserver/tcp_connection.hpp"
 
 #include "Request.hpp"
+#include "ServerConfig.hpp"
 
 namespace wilton {
 namespace c {
@@ -25,22 +26,14 @@ namespace c {
 namespace { // anonymous
 
 namespace sc = staticlib::config;
-namespace ss = staticlib::serialization;
 namespace sh = staticlib::httpserver;
 
 }
 
 class Server {
-public:
-    typedef std::function<void(Request&& req)> handler_type;
-    typedef std::function<handler_type(const std::string& name)> provider_type;
-
-private:
     std::unique_ptr<sh::http_server> server;
-    provider_type provider;
     
-    Server(provider_type provider, ss::JsonValue&& config) :
-    provider(provider) {
+    Server(std::function<void(Request& req)> handler, ServerConfig config) {
         // todo create server, apply config
     }
     
