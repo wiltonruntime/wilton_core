@@ -55,7 +55,7 @@ public:
             {"method", method},
             {"resource", resource},
             {"queryString", queryString},
-        }
+        };
     }
 
 };

@@ -51,7 +51,7 @@ WILTON_EXPORT void wilton_free(
 WILTON_EXPORT char* wilton_Server_create(
         wilton_Server** server_out,
         void* handler_ctx,
-        (*handler)(
+        void (*handler)(
                 void* handler_ctx,
                 wilton_Request* request),
         const char* conf_json,

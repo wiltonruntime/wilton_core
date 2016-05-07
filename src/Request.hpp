@@ -8,10 +8,8 @@
 #ifndef WILTON_C_REQUEST_HPP
 #define	WILTON_C_REQUEST_HPP
 
-#include "staticlib/httpserver/http_request.hpp"
-#include "staticlib/httpserver/http_response_writer.hpp"
-
 #include "staticlib/config.hpp"
+#include "staticlib/httpserver.hpp"
 
 #include "ResponseMetadata.hpp"
 #include "RequestMetadata.hpp"
@@ -38,16 +36,17 @@ public:
     resp(std::move(resp)) { }
 
     RequestMetadata get_request_metadata() {
-        return RequestMetadata();
+        return RequestMetadata(req->get_version_string(), req->get_method(), req->get_resource(), 
+                req->get_query_string());
     }
     
-    std::string& get_request_data() {
+    const std::string& get_request_data() {
         return StringPayloadHandler::get_payload(req);
     }
     
     // todo: medatada validation
     void set_response_metadata(ResponseMetadata rm) {
-        
+        (void) rm;
     }
     
     void send_response(const char* data, uint32_t data_len) {
@@ -55,6 +54,10 @@ public:
 //                "Invalid request lifecycle operation, request is already committed"));
         resp->write(data, data_len);
         resp->send();
+    }
+    
+    void finish() {
+        // todo
     }
     
 };

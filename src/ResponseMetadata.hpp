@@ -39,24 +39,24 @@ public:
     }    
      * */
     
-    ResponseMetadata(const JsonValue& json) {
-        for (const auto& fi : json.get_object()) {
-            auto name = fi.get_name();
+    ResponseMetadata(const ss::JsonValue& json) {
+        for (const ss::JsonField& fi : json.get_object()) {
+            auto& name = fi.get_name();
             if ("statusCode" == name) {
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
                         fi.get_uint32() > std::numeric_limits<uint16_t>::max()) {
                     throw WiltonInternalException(TRACEMSG(std::string() +
-                            "Invalid 'statusCode' field: [" + ss::dump_json_to_string(fi) + "]"));
+                            "Invalid 'statusCode' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->statusMessage = fi.get_uint16();
             } else if ("statusMessage" == name) {
                 if (0 == fi.get_string().length()) throw WiltonInternalException(TRACEMSG(std::string() +
-                        "Invalid 'statusMessage' field: [" + ss::dump_json_to_string(fi) + "]"));
+                        "Invalid 'statusMessage' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->statusMessage = fi.get_string();
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
-                        "Unknown field: [" + ss::dump_json_to_string(fi) + "]"));
+                        "Unknown field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
             }
         }
     }
@@ -65,7 +65,7 @@ public:
         return {
             {"statusCode", statusCode},
             {"statusMessage", statusMessage}
-        }
+        };
     }
     
 };

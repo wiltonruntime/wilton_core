@@ -11,7 +11,7 @@
 #include <cstdint>
 #include <string>
 
-#include "asio.h"
+#include "asio.hpp"
 
 #include "staticlib/serialization.hpp"
 
@@ -43,7 +43,7 @@ public:
     ipAddress(std::move(other.ipAddress)),
     documentRoot(std::move(other.documentRoot)) { }
 
-    ServerConfig& operator=(const ServerConfig& other) {
+    ServerConfig& operator=(ServerConfig&& other) {
         this->numberOfThreads = other.numberOfThreads;
         this->tcpPort = other.tcpPort;
         this->ipAddress = std::move(other.ipAddress);
@@ -52,22 +52,22 @@ public:
     }
 
     ServerConfig(const ss::JsonValue& json) {
-        for (const auto& fi : val.get_object()) {
-            auto name = fi.get_name();
+        for (const ss::JsonField& fi : json.get_object()) {
+            auto& name = fi.get_name();
             if ("numberOfThreads" == name) {
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
                         fi.get_uint32() > std::numeric_limits<uint16_t>::max()) {
                     throw WiltonInternalException(TRACEMSG(std::string() +
-                            "Invalid 'numberOfThreads' field: [" + ss::dump_json_to_string(fi) + "]"));
+                            "Invalid 'numberOfThreads' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->numberOfThreads = fi.get_uint16();
             } else if ("tcpPort" == name) {
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
-                        fi.get_uint64() > std::numeric_limits<uint32_t>::max()) {
+                        fi.get_integer() > std::numeric_limits<uint32_t>::max()) {
                     throw WiltonInternalException(TRACEMSG(std::string() +
-                            "Invalid 'tcpPort' field: [" + ss::dump_json_to_string(fi) + "]"));
+                            "Invalid 'tcpPort' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->tcpPort = fi.get_uint32();
             } else if ("ipAddress" == name) {
@@ -76,7 +76,7 @@ public:
                 this->documentRoot = DocumentRoot(fi.get_value());
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
-                        "Unknown field: [" + ss::dump_json_to_string(fi) + "]"));
+                        "Unknown field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
             }
         }
     }
@@ -87,7 +87,7 @@ public:
             {"tcpPort", tcpPort},
             {"ipAddress", ipAddress.to_string()},
             {"documentRoot", documentRoot.to_json()}
-        }
+        };
     }
 };
 

@@ -31,8 +31,8 @@
 
 #include "staticlib/httpserver/http_request.hpp"
 
-namespace staticlib {
-namespace cbindhttp {
+namespace wilton {
+namespace c {
 
 namespace { // anonymous
 
