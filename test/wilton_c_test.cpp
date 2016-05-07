@@ -1,15 +1,18 @@
 /* 
- * File:   wilton_c_test.c
+ * File:   wilton_c_test.cpp
  * Author: alex
  *
  * Created on May 6, 2016, 9:44 PM
  */
 
+// C++ used here instead of C to support static linking
+// dynamic linking will work with plain C
+
 #include "wilton/wilton_c.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 void hello(void* ctx, wilton_Request* req) {
     (void) ctx;
@@ -26,7 +29,7 @@ void check_err(char* err) {
 int main() {
     char* err;
     wilton_Server* server;
-    char* server_conf = "{\"tcpPort\": 8080}";
+    const char* server_conf = "{\"tcpPort\": 8080}";
     err = wilton_Server_create(&server, NULL, hello, server_conf, strlen(server_conf));
     check_err(err);
 

@@ -40,16 +40,24 @@ staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpserver )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_serialization )
 staticlib_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../wilton_c )
-set ( ${PROJECT_NAME}_DEPS wilton_c )
-staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
+set ( ${PROJECT_NAME}_DEPS_PUBLIC wilton_c )
+staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PUBLIC_PC REQUIRED ${PROJECT_NAME}_DEPS_PUBLIC )
+set ( ${PROJECT_NAME}_DEPS_PRIVATE
+        jansson
+        staticlib_httpserver
+        staticlib_utils
+        staticlib_serialization )
+staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PRIVATE_PC REQUIRED ${PROJECT_NAME}_DEPS_PRIVATE )
 
 # tests
 if ( "${STATICLIB_ROOT_SOURCE_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}" )
     # C
     enable_testing ( )
-    add_executable ( wilton_c_test ${CMAKE_CURRENT_LIST_DIR}/wilton_c_test.c )
-    target_link_libraries ( wilton_c_test ${${PROJECT_NAME}_DEPS_PC_LIBRARIES} )
-    target_include_directories ( wilton_c_test BEFORE PRIVATE ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
+    add_executable ( wilton_c_test ${CMAKE_CURRENT_LIST_DIR}/wilton_c_test.cpp )
+    target_link_libraries ( wilton_c_test 
+        ${${PROJECT_NAME}_DEPS_PUBLIC_PC_LIBRARIES}
+        ${${PROJECT_NAME}_DEPS_PRIVATE_PC_LIBRARIES} )
+    target_include_directories ( wilton_c_test BEFORE PRIVATE ${${PROJECT_NAME}_DEPS_PUBLIC_PC_INCLUDE_DIRS} )
     target_compile_options ( wilton_c_test PRIVATE ${${PROJECT_NAME}_DEPS_PC_CFLAGS_OTHER} ) 
     set_target_properties ( wilton_c_test PROPERTIES FOLDER "test" )
     if ( DEFINED CMAKE_MEMORYCHECK_COMMAND )

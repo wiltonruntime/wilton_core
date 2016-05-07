@@ -8,15 +8,17 @@
 #ifndef WILTON_C_H
 #define	WILTON_C_H
 
-#ifdef _WIN32
-#ifdef WILTON_DLL_IMPORT
-#define WILTON_EXPORT __declspec(dllimport)
-#else
-#define WILTON_EXPORT __declspec(dllexport)
-#endif
-#else
-#define WILTON_EXPORT __attribute__ ((visibility ("default")))
-#endif
+//#ifdef _WIN32
+//#ifdef WILTON_DLL_IMPORT
+//#define WILTON_EXPORT __declspec(dllimport)
+//#else
+//#define WILTON_EXPORT __declspec(dllexport)
+//#endif
+//#else
+//#define WILTON_EXPORT __attribute__ ((visibility ("default")))
+//#endif
+// todo: shared support
+#define WILTON_EXPORT
 
 #ifdef	__cplusplus
 extern "C" {
@@ -50,9 +52,9 @@ WILTON_EXPORT void wilton_free(
  */
 WILTON_EXPORT char* wilton_Server_create(
         wilton_Server** server_out,
-        void* handler_ctx,
-        void (*handler)(
-                void* handler_ctx,
+        void* gateway_ctx,
+        void (*gateway_cb)(
+                void* gateway_ctx,
                 wilton_Request* request),
         const char* conf_json,
         int conf_json_len);
@@ -108,6 +110,7 @@ WILTON_EXPORT char* wilton_Request_send_response(
         const char* data,
         int data_len);
 
+/* TODO
 WILTON_EXPORT char* wilton_Request_send_response_chunked(
         wilton_Request* request,
         void* read_ctx,
@@ -115,6 +118,7 @@ WILTON_EXPORT char* wilton_Request_send_response_chunked(
                 void* read_ctx,
                 char* buf,
                 int len));
+ */ 
 
 #ifdef	__cplusplus
 }

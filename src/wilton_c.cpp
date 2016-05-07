@@ -56,16 +56,16 @@ void wilton_free(char* errmsg) {
 // TODO: fixme json copy
 char* wilton_Server_create(
         wilton_Server** server_out,
-        void* handler_ctx,
-        void (*handler)(
-                void* handler_ctx,
+        void* gateway_ctx,
+        void (*gateway_cb)(
+                void* gateway_ctx,
                 wilton_Request* request),
         const char* conf_json,
         int conf_json_len) /* noexcept */ {
     if (nullptr == server_out) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'server_out' parameter specified"));
-    if (nullptr == handler) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'handler' parameter specified"));
+    if (nullptr == gateway_cb) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'gateway_cb' parameter specified"));
     if (nullptr == conf_json) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'conf_json' parameter specified"));
     if (conf_json_len <= 0 ||
@@ -76,9 +76,9 @@ char* wilton_Server_create(
         std::string metadata{conf_json, conf_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(metadata);
         wc::Server server{
-            [handler_ctx, handler](wc::Request& req) {
+            [gateway_ctx, gateway_cb](wc::Request& req) {
                 wilton_Request* req_ptr = new wilton_Request(req);
-                handler(handler_ctx, req_ptr);
+                gateway_cb(gateway_ctx, req_ptr);
             },
             std::move(json)
         };
