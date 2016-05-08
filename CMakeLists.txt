@@ -17,7 +17,7 @@ cmake_minimum_required ( VERSION 2.8.12 )
 # project
 project ( wilton_c CXX )
 set ( ${PROJECT_NAME}_STATICLIB_VERSION 1.0 )
-set ( ${PROJECT_NAME}_DESCRIPTION "Wilton Web Toolkit for C" )
+set ( ${PROJECT_NAME}_DESCRIPTION "Wilton Web Toolkit C library" )
 set ( ${PROJECT_NAME}_URL https://github.com/wilton-web-toolkit/wilton_c )
 include ( ${CMAKE_CURRENT_LIST_DIR}/resources/macros.cmake )
 
@@ -35,6 +35,7 @@ if ( NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY )
     set ( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 endif ( )
 if ( NOT DEFINED STATICLIB_TOOLCHAIN )
+    # TODO
     staticlib_cbindhttp_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../staticlib_config )
     staticlib_cbindhttp_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../staticlib_utils )
     staticlib_cbindhttp_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../staticlib_httpserver )

@@ -38,6 +38,20 @@ public:
     ...
     }    
      * */
+
+    ResponseMetadata(const ResponseMetadata&) = delete;
+
+    ResponseMetadata& operator=(const ResponseMetadata&) = delete;
+
+    ResponseMetadata(ResponseMetadata&& other) :
+    statusCode(other.statusCode),
+    statusMessage(std::move(other.statusMessage)) { }
+
+    ResponseMetadata& operator=(ResponseMetadata&& other) {
+        statusCode = other.statusCode;
+        statusMessage = std::move(other.statusMessage);
+        return *this;
+    }
     
     ResponseMetadata(const ss::JsonValue& json) {
         for (const ss::JsonField& fi : json.get_object()) {
@@ -49,7 +63,7 @@ public:
                     throw WiltonInternalException(TRACEMSG(std::string() +
                             "Invalid 'statusCode' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
-                this->statusMessage = fi.get_uint16();
+                this->statusCode = fi.get_uint16();
             } else if ("statusMessage" == name) {
                 if (0 == fi.get_string().length()) throw WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'statusMessage' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));

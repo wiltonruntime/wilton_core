@@ -82,12 +82,12 @@ WILTON_EXPORT char* wilton_Server_stop_server(
  */
 WILTON_EXPORT char* wilton_Request_get_request_metadata(
         wilton_Request* request,
-        const char** metadata_json_out,
+        char** metadata_json_out,
         int* metadata_json_len_out);
 
-WILTON_EXPORT const char* wilton_Request_get_request_data(
+WILTON_EXPORT char* wilton_Request_get_request_data(
         wilton_Request* request,
-        const char** data_out,
+        char** data_out,
         int* data_len_out);
 
 /*

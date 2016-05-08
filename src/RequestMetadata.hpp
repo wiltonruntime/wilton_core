@@ -28,8 +28,9 @@ namespace ss = staticlib::serialization;
 class RequestMetadata {
     std::string httpVersion;
     std::string method;
-    std::string resource;
-    std::string queryString;
+    std::string pathname;
+    std::string query;
+    
 
     /*
      * "queryParams": {}
@@ -42,22 +43,50 @@ class RequestMetadata {
      */
     
 public:
-    RequestMetadata(std::string httpVersion, std::string method, std::string resource,
-            std::string queryString) :
+    RequestMetadata(const RequestMetadata&) = delete;
+    
+    RequestMetadata& operator=(const RequestMetadata&) = delete;
+    
+    RequestMetadata(RequestMetadata&& other) :
+    httpVersion(std::move(other.httpVersion)),
+    method(std::move(other.method)),
+    pathname(std::move(other.pathname)),
+    query(std::move(other.query)) { }
+    
+    RequestMetadata& operator=(RequestMetadata&& other) {
+        httpVersion = std::move(other.httpVersion);
+        method = std::move(other.method);
+        pathname = std::move(other.pathname);
+        query = std::move(other.query);
+        return *this;
+    }
+    
+    RequestMetadata(std::string httpVersion, std::string method, std::string pathname,
+            std::string query) :
     httpVersion(std::move(httpVersion)),
     method(std::move(method)),
-    resource(std::move(resource)),
-    queryString(std::move(queryString)) { }
+    pathname(std::move(pathname)),
+    query(std::move(query)) { }
         
     ss::JsonValue to_json() {
         return {
             {"httpVersion", httpVersion},
             {"method", method},
-            {"resource", resource},
-            {"queryString", queryString},
+            {"pathname", pathname},
+            {"query", query},
+            {"url", reconstructUrl()},
         };
     }
 
+private:
+    std::string reconstructUrl() {
+        if (0 == query.length()) {
+            return pathname;
+        } else {
+            return pathname + "?" + query;
+        }
+    }
+    
 };
 
 

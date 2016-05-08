@@ -11,6 +11,7 @@
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
+#include "ResponseMetadata.hpp"
 #include "Request.hpp"
 #include "Server.hpp"
 
@@ -103,7 +104,7 @@ char* wilton_Server_stop_server(wilton_Server* server) /* noexcept */ {
 }
 
 // TODO: fixme json copy
-char* wilton_Request_get_request_metadata(wilton_Request* request, const char** metadata_json_out,
+char* wilton_Request_get_request_metadata(wilton_Request* request, char** metadata_json_out,
         int* metadata_json_len_out) /* noexcept */ {
     if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'server' parameter specified"));
@@ -123,7 +124,8 @@ char* wilton_Request_get_request_metadata(wilton_Request* request, const char** 
     }    
 }
 
-const char* wilton_Request_get_request_data(wilton_Request* request, const char** data_out,
+// TODO: think about copy
+char* wilton_Request_get_request_data(wilton_Request* request, char** data_out,
         int* data_len_out) /* noexcept */ {
     if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'request' parameter specified"));
@@ -133,7 +135,7 @@ const char* wilton_Request_get_request_data(wilton_Request* request, const char*
             "Null 'data_len_out' parameter specified"));
     try {
         const std::string& res = request->impl().get_request_data();
-        *data_out = res.c_str();
+        *data_out = su::alloc_copy(res);
         *data_len_out = res.size();
         return nullptr;
     } catch (const std::exception& e) {
@@ -155,7 +157,8 @@ char* wilton_Request_set_response_metadata(wilton_Request* request,
         uint32_t metadata_json_len_u32 = static_cast<uint32_t> (metadata_json_len);
         std::string metadata{metadata_json, metadata_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(metadata);
-        request->impl().set_response_metadata(std::move(json));
+        wc::ResponseMetadata rm{json};
+        request->impl().set_response_metadata(std::move(rm));
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
