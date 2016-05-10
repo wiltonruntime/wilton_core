@@ -32,6 +32,15 @@ typedef struct wilton_Request wilton_Request;
 
 WILTON_EXPORT void wilton_free(
         char* errmsg);
+
+WILTON_EXPORT char* wilton_log(
+        const char* level_name,
+        int level_name_len,        
+        const char* logger_name,
+        int logger_name_len,
+        const char* message,
+        int message_len);
+
 /*
     {
         "numberOfThreads": uint32_t, 
@@ -45,8 +54,15 @@ WILTON_EXPORT void wilton_free(
         },
         "documentRoot": {
             "urlPath": "/path/to/hanldler",
-            "dirPath": "path/to/directory".
+            "dirPath": "path/to/directory",
+            "zipPath": "path/to/directory.zip",
             "cacheMaxAge": uint32_t
+        }, 
+        "logging": {
+            "appender": "NULL | CONSOLE | FILE | DAILY_ROLLING_FILE",
+            "filePath": "path/to/log/file",
+            "layout": "%d{%Y-%m-%d %H:%M:%S,%q} [%-5p %-5.5T %-20.20c] %m%n",
+            "thresholdLevel": "TRACE | DEBUG | INFO | WARN | ERROR | FATAL"
         }
     }
  */
@@ -119,6 +135,8 @@ WILTON_EXPORT char* wilton_Request_send_response_chunked(
                 char* buf,
                 int len));
  */ 
+
+
 
 #ifdef	__cplusplus
 }

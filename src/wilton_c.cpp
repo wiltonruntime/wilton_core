@@ -11,6 +11,7 @@
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
+#include "Logger.hpp"
 #include "ResponseMetadata.hpp"
 #include "Request.hpp"
 #include "Server.hpp"
@@ -54,6 +55,43 @@ void wilton_free(char* errmsg) {
     std::free(errmsg);
 }
 
+// todo: fixme message copy
+char* wilton_log(
+        const char* level_name,
+        int level_name_len,
+        const char* logger_name,
+        int logger_name_len,
+        const char* message,
+        int message_len) {
+    if (nullptr == level_name) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'level_name' parameter specified"));
+    if (level_name_len <= 0 ||
+            static_cast<int64_t> (level_name_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            "Invalid 'level_name_len' parameter specified: [" + sc::to_string(level_name_len) + "]"));
+    if (nullptr == logger_name) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'logger_name' parameter specified"));
+    if (logger_name_len <= 0 ||
+            static_cast<int64_t> (logger_name_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            "Invalid 'logger_name_len' parameter specified: [" + sc::to_string(logger_name_len) + "]"));
+    if (nullptr == message) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'message' parameter specified"));
+    if (message_len <= 0 ||
+            static_cast<int64_t> (message_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            "Invalid 'message_len' parameter specified: [" + sc::to_string(message_len) + "]"));
+    try {
+        uint32_t level_name_len_u32 = static_cast<uint32_t> (level_name_len);
+        std::string level_name_str{level_name, level_name_len_u32};
+        uint32_t logger_name_len_u32 = static_cast<uint32_t> (logger_name_len);
+        std::string logger_name_str{logger_name, logger_name_len_u32};
+        uint32_t message_len_u32 = static_cast<uint32_t> (message_len);
+        std::string message_str{message, message_len_u32};
+        wc::Logger::log(level_name_str, logger_name_str, message_str);
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+    }
+}
+
 // TODO: fixme json copy
 char* wilton_Server_create(
         wilton_Server** server_out,
@@ -80,6 +118,8 @@ char* wilton_Server_create(
             [gateway_ctx, gateway_cb](wc::Request& req) {
                 wilton_Request* req_ptr = new wilton_Request(req);
                 gateway_cb(gateway_ctx, req_ptr);
+                // todo: special handling for chunked send
+                delete req_ptr;
             },
             std::move(json)
         };
@@ -177,7 +217,6 @@ char* wilton_Request_send_response(wilton_Request* request, const char* data,
     try {
         uint32_t data_len_u32 = static_cast<uint32_t> (data_len);
         request->impl().send_response(data, data_len_u32);
-        delete request;
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
