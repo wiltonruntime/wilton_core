@@ -1,12 +1,12 @@
 /* 
- * File:   ServerConfig.hpp
+ * File:   ServerConfigConfig.hpp
  * Author: alex
  *
  * Created on May 5, 2016, 7:20 PM
  */
 
-#ifndef WILTON_C_SERVERCONFIG_HPP
-#define	WILTON_C_SERVERCONFIG_HPP
+#ifndef WILTON_C_JSON_SERVERCONFIG_HPP
+#define	WILTON_C_JSON_SERVERCONFIG_HPP
 
 #include <cstdint>
 #include <string>
@@ -15,10 +15,13 @@
 
 #include "staticlib/serialization.hpp"
 
-#include "DocumentRoot.hpp"
+#include "json/DocumentRoot.hpp"
+#include "json/Appender.hpp"
+#include "json/Logging.hpp"
 
 namespace wilton {
 namespace c {
+namespace json {
 
 namespace { // anonymous
 
@@ -32,6 +35,7 @@ public:
     uint16_t tcpPort = 8080;
     asio::ip::address_v4 ipAddress = asio::ip::address_v4::any();
     DocumentRoot documentRoot;
+    Logging logging;
 
     ServerConfig(const ServerConfig&) = delete;
 
@@ -41,13 +45,15 @@ public:
     numberOfThreads(other.numberOfThreads),
     tcpPort(other.tcpPort),
     ipAddress(std::move(other.ipAddress)),
-    documentRoot(std::move(other.documentRoot)) { }
+    documentRoot(std::move(other.documentRoot)),
+    logging(std::move(other.logging)) { }
 
     ServerConfig& operator=(ServerConfig&& other) {
         this->numberOfThreads = other.numberOfThreads;
         this->tcpPort = other.tcpPort;
         this->ipAddress = std::move(other.ipAddress);
         this->documentRoot = std::move(other.documentRoot);
+        this->logging = std::move(other.logging);
         return *this;
     }
 
@@ -74,10 +80,15 @@ public:
                 this->ipAddress = asio::ip::address_v4::from_string(fi.get_string());
             } else if ("documentRoot" == name) {
                 this->documentRoot = DocumentRoot(fi.get_value());
+            } else if ("logging" == name) {
+                this->logging = Logging(fi.get_value());
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
                         "Unknown field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
             }
+        }
+        if (0 == logging.appenders.size()) {
+            logging.appenders.emplace_back(json::Appender());
         }
     }
     
@@ -86,13 +97,15 @@ public:
             {"numberOfThreads", numberOfThreads},
             {"tcpPort", tcpPort},
             {"ipAddress", ipAddress.to_string()},
-            {"documentRoot", documentRoot.to_json()}
+            {"documentRoot", documentRoot.to_json()},
+            {"logging", logging.to_json()}
         };
     }
 };
 
 } // namespace
 }
+}
 
-#endif	/* WILTON_C_SERVERCONFIG_HPP */
+#endif	/* WILTON_C_JSON_SERVERCONFIG_HPP */
 

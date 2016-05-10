@@ -5,8 +5,8 @@
  * Created on May 5, 2016, 7:20 PM
  */
 
-#ifndef WILTON_C_REQUESTMETADATA_HPP
-#define	WILTON_C_REQUESTMETADATA_HPP
+#ifndef WILTON_C_JSON_REQUESTMETADATA_HPP
+#define	WILTON_C_JSON_REQUESTMETADATA_HPP
 
 #include <cstdint>
 #include <string>
@@ -18,6 +18,7 @@
 
 namespace wilton {
 namespace c {
+namespace json {
 
 namespace { // anonymous
 
@@ -86,12 +87,12 @@ private:
             return pathname + "?" + query;
         }
     }
-    
 };
 
 
 } // namespace
 }
+}
 
-#endif	/* WILTON_C_REQUESTMETADATA_HPP */
+#endif	/* WILTON_C_JSON_REQUESTMETADATA_HPP */
 

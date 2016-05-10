@@ -11,10 +11,11 @@
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
-#include "Logger.hpp"
-#include "ResponseMetadata.hpp"
+#include "WiltonLogger.hpp"
 #include "Request.hpp"
 #include "Server.hpp"
+
+#include "json/ResponseMetadata.hpp"
 
 namespace { // anonymous
 
@@ -85,7 +86,7 @@ char* wilton_log(
         std::string logger_name_str{logger_name, logger_name_len_u32};
         uint32_t message_len_u32 = static_cast<uint32_t> (message_len);
         std::string message_str{message, message_len_u32};
-        wc::Logger::log(level_name_str, logger_name_str, message_str);
+        wc::WiltonLogger::log(level_name_str, logger_name_str, message_str);
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
@@ -197,7 +198,7 @@ char* wilton_Request_set_response_metadata(wilton_Request* request,
         uint32_t metadata_json_len_u32 = static_cast<uint32_t> (metadata_json_len);
         std::string metadata{metadata_json, metadata_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(metadata);
-        wc::ResponseMetadata rm{json};
+        wc::json::ResponseMetadata rm{json};
         request->impl().set_response_metadata(std::move(rm));
         return nullptr;
     } catch (const std::exception& e) {

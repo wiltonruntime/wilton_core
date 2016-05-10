@@ -5,8 +5,8 @@
  * Created on May 5, 2016, 7:21 PM
  */
 
-#ifndef WILTON_C_RESPONSEMETADATA_HPP
-#define	WILTON_C_RESPONSEMETADATA_HPP
+#ifndef WILTON_C_JSON_RESPONSEMETADATA_HPP
+#define	WILTON_C_JSON_RESPONSEMETADATA_HPP
 
 #include <cstdint>
 #include <string>
@@ -19,6 +19,7 @@
 
 namespace wilton {
 namespace c {
+namespace json {
 
 namespace { // anonymous
 
@@ -86,6 +87,7 @@ public:
 
 } // namespace
 }
+}
 
-#endif	/* WILTON_C_RESPONSEMETADATA_HPP */
+#endif	/* WILTON_C_JSON_RESPONSEMETADATA_HPP */
 

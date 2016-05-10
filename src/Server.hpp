@@ -1,5 +1,5 @@
 /* 
- * File:   Server.hpp
+ * File:   HttpServer.hpp
  * Author: alex
  *
  * Created on May 5, 2016, 12:30 PM
@@ -17,8 +17,12 @@
 #include "staticlib/httpserver.hpp"
 
 #include "Request.hpp"
-#include "ServerConfig.hpp"
 #include "StringPayloadHandler.hpp"
+#include "WiltonInternalException.hpp"
+#include "WiltonLogger.hpp"
+
+#include "json/ServerConfig.hpp"
+#include "json/Logging.hpp"
 
 namespace wilton {
 namespace c {
@@ -34,8 +38,9 @@ class Server {
     std::unique_ptr<sh::http_server> server;
     
 public:    
-    Server(std::function<void(Request& req)> gateway, ServerConfig config) :
+    Server(std::function<void(Request& req)> gateway, json::ServerConfig config) :
     server(sc::make_unique<sh::http_server>(config.numberOfThreads, config.tcpPort)) {
+        WiltonLogger::apply_config(config.logging);
         std::vector<std::string> methods = {"GET", "POST", "PUT", "DELETE"};
         std::string path = "/";
         for (const std::string& me : methods) {

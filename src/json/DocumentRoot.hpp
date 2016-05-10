@@ -5,8 +5,8 @@
  * Created on May 5, 2016, 7:27 PM
  */
 
-#ifndef WILTON_C_DOCUMENTROOT_HPP
-#define	WILTON_C_DOCUMENTROOT_HPP
+#ifndef WILTON_C_JSON_DOCUMENTROOT_HPP
+#define	WILTON_C_JSON_DOCUMENTROOT_HPP
 
 #include <cstdint>
 #include <string>
@@ -20,6 +20,7 @@
 
 namespace wilton {
 namespace c {
+namespace json {
 
 namespace { // anonymous
 
@@ -96,6 +97,7 @@ public:
 
 } // namespace
 }
+}
 
-#endif	/* WILTON_C_DOCUMENTROOT_HPP */
+#endif	/* WILTON_C_JSON_DOCUMENTROOT_HPP */
 

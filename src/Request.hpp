@@ -13,10 +13,11 @@
 #include "staticlib/config.hpp"
 #include "staticlib/httpserver.hpp"
 
-#include "ResponseMetadata.hpp"
-#include "RequestMetadata.hpp"
 #include "StringPayloadHandler.hpp"
 #include "WiltonInternalException.hpp"
+
+#include "json/ResponseMetadata.hpp"
+#include "json/RequestMetadata.hpp"
 
 namespace wilton {
 namespace c {
@@ -41,10 +42,10 @@ public:
     req(std::move(req)),
     resp(std::move(resp)) { }
 
-    RequestMetadata get_request_metadata() {
+    json::RequestMetadata get_request_metadata() {
         std::string http_ver = sc::to_string(req->get_version_major()) + 
                 "." + sc::to_string(req->get_version_minor());
-        return RequestMetadata(http_ver, req->get_method(), req->get_resource(), 
+        return json::RequestMetadata(http_ver, req->get_method(), req->get_resource(), 
                 req->get_query_string());
     }
     
@@ -52,7 +53,7 @@ public:
         return StringPayloadHandler::get_payload(req);
     }
     
-    void set_response_metadata(ResponseMetadata rm) {
+    void set_response_metadata(json::ResponseMetadata rm) {
         resp->get_response().set_status_code(rm.statusCode);
         resp->get_response().set_status_message(rm.statusMessage);
     }
