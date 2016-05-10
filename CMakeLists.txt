@@ -45,6 +45,7 @@ endif ( )
 # dependencies
 set ( ${PROJECT_NAME}_DEPS
         jansson
+        log4cplus
         staticlib_config
         staticlib_utils
         staticlib_httpserver

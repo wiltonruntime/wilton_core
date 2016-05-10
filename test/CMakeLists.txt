@@ -32,6 +32,7 @@ if ( NOT DEFINED STATICLIB_DEPS )
 endif ( )
 if ( NOT STATICLIB_TOOLCHAIN MATCHES "linux_[^_]+_[^_]+" )    
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
 endif ( )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
@@ -44,6 +45,7 @@ set ( ${PROJECT_NAME}_DEPS_PUBLIC wilton_c )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PUBLIC_PC REQUIRED ${PROJECT_NAME}_DEPS_PUBLIC )
 set ( ${PROJECT_NAME}_DEPS_PRIVATE
         jansson
+        log4cplus
         staticlib_httpserver
         staticlib_utils
         staticlib_serialization )
