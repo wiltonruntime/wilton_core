@@ -27,7 +27,7 @@ namespace { // anonymous
 namespace sc = staticlib::config;
 namespace sh = staticlib::httpserver;
 
-}
+} //namespace
 
 class Request {
     enum class State { CREATED, CHUNK_SENT, COMMITTED };

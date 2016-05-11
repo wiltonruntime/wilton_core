@@ -10,6 +10,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "asio.hpp"
 
@@ -34,7 +35,7 @@ public:
     uint32_t numberOfThreads = 2;
     uint16_t tcpPort = 8080;
     asio::ip::address_v4 ipAddress = asio::ip::address_v4::any();
-    DocumentRoot documentRoot;
+    std::vector<DocumentRoot> documentRoots;
     Logging logging;
 
     ServerConfig(const ServerConfig&) = delete;
@@ -78,7 +79,8 @@ public:
                 this->tcpPort = fi.get_uint32();
             } else if ("ipAddress" == name) {
                 this->ipAddress = asio::ip::address_v4::from_string(fi.get_string());
-            } else if ("documentRoot" == name) {
+            } else if ("documentRoots" == name) {
+                // TODO: vector
                 this->documentRoot = DocumentRoot(fi.get_value());
             } else if ("logging" == name) {
                 this->logging = Logging(fi.get_value());

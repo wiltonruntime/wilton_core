@@ -36,7 +36,7 @@ namespace c {
 
 namespace { // anonymous
 
-// if different buffer size is required use 'RequestStreamTransport'
+// todo: make configurable
 const size_t MAX_LENGTH = 1024 * 1024; // the same as default in pion
 const std::string EMPTY_STRING{""};
 

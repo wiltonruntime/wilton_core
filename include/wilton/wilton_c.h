@@ -52,12 +52,16 @@ WILTON_EXPORT char* wilton_log(
             "verifyFile": "path/to/file",
             "verifyOrganization_unit": "ou_name",
         },
-        "documentRoot": {
-            "urlPath": "/path/to/hanldler",
+        "documentRoot": [{
+            "resource": "/path/to/hanldler",
             "dirPath": "path/to/directory",
             "zipPath": "path/to/directory.zip",
-            "cacheMaxAge": uint32_t
-        }, 
+            "cacheMaxAge": uint32_t,
+            "mimeTypes": [{
+                "extension": ".css",
+                "mime": "text/css"
+            }, ...]
+        }, ...], 
         "logging": {
             "appenders": [{
                 "appenderType": "NULL | CONSOLE | FILE | DAILY_ROLLING_FILE",
