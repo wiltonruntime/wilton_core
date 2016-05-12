@@ -37,6 +37,20 @@ class FileHandler {
     json::DocumentRoot conf;
     
 public:
+    // intrusive copy to satisfy std::function
+    FileHandler(FileHandler& other) :
+    conf(std::move(other.conf)) { }
+
+    FileHandler& operator=(const FileHandler&) = delete;
+
+    FileHandler(FileHandler&& other) :
+    conf(std::move(other.conf)) { }
+
+    FileHandler& operator=(FileHandler&& other) {
+        this->conf = std::move(other.conf);
+        return *this;
+    }
+    
     // todo: path leading slash check
     FileHandler(const json::DocumentRoot& conf) :
     conf(conf.clone()) {
@@ -45,6 +59,7 @@ public:
     }
     
     // todo: error messages format
+    // todo: path checks
     void operator()(sh::http_request_ptr& req, sh::tcp_connection_ptr& conn) {
         auto finfun = std::bind(&sh::tcp_connection::finish, conn);
         auto resp = sh::http_response_writer::create(conn, *req, finfun);

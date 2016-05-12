@@ -37,6 +37,14 @@ std::vector<MimeType> mimes_copy(const std::vector<MimeType>& vec) {
     return sr::emplace_to_vector(std::move(copied));
 }
 
+std::vector<MimeType> default_mimes() {
+    std::vector<MimeType> res{};
+    res.emplace_back("txt", "text/plain");
+    res.emplace_back("js", "text/javascript");
+    res.emplace_back("css", "text/css");
+    return res;
+}
+
 } // namepspace
 
 class DocumentRoot {
@@ -45,7 +53,7 @@ public:
     std::string dirPath = "";
     std::string zipPath = "";
     uint32_t cacheMaxAgeSeconds = 604800;
-    std::vector<MimeType> mimeTypes;
+    std::vector<MimeType> mimeTypes = default_mimes();
     
     DocumentRoot(const DocumentRoot&) = delete;
     
@@ -54,11 +62,13 @@ public:
     DocumentRoot(DocumentRoot&& other) :
     resource(std::move(other.resource)),
     dirPath(std::move(other.dirPath)),
+    zipPath(std::move(other.zipPath)),
     cacheMaxAgeSeconds(std::move(other.cacheMaxAgeSeconds)) { }
 
     DocumentRoot& operator=(DocumentRoot&& other) {
         this->resource = std::move(other.resource);
         this->dirPath = std::move(other.dirPath);
+        this->zipPath = std::move(other.zipPath);
         this->cacheMaxAgeSeconds = other.cacheMaxAgeSeconds;
         return *this;
     }

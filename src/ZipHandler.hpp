@@ -38,11 +38,29 @@ class ZipHandler {
     uz::UnzipFileIndex idx;
     
 public:
+    // intrusive copy to satisfy std::function
+    ZipHandler(ZipHandler& other) :
+    conf(std::move(other.conf)),
+    idx(std::move(other.idx)) { }
+
+    ZipHandler& operator=(const ZipHandler&) = delete;
+
+    ZipHandler(ZipHandler&& other) :
+    conf(std::move(other.conf)),
+    idx(std::move(other.idx)) { }
+
+    ZipHandler& operator=(ZipHandler&& other) {
+        this->conf = std::move(other.conf);
+        this->idx = std::move(other.idx);
+        return *this;
+    }
+    
     ZipHandler(const json::DocumentRoot& conf) :
     conf(conf.clone()),
     idx(conf.zipPath) { }    
     
     // todo: error messages format
+    // todo: path checks
     void operator()(sh::http_request_ptr& req, sh::tcp_connection_ptr& conn) {
         auto finfun = std::bind(&sh::tcp_connection::finish, conn);
         auto resp = sh::http_response_writer::create(conn, *req, finfun);

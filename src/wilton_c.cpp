@@ -212,7 +212,7 @@ char* wilton_Request_send_response(wilton_Request* request, const char* data,
             "Null 'request' parameter specified"));
     if (nullptr == data) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'data' parameter specified"));
-    if (data_len <= 0 ||
+    if (data_len < 0 ||
             static_cast<uint64_t>(data_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
             "Invalid 'data_len' parameter specified: [" + sc::to_string(data_len) + "]"));
     try {

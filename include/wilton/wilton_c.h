@@ -52,7 +52,7 @@ WILTON_EXPORT char* wilton_log(
             "verifyFile": "path/to/file",
             "verifyOrganization_unit": "ou_name",
         },
-        "documentRoot": [{
+        "documentRoots": [{
             "resource": "/path/to/hanldler",
             "dirPath": "path/to/directory",
             "zipPath": "path/to/directory.zip",
