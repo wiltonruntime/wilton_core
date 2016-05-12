@@ -87,7 +87,7 @@ public:
                 "Invalid 'logging.appenders.thresholdLevel' field: []"));
     }
 
-    ss::JsonValue to_json() {
+    ss::JsonValue to_json() const {
         return {
             {"appenderType", appenderType},
             {"filePath", filePath},

@@ -41,6 +41,7 @@ namespace c {
 class ResponseStreamSender : public std::enable_shared_from_this<ResponseStreamSender> {
     staticlib::httpserver::http_response_writer_ptr writer;
     std::unique_ptr<std::istream> stream;
+    std::unique_ptr<std::streambuf> streambuf;
 
     std::array<char, 4096> buf;
 

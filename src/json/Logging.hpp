@@ -73,11 +73,11 @@ public:
         }
     }
 
-    ss::JsonValue to_json() {
-        auto japps = sr::transform(sr::refwrap(appenders), [](json::Appender& el) {
+    ss::JsonValue to_json() const {
+        auto japps = sr::transform(sr::refwrap(appenders), [](const json::Appender& el) {
             return el.to_json();
         });
-        auto jlogs = sr::transform(sr::refwrap(loggers), [](json::Logger& el) {
+        auto jlogs = sr::transform(sr::refwrap(loggers), [](const json::Logger& el) {
             return el.to_json();
         });
         return {

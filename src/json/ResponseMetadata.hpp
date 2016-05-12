@@ -76,7 +76,7 @@ public:
         }
     }
 
-    ss::JsonValue to_json() {
+    ss::JsonValue to_json() const {
         return {
             {"statusCode", statusCode},
             {"statusMessage", statusMessage}

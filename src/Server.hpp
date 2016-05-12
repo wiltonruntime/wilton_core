@@ -60,11 +60,11 @@ public:
         }
         for (const auto& dr : conf.documentRoots) {
             if (dr.dirPath.length() > 0) {
-                server->add_handler("GET", dr.resource, FileHandler(dr));
+//                server->add_handler("GET", dr.resource, FileHandler(dr));
             } else if (dr.zipPath.length() > 0) {
-                server->add_handler("GET", dr.resource, ZipHandler(dr));
+//                server->add_handler("GET", dr.resource, ZipHandler(dr));
             } else throw WiltonInternalException(TRACEMSG(std::string() + 
-                    "invalid 'documentRoot': [" + ss::to_json_string(dr) + "]"));
+                    "Invalid 'documentRoot': [" + ss::dump_json_to_string(dr.to_json()) + "]"));
         }
         server->start();
     }

@@ -68,7 +68,7 @@ public:
                 "Invalid 'logging.loggers.value' field: []"));
     }
 
-    ss::JsonValue to_json() {
+    ss::JsonValue to_json() const {
         return {
             {"name", name},
             {"value", value}

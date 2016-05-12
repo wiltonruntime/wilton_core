@@ -31,11 +31,10 @@ namespace sr = staticlib::ranges;
 namespace ss = staticlib::serialization;
 
 std::vector<MimeType> mimes_copy(const std::vector<MimeType>& vec) {
-    auto refs = sr::refwrap(vec);
-    auto copied = sr::transform(refs,[](const MimeType& el) {
+    auto copied = sr::transform(sr::refwrap(vec), [](const MimeType& el) {
         return el.clone();
     });
-    return sr::emplace_to_vector(copied);
+    return sr::emplace_to_vector(std::move(copied));
 }
 
 } // namepspace
@@ -66,12 +65,12 @@ public:
     
     DocumentRoot() { }
     
-    DocumentRoot(const std::string& resource, const std::string dirPath&, 
-            const std::string& zipPath, uint32_t cacheMaxAgeSeconds, 
+    DocumentRoot(std::string resource, std::string dirPath, 
+            std::string zipPath, uint32_t cacheMaxAgeSeconds, 
             const std::vector<MimeType>& mimeTypes) :
-    resource(resource), 
-    dirPath(dirPath), 
-    zipPath(zipPath), 
+    resource(std::move(resource)), 
+    dirPath(std::move(dirPath)), 
+    zipPath(std::move(zipPath)), 
     cacheMaxAgeSeconds(cacheMaxAgeSeconds), 
     mimeTypes(mimes_copy(mimeTypes)) { }
     
@@ -109,8 +108,8 @@ public:
                     "Invalid 'documentRoot.dirPath' and 'documentRoot.zipPath' fields: [], []"));
     }
        
-    ss::JsonValue to_json() {
-        auto mimes = sr::transform(sr::refwrap(mimeTypes), [](MimeType& el) {
+    ss::JsonValue to_json() const {
+        auto mimes = sr::transform(sr::refwrap(mimeTypes), [](const MimeType& el) {
             return el.to_json();
         });
         return {

@@ -39,8 +39,8 @@ class ZipHandler {
     
 public:
     ZipHandler(const json::DocumentRoot& conf) :
-    idx(conf.zipPath),
-    conf(conf.clone()) { }    
+    conf(conf.clone()),
+    idx(conf.zipPath) { }    
     
     // todo: error messages format
     void operator()(sh::http_request_ptr& req, sh::tcp_connection_ptr& conn) {
@@ -51,7 +51,7 @@ public:
         if (!en.is_empty()) {
             auto stream_ptr = uz::open_zip_entry(idx, url_path);
             auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(stream_ptr));
-            set_resp_headers(resp->get_response());
+            set_resp_headers(url_path, resp->get_response());
             sender->send();
         } else {
             resp->get_response().set_status_code(sh::http_request::RESPONSE_CODE_NOT_FOUND);

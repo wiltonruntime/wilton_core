@@ -41,18 +41,21 @@ endif ( )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_endian )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpserver )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_serialization )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
 staticlib_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../wilton_c )
 set ( ${PROJECT_NAME}_DEPS_PUBLIC wilton_c )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PUBLIC_PC REQUIRED ${PROJECT_NAME}_DEPS_PUBLIC )
 set ( ${PROJECT_NAME}_DEPS_PRIVATE
         staticlib_httpserver
-        staticlib_utils
         staticlib_serialization
         staticlib_unzip
+        staticlib_pimpl
+        staticlib_utils
         log4cplus
         jansson
         zlib )

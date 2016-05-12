@@ -62,7 +62,7 @@ public:
                 su::FileDescriptor fd{file_path, 'r'};
                 auto fd_ptr = si::make_source_istream_ptr(std::move(fd));
                 auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(fd_ptr));
-                set_resp_headers(resp->get_response());
+                set_resp_headers(url_path, resp->get_response());
                 sender->send();
             } catch (const std::exception& e) {
                 resp->get_response().set_status_code(sh::http_request::RESPONSE_CODE_NOT_FOUND);

@@ -68,7 +68,7 @@ public:
                 "Invalid 'logging.loggers.level' field: []"));
     }
 
-    ss::JsonValue to_json() {
+    ss::JsonValue to_json() const {
         return {
             {"name", name},
             {"level", level}

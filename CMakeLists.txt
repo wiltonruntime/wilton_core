@@ -49,7 +49,8 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_config
         staticlib_utils
         staticlib_httpserver
-        staticlib_serialization )
+        staticlib_serialization
+        staticlib_unzip )
 wilton_c_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
 # build steps

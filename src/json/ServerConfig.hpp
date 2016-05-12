@@ -14,6 +14,7 @@
 
 #include "asio.hpp"
 
+#include "staticlib/ranges.hpp"
 #include "staticlib/serialization.hpp"
 
 #include "json/DocumentRoot.hpp"
@@ -26,6 +27,7 @@ namespace json {
 
 namespace { // anonymous
 
+namespace sr = staticlib::ranges;
 namespace ss = staticlib::serialization;
 
 }
@@ -46,14 +48,14 @@ public:
     numberOfThreads(other.numberOfThreads),
     tcpPort(other.tcpPort),
     ipAddress(std::move(other.ipAddress)),
-    documentRoot(std::move(other.documentRoot)),
+    documentRoots(std::move(other.documentRoots)),
     logging(std::move(other.logging)) { }
 
     ServerConfig& operator=(ServerConfig&& other) {
         this->numberOfThreads = other.numberOfThreads;
         this->tcpPort = other.tcpPort;
         this->ipAddress = std::move(other.ipAddress);
-        this->documentRoot = std::move(other.documentRoot);
+        this->documentRoots = std::move(other.documentRoots);
         this->logging = std::move(other.logging);
         return *this;
     }
@@ -80,8 +82,12 @@ public:
             } else if ("ipAddress" == name) {
                 this->ipAddress = asio::ip::address_v4::from_string(fi.get_string());
             } else if ("documentRoots" == name) {
-                // TODO: vector
-                this->documentRoot = DocumentRoot(fi.get_value());
+                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw WiltonInternalException(TRACEMSG(std::string() +
+                        "Invalid 'documentRoots' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
+                for (const ss::JsonValue& lo : fi.get_array()) {
+                    auto jd = json::DocumentRoot(lo);
+                    this->documentRoots.emplace_back(std::move(jd));
+                }
             } else if ("logging" == name) {
                 this->logging = Logging(fi.get_value());
             } else {
@@ -94,12 +100,15 @@ public:
         }
     }
     
-    ss::JsonValue to_json() {
+    ss::JsonValue to_json() const {
+        auto drs = sr::transform(sr::refwrap(documentRoots), [](const json::DocumentRoot& el) {
+            return el.to_json();
+        });
         return {
             {"numberOfThreads", numberOfThreads},
             {"tcpPort", tcpPort},
             {"ipAddress", ipAddress.to_string()},
-            {"documentRoot", documentRoot.to_json()},
+            {"documentRoot", drs},
             {"logging", logging.to_json()}
         };
     }

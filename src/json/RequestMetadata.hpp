@@ -69,7 +69,7 @@ public:
     pathname(std::move(pathname)),
     query(std::move(query)) { }
         
-    ss::JsonValue to_json() {
+    ss::JsonValue to_json() const {
         return {
             {"httpVersion", httpVersion},
             {"method", method},
@@ -80,7 +80,7 @@ public:
     }
 
 private:
-    std::string reconstructUrl() {
+    std::string reconstructUrl() const {
         if (0 == query.length()) {
             return pathname;
         } else {
