@@ -13,9 +13,12 @@
 
 #include "staticlib/config.hpp"
 #include "staticlib/httpserver/http_message.hpp"
+#include "staticlib/ranges.hpp"
 #include "staticlib/serialization.hpp"
 
 #include "WiltonInternalException.hpp"
+
+#include "json/Header.hpp"
 
 namespace wilton {
 namespace c {
@@ -24,6 +27,7 @@ namespace json {
 namespace { // anonymous
 
 namespace sh = staticlib::httpserver;
+namespace sr = staticlib::ranges;
 namespace ss = staticlib::serialization;
 
 }
@@ -32,13 +36,7 @@ class ResponseMetadata {
 public:
     uint16_t statusCode = sh::http_message::RESPONSE_CODE_OK;
     std::string statusMessage = sh::http_message::RESPONSE_MESSAGE_OK;
-
-    /*
-    "headers" :{
-    "Header-Name" : "header_value",
-    ...
-    }    
-     * */
+    std::vector<json::Header> headers;
 
     ResponseMetadata(const ResponseMetadata&) = delete;
 
@@ -46,11 +44,13 @@ public:
 
     ResponseMetadata(ResponseMetadata&& other) :
     statusCode(other.statusCode),
-    statusMessage(std::move(other.statusMessage)) { }
+    statusMessage(std::move(other.statusMessage)),
+    headers(std::move(other.headers)) { }
 
     ResponseMetadata& operator=(ResponseMetadata&& other) {
         statusCode = other.statusCode;
         statusMessage = std::move(other.statusMessage);
+        headers = std::move(other.headers);
         return *this;
     }
     
@@ -69,6 +69,14 @@ public:
                 if (0 == fi.get_string().length()) throw WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'statusMessage' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->statusMessage = fi.get_string();
+            } else if ("headers" == name) {
+                if (ss::JsonType::OBJECT != fi.get_type()) throw WiltonInternalException(TRACEMSG(std::string() +
+                        "Invalid 'headers' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
+                for (const auto& hf : fi.get_object()) {
+                    if (ss::JsonType::STRING != hf.get_type()) throw WiltonInternalException(TRACEMSG(std::string() +
+                            "Invalid 'headers' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
+                    this->headers.emplace_back(hf.get_name(), hf.get_string());
+                }
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
                         "Unknown field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
@@ -77,9 +85,14 @@ public:
     }
 
     ss::JsonValue to_json() const {
+        auto ha = sr::transform(sr::refwrap(headers), [](const json::Header & el) {
+            return el.to_json();
+        });
+        std::vector<ss::JsonField> hfields = sr::emplace_to_vector(std::move(ha));
         return {
             {"statusCode", statusCode},
-            {"statusMessage", statusMessage}
+            {"statusMessage", statusMessage},
+            {"headers", std::move(hfields)}
         };
     }
     

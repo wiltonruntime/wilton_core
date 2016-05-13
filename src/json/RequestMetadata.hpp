@@ -10,11 +10,15 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include "staticlib/config.hpp"
+#include "staticlib/ranges.hpp"
 #include "staticlib/serialization.hpp"
 
 #include "WiltonInternalException.hpp"
+
+#include "json/Header.hpp"
 
 namespace wilton {
 namespace c {
@@ -22,6 +26,7 @@ namespace json {
 
 namespace { // anonymous
 
+namespace sr = staticlib::ranges;
 namespace ss = staticlib::serialization;
 
 }
@@ -31,7 +36,7 @@ class RequestMetadata {
     std::string method;
     std::string pathname;
     std::string query;
-    
+    std::vector<json::Header> headers;
 
     /*
      * "queryParams": {}
@@ -52,30 +57,38 @@ public:
     httpVersion(std::move(other.httpVersion)),
     method(std::move(other.method)),
     pathname(std::move(other.pathname)),
-    query(std::move(other.query)) { }
+    query(std::move(other.query)),
+    headers(std::move(other.headers)) { }
     
     RequestMetadata& operator=(RequestMetadata&& other) {
         httpVersion = std::move(other.httpVersion);
         method = std::move(other.method);
         pathname = std::move(other.pathname);
         query = std::move(other.query);
+        headers = std::move(other.headers);
         return *this;
     }
     
     RequestMetadata(std::string httpVersion, std::string method, std::string pathname,
-            std::string query) :
+            std::string query, std::vector<json::Header> headers) :
     httpVersion(std::move(httpVersion)),
     method(std::move(method)),
     pathname(std::move(pathname)),
-    query(std::move(query)) { }
+    query(std::move(query)),
+    headers(std::move(headers)) { }
         
     ss::JsonValue to_json() const {
+        auto ha = sr::transform(sr::refwrap(headers), [](const json::Header& el) {
+            return el.to_json();
+        });
+        std::vector<ss::JsonField> hfields = sr::emplace_to_vector(std::move(ha));
         return {
             {"httpVersion", httpVersion},
             {"method", method},
             {"pathname", pathname},
             {"query", query},
             {"url", reconstructUrl()},
+            {"headers", std::move(hfields)}
         };
     }
 

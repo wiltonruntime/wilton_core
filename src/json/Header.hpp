@@ -13,7 +13,7 @@
 #include "staticlib/config.hpp"
 #include "staticlib/serialization.hpp"
 
-#include "WiltonInternalException"
+#include "WiltonInternalException.hpp"
 
 namespace wilton {
 namespace c {
@@ -45,6 +45,10 @@ public:
     }
 
     Header() { }
+    
+    Header(std::string name, std::string value) :
+    name(std::move(name)),
+    value(std::move(value)) { }
 
     Header(const ss::JsonValue& json) {
         for (const ss::JsonField& fi : json.get_object()) {
@@ -63,16 +67,13 @@ public:
             }
         }
         if (0 == name.length()) throw WiltonInternalException(TRACEMSG(std::string() +
-                "Invalid 'logging.loggers.name' field: []"));
+                "Invalid 'header.name' field: []"));
         if (0 == value.length()) throw WiltonInternalException(TRACEMSG(std::string() +
-                "Invalid 'logging.loggers.value' field: []"));
+                "Invalid 'header.value' field: []"));
     }
 
-    ss::JsonValue to_json() const {
-        return {
-            {"name", name},
-            {"value", value}
-        };
+    ss::JsonField to_json() const {
+        return ss::JsonField{name, ss::JsonValue{value}};
     }
 };
 
