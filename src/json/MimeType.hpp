@@ -45,9 +45,9 @@ public:
 
     MimeType() { }
     
-    MimeType(std::string extension, std::string mime) :
-    extension(std::move(extension)),
-    mime(std::move(mime)) { }
+    MimeType(const std::string& extension, const std::string& mime) :
+    extension(extension.data(), extension.length()),
+    mime(mime.data(), mime.length()) { }
 
     MimeType(const ss::JsonValue& json) {
         for (const ss::JsonField& fi : json.get_object()) {

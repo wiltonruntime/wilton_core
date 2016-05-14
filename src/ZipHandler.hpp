@@ -9,11 +9,11 @@
 #define	WILTON_C_ZIPHANDLER_HPP
 
 #include <cstdint>
+#include <memory>
 #include <string>
 
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
-#include "staticlib/httpserver.hpp"
 #include "staticlib/unzip.hpp"
 
 #include "ResponseStreamSender.hpp"
@@ -34,40 +34,34 @@ namespace su = staticlib::utils;
 } // namespace
 
 class ZipHandler {
-    json::DocumentRoot conf;
-    uz::UnzipFileIndex idx;
+    std::shared_ptr<json::DocumentRoot> conf;
+    std::shared_ptr<uz::UnzipFileIndex> idx;
     
 public:
-    // intrusive copy to satisfy std::function
-    ZipHandler(ZipHandler& other) :
-    conf(std::move(other.conf)),
-    idx(std::move(other.idx)) { }
+    // must be copyable to satisfy std::function
+    ZipHandler(const ZipHandler& other) :
+    conf(other.conf),
+    idx(other.idx) { }
 
-    ZipHandler& operator=(const ZipHandler&) = delete;
-
-    ZipHandler(ZipHandler&& other) :
-    conf(std::move(other.conf)),
-    idx(std::move(other.idx)) { }
-
-    ZipHandler& operator=(ZipHandler&& other) {
-        this->conf = std::move(other.conf);
-        this->idx = std::move(other.idx);
+    ZipHandler& operator=(const ZipHandler& other) {
+        this->conf = other.conf;
+        this->idx = other.idx;
         return *this;
     }
     
     ZipHandler(const json::DocumentRoot& conf) :
-    conf(conf.clone()),
-    idx(conf.zipPath) { }    
+    conf(std::make_shared<json::DocumentRoot>(conf.clone())),
+    idx(std::make_shared<uz::UnzipFileIndex>(conf.zipPath)) { }    
     
     // todo: error messages format
     // todo: path checks
     void operator()(sh::http_request_ptr& req, sh::tcp_connection_ptr& conn) {
         auto finfun = std::bind(&sh::tcp_connection::finish, conn);
         auto resp = sh::http_response_writer::create(conn, *req, finfun);
-        std::string url_path = std::string{req->get_resource(), conf.resource.length()};
-        uz::FileEntry en = idx.find_zip_entry(url_path);        
+        std::string url_path = std::string{req->get_resource(), conf->resource.length()};
+        uz::FileEntry en = idx->find_zip_entry(url_path);        
         if (!en.is_empty()) {
-            auto stream_ptr = uz::open_zip_entry(idx, url_path);
+            auto stream_ptr = uz::open_zip_entry(*idx, url_path);
             auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(stream_ptr));
             set_resp_headers(url_path, resp->get_response());
             sender->send();
@@ -84,7 +78,7 @@ public:
 private:
     void set_resp_headers(const std::string& url_path, sh::http_response& resp) {
         std::string ct{"application/octet-stream"};
-        for (const auto& mi : conf.mimeTypes) {
+        for (const auto& mi : conf->mimeTypes) {
             if (su::ends_with(url_path, mi.extension)) {
                 ct = mi.mime;
                 break;
@@ -92,7 +86,7 @@ private:
         }
         resp.change_header("Content-Type", ct);
         // set caching
-        resp.change_header("Cache-Control", "max-age=" + sc::to_string(conf.cacheMaxAgeSeconds) + ", public");
+        resp.change_header("Cache-Control", "max-age=" + sc::to_string(conf->cacheMaxAgeSeconds) + ", public");
     }    
     
 };

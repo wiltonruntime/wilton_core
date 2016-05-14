@@ -9,6 +9,7 @@
 #define	WILTON_C_FILEHANDLER_HPP
 
 #include <cstdint>
+#include <memory>
 #include <string>
 
 #include "staticlib/config.hpp"
@@ -34,27 +35,22 @@ namespace su = staticlib::utils;
 } //namespace
 
 class FileHandler {
-    json::DocumentRoot conf;
+    std::shared_ptr<json::DocumentRoot> conf;
     
 public:
-    // intrusive copy to satisfy std::function
-    FileHandler(FileHandler& other) :
-    conf(std::move(other.conf)) { }
+    // must be copyable to satisfy std::function
+    FileHandler(const FileHandler& other) :
+    conf(other.conf) { }
 
-    FileHandler& operator=(const FileHandler&) = delete;
-
-    FileHandler(FileHandler&& other) :
-    conf(std::move(other.conf)) { }
-
-    FileHandler& operator=(FileHandler&& other) {
-        this->conf = std::move(other.conf);
+    FileHandler& operator=(const FileHandler& other) {
+        this->conf = other.conf;
         return *this;
     }
-    
+
     // todo: path leading slash check
     FileHandler(const json::DocumentRoot& conf) :
-    conf(conf.clone()) {
-        if (0 == conf.dirPath.length()) throw WiltonInternalException(TRACEMSG(std::string() + 
+    conf(std::make_shared<json::DocumentRoot>(conf.clone())) {
+        if (0 == this->conf->dirPath.length()) throw WiltonInternalException(TRACEMSG(std::string() + 
                 "Invalid empty 'dirPath' specified"));
     }
     
@@ -63,8 +59,8 @@ public:
     void operator()(sh::http_request_ptr& req, sh::tcp_connection_ptr& conn) {
         auto finfun = std::bind(&sh::tcp_connection::finish, conn);
         auto resp = sh::http_response_writer::create(conn, *req, finfun);
-        std::string url_path = std::string{req->get_resource(), conf.resource.length()};
-        std::string file_path = std::string{conf.dirPath} + "/" + url_path;
+        std::string url_path = std::string{req->get_resource(), conf->resource.length()};
+        std::string file_path = std::string{conf->dirPath} + "/" + url_path;
         if (file_path.find("..") != std::string::npos) {
             resp->get_response().set_status_code(sh::http_request::RESPONSE_CODE_BAD_REQUEST);
             resp->get_response().set_status_message(sh::http_request::RESPONSE_MESSAGE_BAD_REQUEST);
@@ -93,7 +89,7 @@ public:
 private:
     void set_resp_headers(const std::string& url_path, sh::http_response& resp) {
         std::string ct{"application/octet-stream"};
-        for(const auto& mi : conf.mimeTypes) {
+        for(const auto& mi : conf->mimeTypes) {
             if (su::ends_with(url_path, mi.extension)) {
                 ct = mi.mime;
                 break;
@@ -101,7 +97,7 @@ private:
         }
         resp.change_header("Content-Type", ct);
         // set caching
-        resp.change_header("Cache-Control", "max-age=" + sc::to_string(conf.cacheMaxAgeSeconds) + ", public");
+        resp.change_header("Cache-Control", "max-age=" + sc::to_string(conf->cacheMaxAgeSeconds) + ", public");
     }
     
 };

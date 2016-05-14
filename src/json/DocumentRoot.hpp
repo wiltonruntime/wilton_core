@@ -63,24 +63,26 @@ public:
     resource(std::move(other.resource)),
     dirPath(std::move(other.dirPath)),
     zipPath(std::move(other.zipPath)),
-    cacheMaxAgeSeconds(std::move(other.cacheMaxAgeSeconds)) { }
+    cacheMaxAgeSeconds(other.cacheMaxAgeSeconds),
+    mimeTypes(std::move(other.mimeTypes)) { }
 
     DocumentRoot& operator=(DocumentRoot&& other) {
         this->resource = std::move(other.resource);
         this->dirPath = std::move(other.dirPath);
         this->zipPath = std::move(other.zipPath);
         this->cacheMaxAgeSeconds = other.cacheMaxAgeSeconds;
+        this->mimeTypes = std::move(other.mimeTypes);
         return *this;
     }
     
     DocumentRoot() { }
     
-    DocumentRoot(std::string resource, std::string dirPath, 
-            std::string zipPath, uint32_t cacheMaxAgeSeconds, 
+    DocumentRoot(const std::string& resource, const std::string& dirPath, 
+            const std::string& zipPath, uint32_t cacheMaxAgeSeconds, 
             const std::vector<MimeType>& mimeTypes) :
-    resource(std::move(resource)), 
-    dirPath(std::move(dirPath)), 
-    zipPath(std::move(zipPath)), 
+    resource(resource.data(), resource.length()), 
+    dirPath(dirPath.data(), dirPath.length()), 
+    zipPath(zipPath.data(), zipPath.length()), 
     cacheMaxAgeSeconds(cacheMaxAgeSeconds), 
     mimeTypes(mimes_copy(mimeTypes)) { }
     
