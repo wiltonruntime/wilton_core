@@ -224,12 +224,32 @@ char* wilton_Request_send_response(wilton_Request* request, const char* data,
     }
 }
 
-/*
-WILTON_EXPORT char* wilton_Request_send_response_chunked(
+char* wilton_Request_send_file(
         wilton_Request* request,
-        void* read_ctx,
-        int (*read)(
-                void* read_ctx,
-                char* buf,
-                int len));
- */ 
+        const char* file_path,
+        int file_path_len,
+        void* finalizer_ctx,
+        void (*finalizer_cb)(
+                void* finalizer_ctx,
+                bool sent_successfully)) {
+    if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'request' parameter specified"));
+    if (nullptr == file_path) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'file_path' parameter specified"));
+    if (file_path_len <= 0 ||
+            static_cast<uint32_t> (file_path_len) > std::numeric_limits<uint16_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            "Invalid 'file_path_len' parameter specified: [" + sc::to_string(file_path_len) + "]"));
+    if (nullptr == finalizer_cb) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'finalizer_cb' parameter specified"));
+    try {
+        uint16_t file_path_len_u16 = static_cast<uint16_t> (file_path_len);
+        std::string file_path_str{file_path, file_path_len_u16};
+        request->impl().send_file(file_path_str, 
+                [finalizer_ctx, finalizer_cb](bool success) {
+                    finalizer_cb(finalizer_ctx, success);
+                });
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+    }
+}

@@ -17,8 +17,11 @@
 #include <unordered_set>
 
 #include "staticlib/config.hpp"
+#include "staticlib/io.hpp"
 #include "staticlib/httpserver.hpp"
+#include "staticlib/utils.hpp"
 
+#include "ResponseStreamSender.hpp"
 #include "StringPayloadHandler.hpp"
 #include "WiltonInternalException.hpp"
 
@@ -32,7 +35,9 @@ namespace c {
 namespace { // anonymous
 
 namespace sc = staticlib::config;
+namespace si = staticlib::io;
 namespace sh = staticlib::httpserver;
+namespace su = staticlib::utils;
 
 const std::unordered_set<std::string> HEADERS_DISCARD_DUPLICATES{
         "age", "authorization", "content-length", "content-type", "etag", "expires", 
@@ -79,6 +84,15 @@ public:
                 "Invalid request lifecycle operation, request is already committed"));
         resp->write(data, data_len);
         resp->send();
+    }
+    
+    void send_file(std::string file_path, std::function<void(bool)> finalizer) {
+        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw WiltonInternalException(TRACEMSG(std::string() +
+                "Invalid request lifecycle operation, request is already committed"));
+        su::FileDescriptor fd{file_path, 'r'};
+        auto fd_ptr = si::make_source_istream_ptr(std::move(fd));
+        auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(fd_ptr), std::move(finalizer));
+        sender->send();
     }
     
     void finish() {

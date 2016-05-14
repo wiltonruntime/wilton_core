@@ -135,16 +135,14 @@ WILTON_EXPORT char* wilton_Request_send_response(
         const char* data,
         int data_len);
 
-/* TODO
-WILTON_EXPORT char* wilton_Request_send_response_chunked(
+WILTON_EXPORT char* wilton_Request_send_file(
         wilton_Request* request,
-        void* read_ctx,
-        int (*read)(
-                void* read_ctx,
-                char* buf,
-                int len));
- */ 
-
+        const char* file_path,
+        int file_path_len,
+        void* finalizer_ctx,
+        void (*finalizer_cb)(
+                void* finalizer_ctx,
+                bool sent_successfully));
 
 
 #ifdef	__cplusplus

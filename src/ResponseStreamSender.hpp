@@ -41,15 +41,18 @@ namespace c {
 class ResponseStreamSender : public std::enable_shared_from_this<ResponseStreamSender> {
     staticlib::httpserver::http_response_writer_ptr writer;
     std::unique_ptr<std::istream> stream;
-    std::unique_ptr<std::streambuf> streambuf;
+    std::function<void(bool)> finalizer;
 
-    std::array<char, 4096> buf;
+    // TODO: up me to 4096, 4 used for callbacks test only 
+    std::array<char, 4> buf;
 
 public:
     ResponseStreamSender(staticlib::httpserver::http_response_writer_ptr writer, 
-            std::unique_ptr<std::istream>&& stream) :
+            std::unique_ptr<std::istream>&& stream, 
+            std::function<void(bool)> finalizer = [](bool){}) :
     writer(std::move(writer)),
-    stream(std::move(stream)) { }
+    stream(std::move(stream)),
+    finalizer(std::move(finalizer)) { }
 
     void send() {
         asio::error_code ec{};
@@ -69,13 +72,16 @@ public:
                 } else {
                     writer->write(buf.data(), len);
                     writer->send_final_chunk();
+                    finalizer(true);
                 }
             } else {
                 writer->send_final_chunk();
+                finalizer(true);
             }
         } else {
             // make sure it will get closed
             writer->get_connection()->set_lifecycle(staticlib::httpserver::tcp_connection::LIFECYCLE_CLOSE);
+            finalizer(false);
         }
     }
 
