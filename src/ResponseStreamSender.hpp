@@ -63,8 +63,8 @@ public:
         if (!ec) {
             staticlib::io::streambuf_source src{stream->rdbuf()};
             size_t len = staticlib::io::read_all(src, buf.data(), buf.size());
+            writer->clear();
             if (len > 0) {
-                writer->clear();
                 if (buf.size() == len) {
                     writer->write_no_copy(buf.data(), len);
                     writer->send_chunk(std::bind(&ResponseStreamSender::handle_write, shared_from_this(),
