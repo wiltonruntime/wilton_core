@@ -8,7 +8,7 @@
 // C++ used here instead of C to support static linking
 // dynamic linking will work with plain C
 
-#include "wilton/wilton_c.h"
+#include "wilton/wilton.h"
 
 #include <cstdio>
 #include <cstdlib>

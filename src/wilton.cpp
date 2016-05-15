@@ -1,11 +1,11 @@
 /* 
- * File:   wilton_c.cpp
+ * File:   wilton.cpp
  * Author: alex
  *
  * Created on April 30, 2016, 11:50 PM
  */
 
-#include "wilton/wilton_c.h"
+#include "wilton/wilton.h"
 
 #include "staticlib/config.hpp"
 #include "staticlib/serialization.hpp"

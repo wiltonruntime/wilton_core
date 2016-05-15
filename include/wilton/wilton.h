@@ -1,24 +1,30 @@
 /* 
- * File:   wilton_c.h
+ * File:   wilton.h
  * Author: alex
  *
  * Created on April 30, 2016, 11:49 PM
  */
 
-#ifndef WILTON_C_H
-#define	WILTON_C_H
+#ifndef WILTON_H
+#define	WILTON_H
 
-//#ifdef _WIN32
-//#ifdef WILTON_DLL_IMPORT
-//#define WILTON_EXPORT __declspec(dllimport)
-//#else
-//#define WILTON_EXPORT __declspec(dllexport)
-//#endif
-//#else
-//#define WILTON_EXPORT __attribute__ ((visibility ("default")))
-//#endif
-// todo: shared support
+#ifdef WILTON_SHARED
+#ifdef _WIN32
+#ifdef WILTON_SHARED_IMPORT
+#define WILTON_EXPORT __declspec(dllimport)
+#else
+#define WILTON_EXPORT __declspec(dllexport)
+#endif // WILTON_SHARED_IMPORT
+#else
+#ifdef WILTON_SHARED_IMPORT
 #define WILTON_EXPORT
+#else
+#define WILTON_EXPORT __attribute__ ((visibility ("default")))
+#endif // WILTON_SHARED_IMPORT
+#endif // _WIN32
+#else
+#define WILTON_EXPORT
+#endif // WILTON_SHARED
 
 #ifdef	__cplusplus
 extern "C" {
@@ -66,7 +72,7 @@ WILTON_EXPORT char* wilton_log(
             "appenders": [{
                 "appenderType": "NULL | CONSOLE | FILE | DAILY_ROLLING_FILE",
                 "filePath": "path/to/log/file",
-                "layout": "%d{%Y-%m-%d %H:%M:%S,%q} [%-5p %-5.5T %-20.20c] %m%n",
+                "layout": "%d{%Y-%m-%d %H:%M:%S,%q} [%-5p %-5.5t %-20.20c] %m%n",
                 "thresholdLevel": "TRACE | DEBUG | INFO | WARN | ERROR | FATAL"
             }, ... ],
             "loggers": [{
@@ -149,5 +155,4 @@ WILTON_EXPORT char* wilton_Request_send_file(
 }
 #endif
 
-#endif	/* WILTON_C_H */
-
+#endif	/* WILTON_H */
