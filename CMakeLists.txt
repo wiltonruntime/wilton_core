@@ -27,6 +27,9 @@ if ( NOT DEFINED STATICLIB_DEPS )
     set ( STATICLIB_DEPS ${CMAKE_CURRENT_LIST_DIR}/../../staticlibs/ CACHE INTERNAL "" )    
 endif ( )
 
+# dep options
+set ( staticlib_httpserver_USE_LOG4CPLUS ON CACHE BOOL "Use log4cplus lib for logging" )
+
 # docs
 option ( ${PROJECT_NAME}_ENABLE_DOCS "Generate doxyfile and exit build" OFF )
 if ( ${PROJECT_NAME}_ENABLE_DOCS )

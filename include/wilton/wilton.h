@@ -148,7 +148,7 @@ WILTON_EXPORT char* wilton_Request_send_file(
         void* finalizer_ctx,
         void (*finalizer_cb)(
                 void* finalizer_ctx,
-                bool sent_successfully));
+                int sent_successfully));
 
 
 #ifdef	__cplusplus

@@ -231,7 +231,7 @@ char* wilton_Request_send_file(
         void* finalizer_ctx,
         void (*finalizer_cb)(
                 void* finalizer_ctx,
-                bool sent_successfully)) {
+                int sent_successfully)) {
     if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'request' parameter specified"));
     if (nullptr == file_path) return su::alloc_copy(TRACEMSG(std::string() +
@@ -246,7 +246,8 @@ char* wilton_Request_send_file(
         std::string file_path_str{file_path, file_path_len_u16};
         request->impl().send_file(file_path_str, 
                 [finalizer_ctx, finalizer_cb](bool success) {
-                    finalizer_cb(finalizer_ctx, success);
+                    int success_int = success ? 1 : 0;
+                    finalizer_cb(finalizer_ctx, success_int);
                 });
         return nullptr;
     } catch (const std::exception& e) {
