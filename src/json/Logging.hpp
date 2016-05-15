@@ -68,7 +68,7 @@ public:
                 }
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
-                        "Unknown 'logging' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
+                        "Unknown 'logging' field: [" + name + "]"));
             }
         }
     }

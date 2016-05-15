@@ -62,7 +62,7 @@ public:
                 this->mime = fi.get_string();
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
-                        "Unknown 'mimeType' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
+                        "Unknown 'mimeType' field: [" + name + "]"));
             }
         }
         if (0 == extension.length()) throw WiltonInternalException(TRACEMSG(std::string() +

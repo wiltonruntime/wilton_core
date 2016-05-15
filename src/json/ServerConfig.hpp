@@ -92,7 +92,7 @@ public:
                 this->logging = Logging(fi.get_value());
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
-                        "Unknown field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
+                        "Unknown field: [" + name + "]"));
             }
         }
         if (0 == logging.appenders.size()) {

@@ -111,7 +111,7 @@ public:
                 this->cacheMaxAgeSeconds = fi.get_uint32();
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
-                        "Unknown 'documentRoot' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
+                        "Unknown 'documentRoot' field: [" + name + "]"));
             }
         }
         if (0 == resource.length()) throw WiltonInternalException(TRACEMSG(std::string() +

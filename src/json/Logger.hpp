@@ -59,7 +59,7 @@ public:
                 this->level = fi.get_string();
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
-                        "Unknown 'logging.loggers' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
+                        "Unknown 'logging.loggers' field: [" + fname + "]"));
             }
         }
         if (0 == name.length()) throw WiltonInternalException(TRACEMSG(std::string() +

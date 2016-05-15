@@ -79,7 +79,7 @@ public:
                 }
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
-                        "Unknown field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
+                        "Unknown field: [" + name + "]"));
             }
         }
     }

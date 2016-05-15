@@ -73,7 +73,7 @@ public:
                 this->thresholdLevel = fi.get_string();
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
-                        "Unknown 'logging.appenders' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
+                        "Unknown 'logging.appenders' field: [" + name + "]"));
             }
         }
         if (0 == appenderType.length()) throw WiltonInternalException(TRACEMSG(std::string() +
