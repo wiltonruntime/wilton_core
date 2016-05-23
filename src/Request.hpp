@@ -63,7 +63,8 @@ public:
         std::string http_ver = sc::to_string(req->get_version_major()) + 
                 "." + sc::to_string(req->get_version_minor());
         auto headers = get_request_headers(*req);
-        return json::RequestMetadata(http_ver, req->get_method(), req->get_resource(), 
+        std::string protocol = resp->get_connection()->get_ssl_flag() ? "https" : "http";
+        return json::RequestMetadata(http_ver, protocol, req->get_method(), req->get_resource(), 
                 req->get_query_string(), std::move(headers));
     }
     

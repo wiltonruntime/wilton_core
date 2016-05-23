@@ -103,9 +103,11 @@ WILTON_EXPORT char* wilton_Server_stop_server(
 // For all other headers, the values are joined together with ', '.
 {
     "httpVersion": "1.1",
+    "protocol": "http|https",
     "method": "GET|POST|PUT|DELETE",
-    "resource": "/path/to/hanldler",
-    "queryString": "/path/to/hanldler?param1=val1...",
+    "pathname": "/path/to/hanldler",
+    "query": "param1=val1...",
+    "url": "/path/to/hanldler?param1=val1...",
     "headers": {
         "Header-Name": "header_value",
         ...

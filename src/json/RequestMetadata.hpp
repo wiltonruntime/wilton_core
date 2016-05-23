@@ -33,21 +33,12 @@ namespace ss = staticlib::serialization;
 
 class RequestMetadata {
     std::string httpVersion;
+    std::string protocol;
     std::string method;
     std::string pathname;
     std::string query;
     std::vector<json::Header> headers;
 
-    /*
-     * "queryParams": {}
- "remoteIp"
-"headers" :
-{
-    "Header-Name" : "header_value",
-    ...
-}
-     */
-    
 public:
     RequestMetadata(const RequestMetadata&) = delete;
     
@@ -55,6 +46,7 @@ public:
     
     RequestMetadata(RequestMetadata&& other) :
     httpVersion(std::move(other.httpVersion)),
+    protocol(std::move(other.protocol)),
     method(std::move(other.method)),
     pathname(std::move(other.pathname)),
     query(std::move(other.query)),
@@ -62,6 +54,7 @@ public:
     
     RequestMetadata& operator=(RequestMetadata&& other) {
         httpVersion = std::move(other.httpVersion);
+        protocol = std::move(other.protocol);
         method = std::move(other.method);
         pathname = std::move(other.pathname);
         query = std::move(other.query);
@@ -69,12 +62,14 @@ public:
         return *this;
     }
     
-    RequestMetadata(std::string httpVersion, std::string method, std::string pathname,
-            std::string query, std::vector<json::Header> headers) :
-    httpVersion(std::move(httpVersion)),
-    method(std::move(method)),
-    pathname(std::move(pathname)),
-    query(std::move(query)),
+    RequestMetadata(const std::string& httpVersion, const std::string& protocol, 
+            const std::string& method, const std::string& pathname,
+            const std::string& query, std::vector<json::Header> headers) :
+    httpVersion(httpVersion.data(), httpVersion.length()),
+    protocol(protocol.data(), protocol.length()),
+    method(method.data(), method.length()),
+    pathname(pathname.data(), pathname.length()),
+    query(query.data(), query.length()),
     headers(std::move(headers)) { }
         
     ss::JsonValue to_json() const {
@@ -84,6 +79,7 @@ public:
         std::vector<ss::JsonField> hfields = sr::emplace_to_vector(std::move(ha));
         return {
             {"httpVersion", httpVersion},
+            {"protocol", protocol},
             {"method", method},
             {"pathname", pathname},
             {"query", query},
