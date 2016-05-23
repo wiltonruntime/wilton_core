@@ -62,7 +62,7 @@ WILTON_EXPORT char* wilton_log(
             "resource": "/path/to/hanldler",
             "dirPath": "path/to/directory",
             "zipPath": "path/to/directory.zip",
-            "cacheMaxAge": uint32_t,
+            "cacheMaxAgeSeconds": uint32_t,
             "mimeTypes": [{
                 "extension": ".css",
                 "mime": "text/css"

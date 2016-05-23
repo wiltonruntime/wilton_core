@@ -39,9 +39,13 @@ std::vector<MimeType> mimes_copy(const std::vector<MimeType>& vec) {
 
 std::vector<MimeType> default_mimes() {
     std::vector<MimeType> res{};
-    res.emplace_back("txt", "text/plain");
-    res.emplace_back("js", "text/javascript");
-    res.emplace_back("css", "text/css");
+    res.emplace_back("txt",  "text/plain");
+    res.emplace_back("js",   "text/javascript");
+    res.emplace_back("css",  "text/css");
+    res.emplace_back("html", "text/html");
+    res.emplace_back("png",  "image/png");
+    res.emplace_back("jpg",  "image/jpeg");
+    res.emplace_back("svg",  "image/svg+xml");
     return res;
 }
 
@@ -109,6 +113,13 @@ public:
                             "Invalid 'documentRoot.cacheMaxAgeSeconds' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->cacheMaxAgeSeconds = fi.get_uint32();
+            } else if ("mimeTypes" == name) {
+                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw WiltonInternalException(TRACEMSG(std::string() +
+                        "Invalid 'documentRoot.mimeTypes' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
+                for (const ss::JsonValue& ap : fi.get_array()) {
+                    auto ja = json::MimeType(ap);
+                    mimeTypes.emplace_back(std::move(ja));
+                }
             } else {
                 throw WiltonInternalException(TRACEMSG(std::string() +
                         "Unknown 'documentRoot' field: [" + name + "]"));
