@@ -58,7 +58,7 @@ public:
     void operator()(sh::http_request_ptr& req, sh::tcp_connection_ptr& conn) {
         auto finfun = std::bind(&sh::tcp_connection::finish, conn);
         auto resp = sh::http_response_writer::create(conn, *req, finfun);
-        std::string url_path = std::string{req->get_resource(), conf->resource.length()};
+        std::string url_path = conf->zipInnerPrefix + std::string{req->get_resource(), conf->resource.length()};
         uz::FileEntry en = idx->find_zip_entry(url_path);        
         if (!en.is_empty()) {
             auto stream_ptr = uz::open_zip_entry(*idx, url_path);
