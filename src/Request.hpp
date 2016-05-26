@@ -19,8 +19,10 @@
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
 #include "staticlib/httpserver.hpp"
+#include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
+#include "MustacheProcessor.hpp"
 #include "ResponseStreamSender.hpp"
 #include "StringPayloadHandler.hpp"
 #include "WiltonInternalException.hpp"
@@ -37,6 +39,7 @@ namespace { // anonymous
 namespace sc = staticlib::config;
 namespace si = staticlib::io;
 namespace sh = staticlib::httpserver;
+namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
 
 const std::unordered_set<std::string> HEADERS_DISCARD_DUPLICATES{
@@ -93,6 +96,15 @@ public:
         su::FileDescriptor fd{file_path, 'r'};
         auto fd_ptr = si::make_source_istream_ptr(std::move(fd));
         auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(fd_ptr), std::move(finalizer));
+        sender->send();
+    }
+    
+    void send_mustache(std::string mustache_file_path, ss::JsonValue json) {
+        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw WiltonInternalException(TRACEMSG(std::string() +
+                "Invalid request lifecycle operation, request is already committed"));
+        MustacheProcessor mp{mustache_file_path, std::move(json)};
+        auto mp_ptr = si::make_source_istream_ptr(std::move(mp));
+        auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(mp_ptr));
         sender->send();
     }
     

@@ -47,6 +47,7 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
     endif ( )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_mstch )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
@@ -62,6 +63,7 @@ endif ( )
 set ( ${PROJECT_NAME}_DEPS
         jansson
         log4cplus
+        mstch
         staticlib_config
         staticlib_utils
         staticlib_httpserver

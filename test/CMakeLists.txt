@@ -39,6 +39,7 @@ if ( NOT STATICLIB_TOOLCHAIN MATCHES "linux_[^_]+_[^_]+" )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
 endif ( )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_mstch )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
@@ -58,6 +59,7 @@ set ( ${PROJECT_NAME}_DEPS_PRIVATE
         staticlib_pimpl
         staticlib_utils
         log4cplus
+        mstch
         jansson
         zlib )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PRIVATE_PC REQUIRED ${PROJECT_NAME}_DEPS_PRIVATE )

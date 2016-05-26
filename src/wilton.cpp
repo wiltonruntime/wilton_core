@@ -231,7 +231,7 @@ char* wilton_Request_send_file(
         void* finalizer_ctx,
         void (*finalizer_cb)(
                 void* finalizer_ctx,
-                int sent_successfully)) {
+                int sent_successfully)) /* noexcept */ {
     if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'request' parameter specified"));
     if (nullptr == file_path) return su::alloc_copy(TRACEMSG(std::string() +
@@ -244,7 +244,7 @@ char* wilton_Request_send_file(
     try {
         uint16_t file_path_len_u16 = static_cast<uint16_t> (file_path_len);
         std::string file_path_str{file_path, file_path_len_u16};
-        request->impl().send_file(file_path_str, 
+        request->impl().send_file(std::move(file_path_str), 
                 [finalizer_ctx, finalizer_cb](bool success) {
                     int success_int = success ? 1 : 0;
                     finalizer_cb(finalizer_ctx, success_int);
@@ -253,4 +253,35 @@ char* wilton_Request_send_file(
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
     }
+}
+
+char* wilton_Request_send_mustache(
+        wilton_Request* request,
+        const char* mustache_file_path,
+        int mustache_file_path_len,
+        const char* values_json,
+        int values_json_len) /* noexcept */ {
+    if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'request' parameter specified"));
+    if (nullptr == mustache_file_path) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'mustache_file_path' parameter specified"));
+    if (mustache_file_path_len <= 0 ||
+            static_cast<uint32_t> (mustache_file_path_len) > std::numeric_limits<uint16_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            "Invalid 'mustache_file_path_len' parameter specified: [" + sc::to_string(mustache_file_path_len) + "]"));
+    if (nullptr == values_json) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'values_json' parameter specified"));
+    if (values_json_len <= 0 ||
+            static_cast<uint64_t> (values_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            "Invalid 'values_json_len' parameter specified: [" + sc::to_string(values_json_len) + "]"));
+    try {
+        uint16_t mustache_file_path_len_u16 = static_cast<uint16_t> (mustache_file_path_len);
+        std::string mustache_file_path_str{mustache_file_path, mustache_file_path_len_u16};
+        uint32_t values_json_len_u32 = static_cast<uint32_t> (values_json_len);
+        std::string values_json_str{values_json, values_json_len_u32};
+        ss::JsonValue json = ss::load_json_from_string(values_json_str);
+        request->impl().send_mustache(std::move(mustache_file_path_str), std::move(json));
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+    }    
 }

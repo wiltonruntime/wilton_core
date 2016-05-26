@@ -153,6 +153,12 @@ WILTON_EXPORT char* wilton_Request_send_file(
                 void* finalizer_ctx,
                 int sent_successfully));
 
+WILTON_EXPORT char* wilton_Request_send_mustache(
+        wilton_Request* request,
+        const char* mustache_file_path,
+        int mustache_file_path_len,
+        const char* values_json,
+        int values_json_len);
 
 #ifdef	__cplusplus
 }
