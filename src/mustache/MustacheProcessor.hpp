@@ -31,7 +31,7 @@ public:
      * 
      * @param pimpl impl object
      */
-    PIMPL_CONSTRUCTOR(MustacheProcessor)    
+    PIMPL_CONSTRUCTOR(MustacheProcessor)
     
     MustacheProcessor(const std::string& mustache_file_path, staticlib::serialization::JsonValue json);
     

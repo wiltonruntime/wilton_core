@@ -11,7 +11,7 @@
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
-#include "WiltonLogger.hpp"
+#include "logging/WiltonLogger.hpp"
 #include "Request.hpp"
 #include "Server.hpp"
 
@@ -85,7 +85,7 @@ char* wilton_log(
         std::string logger_name_str{logger_name, logger_name_len_u32};
         uint32_t message_len_u32 = static_cast<uint32_t> (message_len);
         std::string message_str{message, message_len_u32};
-        wilton::WiltonLogger::log(level_name_str, logger_name_str, message_str);
+        wilton::logging::WiltonLogger::log(level_name_str, logger_name_str, message_str);
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));

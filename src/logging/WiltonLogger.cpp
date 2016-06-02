@@ -1,15 +1,13 @@
 /* 
- * File:   WiltonLogger.hpp
+ * File:   WiltonLogger.cpp
  * Author: alex
- *
- * Created on May 10, 2016, 4:49 PM
+ * 
+ * Created on June 2, 2016, 4:27 PM
  */
 
-#ifndef WILTON_C_WILTON_LOGGER_HPP
-#define	WILTON_C_WILTON_LOGGER_HPP
+#include "logging/WiltonLogger.hpp"
 
 #include <atomic>
-#include <string>
 
 #include "log4cplus/logger.h"
 #include "log4cplus/appender.h"
@@ -17,13 +15,15 @@
 #include "log4cplus/nullappender.h"
 #include "log4cplus/fileappender.h"
 
-#include "WiltonInternalException.hpp"
+#include "staticlib/pimpl/pimpl_forward_macros.hpp"
 
+#include "WiltonInternalException.hpp"
 #include "json/Appender.hpp"
 #include "json/Logger.hpp"
 #include "json/Logging.hpp"
 
 namespace wilton {
+namespace logging {
 
 namespace { // anonymous
 
@@ -50,9 +50,9 @@ log4cplus::LogLevel to_level(const std::string& level_name) {
 
 } // namespace
 
-class WiltonLogger {
-
+class WiltonLogger::Impl : public staticlib::pimpl::PimplObject::Impl {
 public:
+
     static void log(const std::string& level_name, const std::string& logger_name, const std::string& message) {
         const auto& logger = log4cplus::Logger::getInstance(logger_name);
         log4cplus::LogLevel level = to_level(level_name);
@@ -60,7 +60,7 @@ public:
             logger.log(level, message);
         }
     }
-    
+
     static void apply_config(const json::Logging& config) {
         if (INITIALIZED.compare_exchange_strong(THE_FALSE, true)) {
 #ifndef STATICLIB_LINUX
@@ -78,7 +78,7 @@ public:
             lo.setLogLevel(to_level(cf.level));
         }
     }
-    
+
 private:
     // todo: check invalid file behaviour
     static log4cplus::Appender* create_appender_ptr(const json::Appender& conf) {
@@ -91,13 +91,15 @@ private:
         } else if ("DAILY_ROLLING_FILE" == conf.appenderType) {
             return new log4cplus::DailyRollingFileAppender(conf.filePath);
         } else {
-            throw WiltonInternalException(TRACEMSG(std::string() + 
+            throw WiltonInternalException(TRACEMSG(std::string() +
                     "Invalid 'logging.appender.appenderType': [" + conf.appenderType + "]"));
         }
     }
-    
+
 };
+PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, log, (const std::string&)(const std::string&)(const std::string&), (), WiltonInternalException)
+PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, apply_config, (const json::Logging&), (), WiltonInternalException)
 
 } // namespace
+}
 
-#endif	/* WILTON_C_WILTON_LOGGER_HPP */

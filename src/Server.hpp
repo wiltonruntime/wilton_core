@@ -21,7 +21,7 @@
 #include "Request.hpp"
 #include "StringPayloadHandler.hpp"
 #include "WiltonInternalException.hpp"
-#include "WiltonLogger.hpp"
+#include "logging/WiltonLogger.hpp"
 #include "ZipHandler.hpp"
 
 #include "json/ServerConfig.hpp"
@@ -43,7 +43,7 @@ class Server {
 public:    
     Server(std::function<void(Request& req)> gateway, json::ServerConfig conf) :
     server(sc::make_unique<sh::http_server>(conf.numberOfThreads, conf.tcpPort)) {
-        WiltonLogger::apply_config(conf.logging);
+        logging::WiltonLogger::apply_config(conf.logging);
         std::vector<std::string> methods = {"GET", "POST", "PUT", "DELETE"};
         std::string path = "/";
         for (const std::string& me : methods) {
