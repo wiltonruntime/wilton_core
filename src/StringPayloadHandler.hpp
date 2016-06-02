@@ -31,6 +31,8 @@
 
 #include "staticlib/httpserver/http_request.hpp"
 
+#include "WiltonInternalException.hpp"
+
 namespace wilton {
 
 namespace { // anonymous
@@ -42,22 +44,28 @@ const std::string EMPTY_STRING{""};
 } // namespace
 
 class StringPayloadHandler {
-    mutable std::string buffer;
+    std::shared_ptr<std::string> buffer;
 
 public:
     // intrusive copy and move constructors to satisfy std::function
     StringPayloadHandler(const StringPayloadHandler& other) :
-    buffer(std::move(other.buffer)) { }
+    buffer(other.buffer) { }
     
-    StringPayloadHandler& operator=(const StringPayloadHandler&) = delete;
+    StringPayloadHandler& operator=(const StringPayloadHandler& other) {
+        buffer = other.buffer;
+        return *this;
+    }
     
     StringPayloadHandler(StringPayloadHandler&& other) :    
     buffer(std::move(other.buffer)) { }
     
-    StringPayloadHandler& operator=(StringPayloadHandler&&) = delete;
+    StringPayloadHandler& operator=(StringPayloadHandler&& other) {
+        buffer = std::move(other.buffer);
+        return *this;
+    }
     
     StringPayloadHandler() : 
-    buffer() { }
+    buffer(new std::string()) { }
 
     static StringPayloadHandler create(staticlib::httpserver::http_request_ptr& /* request */) {
         return StringPayloadHandler{};
@@ -73,15 +81,15 @@ public:
     }
 
     void operator()(const char* s, size_t n) {
-        if (buffer.length() + n < MAX_LENGTH) {
-            buffer.append(s, n);
+        if (buffer->length() + n < MAX_LENGTH) {
+            buffer->append(s, n);
         } else {
-            throw std::runtime_error("Request body exceeds 1MB, client connection will be closed");
+            throw WiltonInternalException("Request body exceeds 1MB, client connection will be closed");
         }
     }
 
     std::string& get_buffer() {        
-        return buffer;
+        return *buffer;
     }
 
 };
