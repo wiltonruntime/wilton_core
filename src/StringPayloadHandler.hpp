@@ -32,7 +32,6 @@
 #include "staticlib/httpserver/http_request.hpp"
 
 namespace wilton {
-namespace c {
 
 namespace { // anonymous
 
@@ -88,6 +87,5 @@ public:
 };
 
 } // namespace
-}
 
 #endif	/* WILTON_C_STRINGPAYLOADHANDLER_HPP */

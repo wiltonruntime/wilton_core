@@ -22,32 +22,31 @@ namespace { // anonymous
 namespace sc = staticlib::config;
 namespace su = staticlib::utils;
 namespace ss = staticlib::serialization;
-namespace wc = wilton::c;
 
 }
 
 struct wilton_Server {
 private:
-    wc::Server delegate;
+    wilton::Server delegate;
 
 public:
-    wilton_Server(wc::Server&& delegate) :
+    wilton_Server(wilton::Server&& delegate) :
     delegate(std::move(delegate)) { }
 
-    wc::Server& impl() {
+    wilton::Server& impl() {
         return delegate;
     }
 };
 
 struct wilton_Request {
 private:
-    wc::Request& delegate;
+    wilton::Request& delegate;
 
 public:
-    wilton_Request(wc::Request& delegate) :
+    wilton_Request(wilton::Request& delegate) :
     delegate(delegate) { }
 
-    wc::Request& impl() {
+    wilton::Request& impl() {
         return delegate;
     }
 };
@@ -86,7 +85,7 @@ char* wilton_log(
         std::string logger_name_str{logger_name, logger_name_len_u32};
         uint32_t message_len_u32 = static_cast<uint32_t> (message_len);
         std::string message_str{message, message_len_u32};
-        wc::WiltonLogger::log(level_name_str, logger_name_str, message_str);
+        wilton::WiltonLogger::log(level_name_str, logger_name_str, message_str);
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
@@ -115,8 +114,8 @@ char* wilton_Server_create(
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
         std::string metadata{conf_json, conf_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(metadata);
-        wc::Server server{
-            [gateway_ctx, gateway_cb](wc::Request& req) {
+        wilton::Server server{
+            [gateway_ctx, gateway_cb](wilton::Request& req) {
                 wilton_Request* req_ptr = new wilton_Request(req);
                 gateway_cb(gateway_ctx, req_ptr);
                 // todo: special handling for chunked send
@@ -198,7 +197,7 @@ char* wilton_Request_set_response_metadata(wilton_Request* request,
         uint32_t metadata_json_len_u32 = static_cast<uint32_t> (metadata_json_len);
         std::string metadata{metadata_json, metadata_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(metadata);
-        wc::json::ResponseMetadata rm{json};
+        wilton::json::ResponseMetadata rm{json};
         request->impl().set_response_metadata(std::move(rm));
         return nullptr;
     } catch (const std::exception& e) {

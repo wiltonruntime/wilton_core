@@ -36,7 +36,6 @@
 
 
 namespace wilton {
-namespace c {
 
 class ResponseStreamSender : public std::enable_shared_from_this<ResponseStreamSender> {
     staticlib::httpserver::http_response_writer_ptr writer;
@@ -88,6 +87,5 @@ public:
 };
 
 } // namespace
-}
 
 #endif	/* WILTON_C_RESPONSESTREAMSENDER_HPP */

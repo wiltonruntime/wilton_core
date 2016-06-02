@@ -28,7 +28,6 @@
 #include "json/Logging.hpp"
 
 namespace wilton {
-namespace c {
 
 namespace { // anonymous
 
@@ -76,7 +75,6 @@ public:
 };
 
 } // namespace
-}
 
 #endif	/* WILTON_C_SERVER_HPP */
 

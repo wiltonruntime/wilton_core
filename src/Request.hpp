@@ -32,7 +32,6 @@
 #include "json/RequestMetadata.hpp"
 
 namespace wilton {
-namespace c {
 
 namespace { // anonymous
 
@@ -154,7 +153,6 @@ private:
 };
 
 } // namespace
-}
 
 #endif	/* WILTON_C_REQUEST_HPP */
 

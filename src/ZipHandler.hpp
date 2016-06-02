@@ -22,7 +22,6 @@
 #include "json/DocumentRoot.hpp"
 
 namespace wilton {
-namespace c {
 
 namespace { // anonymous
 
@@ -92,7 +91,6 @@ private:
 };
 
 } // namespace
-}
 
 
 #endif	/* WILTON_C_ZIPHANDLER_HPP */

@@ -14,7 +14,6 @@
 #include "staticlib/serialization.hpp"
 
 namespace wilton {
-namespace c {
 namespace json {
 
 namespace { // anonymous
@@ -85,7 +84,6 @@ public:
 };
 
 } // namespace
-}
 }
 
 #endif	/* WILTON_C_MIMETYPE_HPP */

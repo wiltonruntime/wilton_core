@@ -21,7 +21,6 @@
 #include "json/Header.hpp"
 
 namespace wilton {
-namespace c {
 namespace json {
 
 namespace { // anonymous
@@ -100,7 +99,6 @@ private:
 
 
 } // namespace
-}
 }
 
 #endif	/* WILTON_C_JSON_REQUESTMETADATA_HPP */

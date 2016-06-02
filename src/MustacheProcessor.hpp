@@ -23,7 +23,6 @@
 #include "WiltonInternalException.hpp"
 
 namespace wilton {
-namespace c {
 
 namespace { // anonymous
 
@@ -105,7 +104,6 @@ private:
 };
 
 } // namespace
-}
 
 
 #endif	/* WILTON_C_MUSTACHEPROCESSOR_HPP */

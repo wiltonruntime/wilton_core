@@ -16,7 +16,6 @@
 #include "WiltonInternalException.hpp"
 
 namespace wilton {
-namespace c {
 namespace json {
 
 namespace { // anonymous
@@ -99,7 +98,6 @@ public:
 };
 
 } // namepspace
-}
 }
 
 #endif	/* WILTON_C_JSON_APPENDER_HPP */
