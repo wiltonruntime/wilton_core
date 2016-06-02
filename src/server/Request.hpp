@@ -35,7 +35,7 @@ public:
      * 
      * @param pimpl impl object
      */
-    PIMPL_CONSTRUCTOR(Request)    
+    PIMPL_CONSTRUCTOR(Request)
     
     json::RequestMetadata get_request_metadata();
     
