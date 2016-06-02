@@ -5,8 +5,8 @@
  * Created on May 11, 2016, 12:50 PM
  */
 
-#ifndef WILTON_C_ZIPHANDLER_HPP
-#define	WILTON_C_ZIPHANDLER_HPP
+#ifndef WILTON_SERVER_ZIPHANDLER_HPP
+#define	WILTON_SERVER_ZIPHANDLER_HPP
 
 #include <cstdint>
 #include <memory>
@@ -22,6 +22,7 @@
 #include "json/DocumentRoot.hpp"
 
 namespace wilton {
+namespace server {
 
 namespace { // anonymous
 
@@ -91,7 +92,6 @@ private:
 };
 
 } // namespace
+}
 
-
-#endif	/* WILTON_C_ZIPHANDLER_HPP */
-
+#endif	/* WILTON_SERVER_ZIPHANDLER_HPP */

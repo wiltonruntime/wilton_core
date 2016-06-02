@@ -12,8 +12,8 @@
 #include "staticlib/utils.hpp"
 
 #include "logging/WiltonLogger.hpp"
-#include "Request.hpp"
-#include "Server.hpp"
+#include "server/Request.hpp"
+#include "server/Server.hpp"
 
 #include "json/ResponseMetadata.hpp"
 
@@ -27,26 +27,26 @@ namespace ss = staticlib::serialization;
 
 struct wilton_Server {
 private:
-    wilton::Server delegate;
+    wilton::server::Server delegate;
 
 public:
-    wilton_Server(wilton::Server&& delegate) :
+    wilton_Server(wilton::server::Server&& delegate) :
     delegate(std::move(delegate)) { }
 
-    wilton::Server& impl() {
+    wilton::server::Server& impl() {
         return delegate;
     }
 };
 
 struct wilton_Request {
 private:
-    wilton::Request& delegate;
+    wilton::server::Request& delegate;
 
 public:
-    wilton_Request(wilton::Request& delegate) :
+    wilton_Request(wilton::server::Request& delegate) :
     delegate(delegate) { }
 
-    wilton::Request& impl() {
+    wilton::server::Request& impl() {
         return delegate;
     }
 };
@@ -114,8 +114,8 @@ char* wilton_Server_create(
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
         std::string metadata{conf_json, conf_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(metadata);
-        wilton::Server server{
-            [gateway_ctx, gateway_cb](wilton::Request& req) {
+        wilton::server::Server server{
+            [gateway_ctx, gateway_cb](wilton::server::Request& req) {
                 wilton_Request* req_ptr = new wilton_Request(req);
                 gateway_cb(gateway_ctx, req_ptr);
                 // todo: special handling for chunked send

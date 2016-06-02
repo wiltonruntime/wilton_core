@@ -21,8 +21,8 @@
  * Created on April 5, 2015, 5:49 PM
  */
 
-#ifndef WILTON_C_STRINGPAYLOADHANDLER_HPP
-#define	WILTON_C_STRINGPAYLOADHANDLER_HPP
+#ifndef WILTON_SERVER_STRINGPAYLOADHANDLER_HPP
+#define	WILTON_SERVER_STRINGPAYLOADHANDLER_HPP
 
 #include <exception>
 #include <functional>
@@ -34,6 +34,7 @@
 #include "WiltonInternalException.hpp"
 
 namespace wilton {
+namespace server {
 
 namespace { // anonymous
 
@@ -95,5 +96,6 @@ public:
 };
 
 } // namespace
+}
 
-#endif	/* WILTON_C_STRINGPAYLOADHANDLER_HPP */
+#endif	/* WILTON_SERVER_STRINGPAYLOADHANDLER_HPP */

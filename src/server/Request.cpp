@@ -1,17 +1,15 @@
 /* 
- * File:   Request.hpp
+ * File:   Request.cpp
  * Author: alex
- *
- * Created on May 5, 2016, 12:30 PM
+ * 
+ * Created on June 2, 2016, 5:16 PM
  */
 
-#ifndef WILTON_C_REQUEST_HPP
-#define	WILTON_C_REQUEST_HPP
+#include "server/Request.hpp"
 
 #include <cctype>
 #include <algorithm>
 #include <atomic>
-#include <string>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
@@ -19,6 +17,7 @@
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
 #include "staticlib/httpserver.hpp"
+#include "staticlib/pimpl/pimpl_forward_macros.hpp"
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
@@ -32,6 +31,7 @@
 #include "json/RequestMetadata.hpp"
 
 namespace wilton {
+namespace server {
 
 namespace { // anonymous
 
@@ -42,54 +42,59 @@ namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
 
 const std::unordered_set<std::string> HEADERS_DISCARD_DUPLICATES{
-        "age", "authorization", "content-length", "content-type", "etag", "expires", 
-        "from", "host", "if-modified-since", "if-unmodified-since", "last-modified", "location", 
-        "max-forwards", "proxy-authorization", "referer", "retry-after", "user-agent"};
+    "age", "authorization", "content-length", "content-type", "etag", "expires",
+    "from", "host", "if-modified-since", "if-unmodified-since", "last-modified", "location",
+    "max-forwards", "proxy-authorization", "referer", "retry-after", "user-agent"
+};
 
 } //namespace
 
-class Request {
-    enum class State { CREATED, CHUNK_SENT, COMMITTED };
+class Request::Impl : public staticlib::pimpl::PimplObject::Impl {
+
+    enum class State {
+        CREATED, CHUNK_SENT, COMMITTED
+    };
     std::atomic<const State> state;
     // owning ptrs here to not restrict clients async ops
     sh::http_request_ptr req;
     sh::http_response_writer_ptr resp;
-    
-public:
-    Request(sh::http_request_ptr&& req, sh::http_response_writer_ptr&& resp) :
-    state(State::CREATED),
-    req(std::move(req)),
-    resp(std::move(resp)) { }
 
-    json::RequestMetadata get_request_metadata() {
-        std::string http_ver = sc::to_string(req->get_version_major()) + 
+public:
+
+    Impl(void* /* sh::http_request_ptr&& */ req, void* /* sh::http_response_writer_ptr&& */ resp) :
+    state(State::CREATED),
+    req(std::move(*static_cast<sh::http_request_ptr*>(req))),
+    resp(std::move(*static_cast<sh::http_response_writer_ptr*> (resp))) { }
+
+    json::RequestMetadata get_request_metadata(Request&) {
+        std::string http_ver = sc::to_string(req->get_version_major()) +
                 "." + sc::to_string(req->get_version_minor());
         auto headers = get_request_headers(*req);
         std::string protocol = resp->get_connection()->get_ssl_flag() ? "https" : "http";
-        return json::RequestMetadata(http_ver, protocol, req->get_method(), req->get_resource(), 
+        return json::RequestMetadata(http_ver, protocol, req->get_method(), req->get_resource(),
                 req->get_query_string(), std::move(headers));
     }
-    
-    const std::string& get_request_data() {
+
+    const std::string& get_request_data(Request&) {
         return StringPayloadHandler::get_payload(req);
     }
-    
-    void set_response_metadata(json::ResponseMetadata rm) {
+
+    void set_response_metadata(Request&, json::ResponseMetadata rm) {
         resp->get_response().set_status_code(rm.statusCode);
         resp->get_response().set_status_message(rm.statusMessage);
         for (const json::Header& ha : rm.headers) {
             resp->get_response().change_header(ha.name, ha.value);
         }
     }
-    
-    void send_response(const char* data, uint32_t data_len) {
+
+    void send_response(Request&, const char* data, uint32_t data_len) {
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw WiltonInternalException(TRACEMSG(std::string() +
                 "Invalid request lifecycle operation, request is already committed"));
         resp->write(data, data_len);
         resp->send();
     }
-    
-    void send_file(std::string file_path, std::function<void(bool)> finalizer) {
+
+    void send_file(Request&, std::string file_path, std::function<void(bool) > finalizer) {
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw WiltonInternalException(TRACEMSG(std::string() +
                 "Invalid request lifecycle operation, request is already committed"));
         su::FileDescriptor fd{file_path, 'r'};
@@ -97,8 +102,8 @@ public:
         auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(fd_ptr), std::move(finalizer));
         sender->send();
     }
-    
-    void send_mustache(std::string mustache_file_path, ss::JsonValue json) {
+
+    void send_mustache(Request&, std::string mustache_file_path, ss::JsonValue json) {
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw WiltonInternalException(TRACEMSG(std::string() +
                 "Invalid request lifecycle operation, request is already committed"));
         auto mp = mustache::MustacheProcessor{mustache_file_path, std::move(json)};
@@ -106,13 +111,13 @@ public:
         auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(mp_ptr));
         sender->send();
     }
-    
-    void finish() {
+
+    void finish(Request&) {
         if (state.compare_exchange_strong(State::CREATED, State::COMMITTED)) {
             resp->send();
         }
     }
-    
+
 private:
     // todo: cookies
     // Duplicates in raw headers are handled in the following ways, depending on the header name:
@@ -135,12 +140,12 @@ private:
         for (auto& en : map) {
             res.emplace_back(std::move(en.second));
         }
-        std::sort(res.begin(), res.end(), [](const json::Header& el1, const json::Header& el2) {
+        std::sort(res.begin(), res.end(), [](const json::Header& el1, const json::Header & el2) {
             return el1.name < el2.name;
         });
         return res;
     }
-    
+
     void append_with_comma(std::string& str, const std::string& tail) {
         if (str.empty()) {
             str = tail;
@@ -149,10 +154,17 @@ private:
             str.append(tail);
         }
     }
-    
+
 };
+PIMPL_FORWARD_CONSTRUCTOR(Request, (void*)(void*), (), WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, json::RequestMetadata, get_request_metadata, (), (), WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, const std::string&, get_request_data, (), (), WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, void, set_response_metadata, (json::ResponseMetadata), (), WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, void, send_response, (const char*)(uint32_t), (), WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, void, send_file, (std::string)(std::function<void(bool)>), (), WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, void, send_mustache, (std::string)(ss::JsonValue), (), WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, void, finish, (), (), WiltonInternalException)
 
 } // namespace
-
-#endif	/* WILTON_C_REQUEST_HPP */
+}
 

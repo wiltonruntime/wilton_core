@@ -21,8 +21,8 @@
  * Created on April 5, 2015, 10:58 PM
  */
 
-#ifndef WILTON_C_RESPONSESTREAMSENDER_HPP
-#define	WILTON_C_RESPONSESTREAMSENDER_HPP
+#ifndef WILTON_SERVER_RESPONSESTREAMSENDER_HPP
+#define	WILTON_SERVER_RESPONSESTREAMSENDER_HPP
 
 #include <memory>
 
@@ -36,6 +36,7 @@
 
 
 namespace wilton {
+namespace server {
 
 class ResponseStreamSender : public std::enable_shared_from_this<ResponseStreamSender> {
     staticlib::httpserver::http_response_writer_ptr writer;
@@ -87,5 +88,6 @@ public:
 };
 
 } // namespace
+}
 
-#endif	/* WILTON_C_RESPONSESTREAMSENDER_HPP */
+#endif	/* WILTON_SERVER_RESPONSESTREAMSENDER_HPP */
