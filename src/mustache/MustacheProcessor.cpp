@@ -1,28 +1,24 @@
 /* 
- * File:   MustacheProcessor.hpp
+ * File:   MustacheProcessor.cpp
  * Author: alex
- *
- * Created on May 26, 2016, 2:51 PM
+ * 
+ * Created on June 2, 2016, 3:32 PM
  */
 
-#ifndef WILTON_C_MUSTACHEPROCESSOR_HPP
-#define	WILTON_C_MUSTACHEPROCESSOR_HPP
+#include "mustache/MustacheProcessor.hpp"
 
 #include <array>
-#include <ios>
 #include <map>
-#include <string>
 #include <vector>
 
 #include "mstch/mstch.hpp"
 
 #include "staticlib/io.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/pimpl/pimpl_forward_macros.hpp"
 #include "staticlib/utils.hpp"
 
-#include "WiltonInternalException.hpp"
-
 namespace wilton {
+namespace mustache {
 
 namespace { // anonymous
 
@@ -33,35 +29,25 @@ namespace su = staticlib::utils;
 
 } //namespace
 
-class MustacheProcessor {
+class MustacheProcessor::Impl : public staticlib::pimpl::PimplObject::Impl {
     mstch::renderer renderer;
-    
-public:
-    MustacheProcessor(const MustacheProcessor&) = delete;
-    
-    MustacheProcessor(MustacheProcessor&& other) :
-    renderer(std::move(other.renderer)) { }
-    
-    MustacheProcessor& operator=(const MustacheProcessor&) = delete;
-    
-    MustacheProcessor& operator=(MustacheProcessor&& other) {
-        this->renderer = std::move(other.renderer);
-        return *this;
-    }
 
-    MustacheProcessor(const std::string& mustache_file_path, ss::JsonValue json) try :
+public:
+    ~Impl() STATICLIB_NOEXCEPT { }
+    
+    Impl(const std::string& mustache_file_path, ss::JsonValue json) try :
         renderer(read_file(mustache_file_path), create_node(json)) {
     } catch (const std::exception& e) {
         throw WiltonInternalException(TRACEMSG(std::string() + e.what() +
                 "\nError processing mustache template: [" + mustache_file_path + "]" +
                 " with values: [" + ss::dump_json_to_string(json) + "]"));
     }
-    
-    std::streamsize read(char* buffer, std::streamsize length) {
+
+    std::streamsize read(MustacheProcessor&, char* buffer, std::streamsize length) {
         return renderer.read(buffer, length);
     }
     
-private:
+private:       
 
     static std::string read_file(const std::string path) {
         su::FileDescriptor fd{path, 'r'};
@@ -83,7 +69,7 @@ private:
         default: throw WiltonInternalException(TRACEMSG(std::string() +
                     "Unsupported JSON type:[" + sc::to_string(static_cast<char> (value.get_type())) + "]"));
         }
-    }    
+    }
 
     static mstch::node create_map(const ss::JsonValue& value) {
         std::map<const std::string, mstch::node> map;
@@ -100,11 +86,11 @@ private:
         }
         return mstch::node(std::move(array));
     }
-   
+
 };
+PIMPL_FORWARD_CONSTRUCTOR(MustacheProcessor, (const std::string&)(ss::JsonValue), (), WiltonInternalException)
+PIMPL_FORWARD_METHOD(MustacheProcessor, std::streamsize, read, (char*)(std::streamsize), (), WiltonInternalException)
 
 } // namespace
-
-
-#endif	/* WILTON_C_MUSTACHEPROCESSOR_HPP */
+}
 

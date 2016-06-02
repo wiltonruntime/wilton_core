@@ -22,7 +22,7 @@
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
-#include "MustacheProcessor.hpp"
+#include "mustache/MustacheProcessor.hpp"
 #include "ResponseStreamSender.hpp"
 #include "StringPayloadHandler.hpp"
 #include "WiltonInternalException.hpp"
@@ -101,7 +101,7 @@ public:
     void send_mustache(std::string mustache_file_path, ss::JsonValue json) {
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw WiltonInternalException(TRACEMSG(std::string() +
                 "Invalid request lifecycle operation, request is already committed"));
-        MustacheProcessor mp{mustache_file_path, std::move(json)};
+        auto mp = mustache::MustacheProcessor{mustache_file_path, std::move(json)};
         auto mp_ptr = si::make_source_istream_ptr(std::move(mp));
         auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(mp_ptr));
         sender->send();
