@@ -46,8 +46,10 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_zlib )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
+        wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_sqlite )
     endif ( )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_mstch )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_soci )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
@@ -57,6 +59,7 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_serialization )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_orm )
 endif ( )
 
 # dependencies
@@ -64,11 +67,14 @@ set ( ${PROJECT_NAME}_DEPS
         jansson
         log4cplus
         mstch
+        sqlite3
+        soci
         staticlib_config
         staticlib_utils
         staticlib_httpserver
         staticlib_serialization
-        staticlib_unzip )
+        staticlib_unzip
+        staticlib_orm )
 wilton_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
 # build steps

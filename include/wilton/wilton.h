@@ -36,6 +36,12 @@ typedef struct wilton_Server wilton_Server;
 struct wilton_Request;
 typedef struct wilton_Request wilton_Request;
 
+struct wilton_DBConnection;
+typedef struct wilton_DBConnection wilton_DBConnection;
+
+struct wilton_DBTransaction;
+typedef struct wilton_DBTransaction wilton_DBTransaction;
+
 WILTON_EXPORT void wilton_free(
         char* errmsg);
 
@@ -159,6 +165,42 @@ WILTON_EXPORT char* wilton_Request_send_mustache(
         int mustache_file_path_len,
         const char* values_json,
         int values_json_len);
+
+// DB
+
+WILTON_EXPORT char* wilton_DBConnection_open(
+        wilton_DBConnection** conn_out,
+        const char* conn_url,
+        int conn_url_len);
+
+WILTON_EXPORT char* wilton_DBConnection_query(
+        wilton_DBConnection* conn,
+        const char* sql_text,
+        int sql_text_len,
+        const char* params_json,
+        int params_json_len,
+        char** result_set_out,
+        int* result_set_len_out);
+
+WILTON_EXPORT char* wilton_DBConnection_execute(
+        wilton_DBConnection* conn,
+        const char* sql_text,
+        int sql_text_len,
+        const char* params_json,
+        int params_json_len);
+
+WILTON_EXPORT char* wilton_DBConnection_close(
+        wilton_DBConnection* conn);
+
+WILTON_EXPORT char* wilton_DBTransaction_start(
+        wilton_DBConnection* conn,
+        wilton_DBTransaction** tran_out);
+
+WILTON_EXPORT char* wilton_DBTransaction_commit(
+        wilton_DBTransaction* tran);
+
+WILTON_EXPORT char* wilton_DBTransaction_rollback(
+        wilton_DBTransaction* tran);
 
 #ifdef	__cplusplus
 }
