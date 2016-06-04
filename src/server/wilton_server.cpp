@@ -1,14 +1,13 @@
 /* 
- * File:   wilton.cpp
+ * File:   wilton_server.cpp
  * Author: alex
- *
- * Created on April 30, 2016, 11:50 PM
+ * 
+ * Created on June 4, 2016, 8:15 PM
  */
 
 #include "wilton/wilton.h"
 
 #include "staticlib/config.hpp"
-#include "staticlib/orm.hpp"
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
@@ -20,62 +19,36 @@
 namespace { // anonymous
 
 namespace sc = staticlib::config;
-namespace so = staticlib::orm;
 namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
+namespace ws = wilton::server;
+namespace wj = wilton::json;
 
 }
 
 struct wilton_Server {
 private:
-    wilton::server::Server delegate;
+    ws::Server delegate;
 
 public:
-    wilton_Server(wilton::server::Server&& delegate) :
+    wilton_Server(ws::Server&& delegate) :
     delegate(std::move(delegate)) { }
 
-    wilton::server::Server& impl() {
+    ws::Server& impl() {
         return delegate;
     }
 };
 
 struct wilton_Request {
 private:
-    wilton::server::Request& delegate;
+    ws::Request& delegate;
 
 public:
-    wilton_Request(wilton::server::Request& delegate) :
+    wilton_Request(ws::Request& delegate) :
     delegate(delegate) { }
 
-    wilton::server::Request& impl() {
+    ws::Request& impl() {
         return delegate;
-    }
-};
-
-struct wilton_DBConnection {
-private:
-    so::Connection conn;
-    
-public:
-    wilton_DBConnection(so::Connection&& conn) :
-    conn(std::move(conn)) { }
-    
-    so::Connection& impl() {
-        return conn;
-    }
-};
-
-struct wilton_DBTransaction {
-private:
-    so::Transaction tran;
-
-public:
-
-    wilton_DBTransaction(so::Transaction&& tran) :
-    tran(std::move(tran)) { }
-
-    so::Transaction& impl() {
-        return tran;
     }
 };
 
@@ -84,8 +57,8 @@ char* wilton_Server_create(
         wilton_Server** server_out,
         void* gateway_ctx,
         void (*gateway_cb)(
-                void* gateway_ctx,
-                wilton_Request* request),
+        void* gateway_ctx,
+        wilton_Request* request),
         const char* conf_json,
         int conf_json_len) /* noexcept */ {
     if (nullptr == server_out) return su::alloc_copy(TRACEMSG(std::string() +
@@ -95,14 +68,14 @@ char* wilton_Server_create(
     if (nullptr == conf_json) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'conf_json' parameter specified"));
     if (conf_json_len <= 0 ||
-            static_cast<int64_t>(conf_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<int64_t> (conf_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
             "Invalid 'conf_json_len' parameter specified: [" + sc::to_string(conf_json_len) + "]"));
     try {
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
         std::string metadata{conf_json, conf_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(metadata);
-        wilton::server::Server server{
-            [gateway_ctx, gateway_cb](wilton::server::Request& req) {
+        ws::Server server{
+            [gateway_ctx, gateway_cb](ws::Request & req) {
                 wilton_Request* req_ptr = new wilton_Request(req);
                 gateway_cb(gateway_ctx, req_ptr);
                 // todo: special handling for chunked send
@@ -115,7 +88,7 @@ char* wilton_Server_create(
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
-    }    
+    }
 }
 
 char* wilton_Server_stop_server(wilton_Server* server) /* noexcept */ {
@@ -148,7 +121,7 @@ char* wilton_Request_get_request_metadata(wilton_Request* request, char** metada
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
-    }    
+    }
 }
 
 // TODO: think about copy
@@ -178,13 +151,13 @@ char* wilton_Request_set_response_metadata(wilton_Request* request,
     if (nullptr == metadata_json) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'metadata_json' parameter specified"));
     if (metadata_json_len <= 0 ||
-            static_cast<uint64_t>(metadata_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<uint64_t> (metadata_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
             "Invalid 'metadata_json_len' parameter specified: [" + sc::to_string(metadata_json_len) + "]"));
     try {
         uint32_t metadata_json_len_u32 = static_cast<uint32_t> (metadata_json_len);
         std::string metadata{metadata_json, metadata_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(metadata);
-        wilton::json::ResponseMetadata rm{json};
+        wj::ResponseMetadata rm{json};
         request->impl().set_response_metadata(std::move(rm));
         return nullptr;
     } catch (const std::exception& e) {
@@ -199,7 +172,7 @@ char* wilton_Request_send_response(wilton_Request* request, const char* data,
     if (nullptr == data) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'data' parameter specified"));
     if (data_len < 0 ||
-            static_cast<uint64_t>(data_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<uint64_t> (data_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
             "Invalid 'data_len' parameter specified: [" + sc::to_string(data_len) + "]"));
     try {
         uint32_t data_len_u32 = static_cast<uint32_t> (data_len);
@@ -216,8 +189,8 @@ char* wilton_Request_send_file(
         int file_path_len,
         void* finalizer_ctx,
         void (*finalizer_cb)(
-                void* finalizer_ctx,
-                int sent_successfully)) /* noexcept */ {
+        void* finalizer_ctx,
+        int sent_successfully)) /* noexcept */ {
     if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
             "Null 'request' parameter specified"));
     if (nullptr == file_path) return su::alloc_copy(TRACEMSG(std::string() +
@@ -230,7 +203,7 @@ char* wilton_Request_send_file(
     try {
         uint16_t file_path_len_u16 = static_cast<uint16_t> (file_path_len);
         std::string file_path_str{file_path, file_path_len_u16};
-        request->impl().send_file(std::move(file_path_str), 
+        request->impl().send_file(std::move(file_path_str),
                 [finalizer_ctx, finalizer_cb](bool success) {
                     int success_int = success ? 1 : 0;
                     finalizer_cb(finalizer_ctx, success_int);
@@ -271,28 +244,3 @@ char* wilton_Request_send_mustache(
         return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
     }
 }
-
-char* wilton_DBConnection_open(
-        wilton_DBConnection** conn_out,
-        const char* conn_url,
-        int conn_url_len) /* noexcept */ {
-    if (nullptr == conn_out) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'conn_out' parameter specified"));
-    if (nullptr == conn_url) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'conn_url' parameter specified"));
-    if (conn_url_len <= 0 ||
-            static_cast<uint32_t> (conn_url_len) > std::numeric_limits<uint16_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
-            "Invalid 'conn_url_len' parameter specified: [" + sc::to_string(conn_url_len) + "]"));    
-    try {
-        uint16_t conn_url_len_u16 = static_cast<uint16_t> (conn_url_len);
-        std::string conn_url_str{conn_url, conn_url_len_u16};
-        so::Connection conn{conn_url_str};
-        wilton_DBConnection* conn_ptr = new wilton_DBConnection{std::move(conn)};
-        *conn_out = conn_ptr;
-        return nullptr;
-    } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
-    }
-}
-
-
