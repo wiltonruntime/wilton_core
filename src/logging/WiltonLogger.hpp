@@ -32,7 +32,7 @@ public:
      * 
      * @param pimpl impl object
      */
-    PIMPL_CONSTRUCTOR(WiltonLogger)    
+    PIMPL_CONSTRUCTOR(WiltonLogger)
 
     static void log(const std::string& level_name, const std::string& logger_name, const std::string& message);
     

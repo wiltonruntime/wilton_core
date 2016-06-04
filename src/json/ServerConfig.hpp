@@ -12,11 +12,10 @@
 #include <string>
 #include <vector>
 
-#include "asio.hpp"
-
 #include "staticlib/ranges.hpp"
 #include "staticlib/serialization.hpp"
 
+#include "common/WiltonInternalException.hpp"
 #include "json/DocumentRoot.hpp"
 #include "json/Appender.hpp"
 #include "json/Logging.hpp"
@@ -24,18 +23,11 @@
 namespace wilton {
 namespace json {
 
-namespace { // anonymous
-
-namespace sr = staticlib::ranges;
-namespace ss = staticlib::serialization;
-
-}
-
 class ServerConfig {
 public:    
     uint32_t numberOfThreads = 2;
     uint16_t tcpPort = 8080;
-    asio::ip::address_v4 ipAddress = asio::ip::address_v4::any();
+    std::string ipAddress = "0.0.0.0";
     std::vector<DocumentRoot> documentRoots;
     Logging logging;
 
@@ -59,7 +51,8 @@ public:
         return *this;
     }
 
-    ServerConfig(const ss::JsonValue& json) {
+    ServerConfig(const staticlib::serialization::JsonValue& json) {
+        namespace ss = staticlib::serialization;
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("numberOfThreads" == name) {
@@ -79,7 +72,7 @@ public:
                 }
                 this->tcpPort = fi.get_uint32();
             } else if ("ipAddress" == name) {
-                this->ipAddress = asio::ip::address_v4::from_string(fi.get_string());
+                this->ipAddress = fi.get_string();
             } else if ("documentRoots" == name) {
                 if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'documentRoots' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
@@ -99,14 +92,15 @@ public:
         }
     }
     
-    ss::JsonValue to_json() const {
+    staticlib::serialization::JsonValue to_json() const {
+        namespace sr = staticlib::ranges;
         auto drs = sr::transform(sr::refwrap(documentRoots), [](const json::DocumentRoot& el) {
             return el.to_json();
         });
         return {
             {"numberOfThreads", numberOfThreads},
             {"tcpPort", tcpPort},
-            {"ipAddress", ipAddress.to_string()},
+            {"ipAddress", ipAddress},
             {"documentRoot", drs},
             {"logging", logging.to_json()}
         };

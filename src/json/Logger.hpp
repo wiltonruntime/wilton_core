@@ -5,8 +5,8 @@
  * Created on May 10, 2016, 8:01 PM
  */
 
-#ifndef WILTON_C_JSON_LOGGER_HPP
-#define	WILTON_C_JSON_LOGGER_HPP
+#ifndef WILTON_JSON_LOGGER_HPP
+#define	WILTON_JSON_LOGGER_HPP
 
 #include <string>
 
@@ -17,12 +17,6 @@
 
 namespace wilton {
 namespace json {
-
-namespace { // anonymous
-
-namespace ss = staticlib::serialization;
-
-} // namespace
 
 class Logger {
 public:
@@ -45,7 +39,8 @@ public:
 
     Logger() { }
 
-    Logger(const ss::JsonValue& json) {
+    Logger(const staticlib::serialization::JsonValue& json) {
+        namespace ss = staticlib::serialization;
         for (const ss::JsonField& fi : json.get_object()) {
             auto& fname = fi.get_name();
             if ("name" == fname) {
@@ -67,7 +62,7 @@ public:
                 "Invalid 'logging.loggers.level' field: []"));
     }
 
-    ss::JsonValue to_json() const {
+    staticlib::serialization::JsonValue to_json() const {
         return {
             {"name", name},
             {"level", level}
@@ -78,5 +73,5 @@ public:
 } // namepspace
 }
 
-#endif	/* WILTON_C_JSON_LOGGER_HPP */
+#endif	/* WILTON_JSON_LOGGER_HPP */
 

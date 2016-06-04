@@ -5,23 +5,17 @@
  * Created on May 11, 2016, 1:23 PM
  */
 
-#ifndef WILTON_C_MIMETYPE_HPP
-#define	WILTON_C_MIMETYPE_HPP
+#ifndef WILTON_MIMETYPE_HPP
+#define	WILTON_MIMETYPE_HPP
 
 #include <string>
 #include <vector>
 
+#include "common/WiltonInternalException.hpp"
 #include "staticlib/serialization.hpp"
 
 namespace wilton {
 namespace json {
-
-namespace { // anonymous
-
-namespace sr = staticlib::ranges;
-namespace ss = staticlib::serialization;
-
-} // namepspace
 
 class MimeType {
 public:
@@ -48,7 +42,8 @@ public:
     extension(extension.data(), extension.length()),
     mime(mime.data(), mime.length()) { }
 
-    MimeType(const ss::JsonValue& json) {
+    MimeType(const staticlib::serialization::JsonValue& json) {
+        namespace ss = staticlib::serialization;
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("extension" == name) {
@@ -70,7 +65,7 @@ public:
                 "Invalid 'mimeType.mime' and 'documentRoot.zipPath' field: []"));
     }
     
-    ss::JsonValue to_json() const {    
+    staticlib::serialization::JsonValue to_json() const {    
         return {
             {"extension", extension},
             {"mime", mime}
@@ -86,5 +81,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_C_MIMETYPE_HPP */
+#endif	/* WILTON_MIMETYPE_HPP */
 

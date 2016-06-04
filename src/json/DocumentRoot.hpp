@@ -5,50 +5,22 @@
  * Created on May 5, 2016, 7:27 PM
  */
 
-#ifndef WILTON_C_JSON_DOCUMENTROOT_HPP
-#define	WILTON_C_JSON_DOCUMENTROOT_HPP
+#ifndef WILTON_JSON_DOCUMENTROOT_HPP
+#define	WILTON_JSON_DOCUMENTROOT_HPP
 
 #include <cstdint>
 #include <string>
 #include <vector>
-
-#include "asio.hpp"
 
 #include "staticlib/config.hpp"
 #include "staticlib/ranges.hpp"
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "MimeType.hpp"
+#include "json/MimeType.hpp"
 
 namespace wilton {
 namespace json {
-
-namespace { // anonymous
-
-namespace sr = staticlib::ranges;
-namespace ss = staticlib::serialization;
-
-std::vector<MimeType> mimes_copy(const std::vector<MimeType>& vec) {
-    auto copied = sr::transform(sr::refwrap(vec), [](const MimeType& el) {
-        return el.clone();
-    });
-    return sr::emplace_to_vector(std::move(copied));
-}
-
-std::vector<MimeType> default_mimes() {
-    std::vector<MimeType> res{};
-    res.emplace_back("txt",  "text/plain");
-    res.emplace_back("js",   "text/javascript");
-    res.emplace_back("css",  "text/css");
-    res.emplace_back("html", "text/html");
-    res.emplace_back("png",  "image/png");
-    res.emplace_back("jpg",  "image/jpeg");
-    res.emplace_back("svg",  "image/svg+xml");
-    return res;
-}
-
-} // namepspace
 
 class DocumentRoot {
 public:
@@ -93,7 +65,8 @@ public:
     cacheMaxAgeSeconds(cacheMaxAgeSeconds), 
     mimeTypes(mimes_copy(mimeTypes)) { }
     
-    DocumentRoot(const ss::JsonValue& json) {
+    DocumentRoot(const staticlib::serialization::JsonValue& json) {
+        namespace ss = staticlib::serialization;
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("resource" == name) {
@@ -138,7 +111,8 @@ public:
                     "Invalid 'documentRoot.dirPath' and 'documentRoot.zipPath' fields: [], []"));
     }
        
-    ss::JsonValue to_json() const {
+    staticlib::serialization::JsonValue to_json() const {
+        namespace sr = staticlib::ranges;
         auto mimes = sr::transform(sr::refwrap(mimeTypes), [](const MimeType& el) {
             return el.to_json();
         });
@@ -159,11 +133,32 @@ public:
     DocumentRoot clone() const {
         return DocumentRoot(resource, dirPath, zipPath, zipInnerPrefix, cacheMaxAgeSeconds, mimeTypes);
     }
+    
+private:
+    static std::vector<MimeType> mimes_copy(const std::vector<MimeType>& vec) {
+        namespace sr = staticlib::ranges;
+        auto copied = sr::transform(sr::refwrap(vec), [](const MimeType & el) {
+            return el.clone();
+        });
+        return sr::emplace_to_vector(std::move(copied));
+    }
+
+    static std::vector<MimeType> default_mimes() {
+        std::vector<MimeType> res{};
+        res.emplace_back("txt", "text/plain");
+        res.emplace_back("js", "text/javascript");
+        res.emplace_back("css", "text/css");
+        res.emplace_back("html", "text/html");
+        res.emplace_back("png", "image/png");
+        res.emplace_back("jpg", "image/jpeg");
+        res.emplace_back("svg", "image/svg+xml");
+        return res;
+    }
 
 };
 
 } // namespace
 }
 
-#endif	/* WILTON_C_JSON_DOCUMENTROOT_HPP */
+#endif	/* WILTON_JSON_DOCUMENTROOT_HPP */
 

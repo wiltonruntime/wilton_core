@@ -5,8 +5,8 @@
  * Created on May 5, 2016, 7:20 PM
  */
 
-#ifndef WILTON_C_JSON_REQUESTMETADATA_HPP
-#define	WILTON_C_JSON_REQUESTMETADATA_HPP
+#ifndef WILTON_JSON_REQUESTMETADATA_HPP
+#define	WILTON_JSON_REQUESTMETADATA_HPP
 
 #include <cstdint>
 #include <string>
@@ -17,18 +17,10 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
-
 #include "json/Header.hpp"
 
 namespace wilton {
 namespace json {
-
-namespace { // anonymous
-
-namespace sr = staticlib::ranges;
-namespace ss = staticlib::serialization;
-
-}
 
 class RequestMetadata {
     std::string httpVersion;
@@ -71,7 +63,9 @@ public:
     query(query.data(), query.length()),
     headers(std::move(headers)) { }
         
-    ss::JsonValue to_json() const {
+    staticlib::serialization::JsonValue to_json() const {
+        namespace ss = staticlib::serialization;
+        namespace sr = staticlib::ranges;
         auto ha = sr::transform(sr::refwrap(headers), [](const json::Header& el) {
             return el.to_json();
         });
@@ -101,5 +95,5 @@ private:
 } // namespace
 }
 
-#endif	/* WILTON_C_JSON_REQUESTMETADATA_HPP */
+#endif	/* WILTON_JSON_REQUESTMETADATA_HPP */
 

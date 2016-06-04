@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+#include "asio.hpp"
+
 #include "staticlib/config.hpp"
 #include "staticlib/httpserver.hpp"
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
@@ -45,7 +47,8 @@ class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
 
 public:
     Impl(gateway_fun_type gateway, json::ServerConfig conf) :
-    server(sc::make_unique<sh::http_server>(conf.numberOfThreads, conf.tcpPort)) {
+    server(sc::make_unique<sh::http_server>(conf.numberOfThreads, conf.tcpPort,
+            asio::ip::address_v4::from_string(conf.ipAddress))) {
         logging::WiltonLogger::apply_config(conf.logging);
         std::vector<std::string> methods = {"GET", "POST", "PUT", "DELETE"};
         std::string path = "/";

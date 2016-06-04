@@ -5,8 +5,8 @@
  * Created on May 10, 2016, 5:12 PM
  */
 
-#ifndef WILTON_C_JSON_LOGGING_HPP
-#define	WILTON_C_JSON_LOGGING_HPP
+#ifndef WILTON_JSON_LOGGING_HPP
+#define	WILTON_JSON_LOGGING_HPP
 
 #include <string>
 #include <vector>
@@ -14,18 +14,12 @@
 #include "staticlib/ranges.hpp"
 #include "staticlib/serialization.hpp"
 
+#include "common/WiltonInternalException.hpp"
 #include "json/Appender.hpp"
 #include "json/Logger.hpp"
 
 namespace wilton {
 namespace json {
-
-namespace { // anonymous
-
-namespace sr = staticlib::ranges;
-namespace ss = staticlib::serialization;
-
-} // namespace
 
 class Logging {
 public:
@@ -48,7 +42,8 @@ public:
 
     Logging() { }
 
-    Logging(const ss::JsonValue& json) {
+    Logging(const staticlib::serialization::JsonValue& json) {
+        namespace ss = staticlib::serialization;
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("appenders" == name) {
@@ -72,7 +67,8 @@ public:
         }
     }
 
-    ss::JsonValue to_json() const {
+    staticlib::serialization::JsonValue to_json() const {
+        namespace sr = staticlib::ranges;
         auto japps = sr::transform(sr::refwrap(appenders), [](const json::Appender& el) {
             return el.to_json();
         });
@@ -89,5 +85,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_C_JSON_LOGGING_HPP */
+#endif	/* WILTON_JSON_LOGGING_HPP */
 

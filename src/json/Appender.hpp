@@ -5,8 +5,8 @@
  * Created on May 10, 2016, 7:55 PM
  */
 
-#ifndef WILTON_C_JSON_APPENDER_HPP
-#define	WILTON_C_JSON_APPENDER_HPP
+#ifndef WILTON_JSON_APPENDER_HPP
+#define	WILTON_JSON_APPENDER_HPP
 
 #include <string>
 
@@ -17,12 +17,6 @@
 
 namespace wilton {
 namespace json {
-
-namespace { // anonymous
-
-namespace ss = staticlib::serialization;
-
-} // namespace
 
 class Appender {
 public:
@@ -51,7 +45,8 @@ public:
 
     Appender() { }
 
-    Appender(const ss::JsonValue& json) {
+    Appender(const staticlib::serialization::JsonValue& json) {
+        namespace ss = staticlib::serialization;
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("appenderType" == name) {
@@ -86,7 +81,7 @@ public:
                 "Invalid 'logging.appenders.thresholdLevel' field: []"));
     }
 
-    ss::JsonValue to_json() const {
+    staticlib::serialization::JsonValue to_json() const {
         return {
             {"appenderType", appenderType},
             {"filePath", filePath},
@@ -100,5 +95,5 @@ public:
 } // namepspace
 }
 
-#endif	/* WILTON_C_JSON_APPENDER_HPP */
+#endif	/* WILTON_JSON_APPENDER_HPP */
 

@@ -5,14 +5,13 @@
  * Created on May 5, 2016, 7:21 PM
  */
 
-#ifndef WILTON_C_JSON_RESPONSEMETADATA_HPP
-#define	WILTON_C_JSON_RESPONSEMETADATA_HPP
+#ifndef WILTON_JSON_RESPONSEMETADATA_HPP
+#define	WILTON_JSON_RESPONSEMETADATA_HPP
 
 #include <cstdint>
 #include <string>
 
 #include "staticlib/config.hpp"
-#include "staticlib/httpserver/http_message.hpp"
 #include "staticlib/ranges.hpp"
 #include "staticlib/serialization.hpp"
 
@@ -22,18 +21,10 @@
 namespace wilton {
 namespace json {
 
-namespace { // anonymous
-
-namespace sh = staticlib::httpserver;
-namespace sr = staticlib::ranges;
-namespace ss = staticlib::serialization;
-
-}
-
 class ResponseMetadata {
 public:
-    uint16_t statusCode = sh::http_message::RESPONSE_CODE_OK;
-    std::string statusMessage = sh::http_message::RESPONSE_MESSAGE_OK;
+    uint16_t statusCode = 200;
+    std::string statusMessage = "OK";
     std::vector<json::Header> headers;
 
     ResponseMetadata(const ResponseMetadata&) = delete;
@@ -52,7 +43,8 @@ public:
         return *this;
     }
     
-    ResponseMetadata(const ss::JsonValue& json) {
+    ResponseMetadata(const staticlib::serialization::JsonValue& json) {
+        namespace ss = staticlib::serialization;
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("statusCode" == name) {
@@ -82,7 +74,9 @@ public:
         }
     }
 
-    ss::JsonValue to_json() const {
+    staticlib::serialization::JsonValue to_json() const {
+        namespace sr = staticlib::ranges;
+        namespace ss = staticlib::serialization;
         auto ha = sr::transform(sr::refwrap(headers), [](const json::Header & el) {
             return el.to_json();
         });
@@ -99,5 +93,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_C_JSON_RESPONSEMETADATA_HPP */
+#endif	/* WILTON_JSON_RESPONSEMETADATA_HPP */
 

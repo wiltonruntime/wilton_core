@@ -5,8 +5,8 @@
  * Created on May 5, 2016, 9:00 PM
  */
 
-#ifndef WILTON_C_JSON_HEADER_HPP
-#define	WILTON_C_JSON_HEADER_HPP
+#ifndef WILTON_JSON_HEADER_HPP
+#define	WILTON_JSON_HEADER_HPP
 
 #include <string>
 
@@ -17,12 +17,6 @@
 
 namespace wilton {
 namespace json {
-
-namespace { // anonymous
-
-namespace ss = staticlib::serialization;
-
-} // namespace
 
 class Header {
 public:
@@ -49,7 +43,8 @@ public:
     name(std::move(name)),
     value(std::move(value)) { }
 
-    Header(const ss::JsonValue& json) {
+    Header(const staticlib::serialization::JsonValue& json) {
+        namespace ss = staticlib::serialization;
         for (const ss::JsonField& fi : json.get_object()) {
             auto& fname = fi.get_name();
             if ("name" == fname) {
@@ -71,7 +66,8 @@ public:
                 "Invalid 'header.value' field: []"));
     }
 
-    ss::JsonField to_json() const {
+    staticlib::serialization::JsonField to_json() const {
+        namespace ss = staticlib::serialization;
         return ss::JsonField{name, ss::JsonValue{value}};
     }
 };
@@ -80,5 +76,5 @@ public:
 } // namepspace
 }
 
-#endif	/* WILTON_C_JSON_HEADER_HPP */
+#endif	/* WILTON_JSON_HEADER_HPP */
 
