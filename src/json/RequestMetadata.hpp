@@ -16,7 +16,7 @@
 #include "staticlib/ranges.hpp"
 #include "staticlib/serialization.hpp"
 
-#include "WiltonInternalException.hpp"
+#include "common/WiltonInternalException.hpp"
 
 #include "json/Header.hpp"
 

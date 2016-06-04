@@ -18,8 +18,7 @@
 #include "staticlib/utils.hpp"
 
 #include "ResponseStreamSender.hpp"
-#include "WiltonInternalException.hpp"
-
+#include "common/WiltonInternalException.hpp"
 #include "json/DocumentRoot.hpp"
 
 namespace wilton {
@@ -50,7 +49,7 @@ public:
     // todo: path leading slash check
     FileHandler(const json::DocumentRoot& conf) :
     conf(std::make_shared<json::DocumentRoot>(conf.clone())) {
-        if (0 == this->conf->dirPath.length()) throw WiltonInternalException(TRACEMSG(std::string() + 
+        if (0 == this->conf->dirPath.length()) throw common::WiltonInternalException(TRACEMSG(std::string() + 
                 "Invalid empty 'dirPath' specified"));
     }
     

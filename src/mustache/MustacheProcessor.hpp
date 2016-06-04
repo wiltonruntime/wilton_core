@@ -14,7 +14,7 @@
 #include "staticlib/pimpl.hpp"
 #include "staticlib/serialization.hpp"
 
-#include "WiltonInternalException.hpp"
+#include "common/WiltonInternalException.hpp"
 
 namespace wilton {
 namespace mustache {

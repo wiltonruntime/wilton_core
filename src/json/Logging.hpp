@@ -52,21 +52,21 @@ public:
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("appenders" == name) {
-                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw WiltonInternalException(TRACEMSG(std::string() +
+                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'logging.appenders' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 for (const ss::JsonValue& ap : fi.get_array()) {
                     auto ja = json::Appender(ap);
                     appenders.emplace_back(std::move(ja));
                 }
             } else if ("loggers" == name) {
-                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw WiltonInternalException(TRACEMSG(std::string() +
+                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'logging.loggers' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 for (const ss::JsonValue& lo : fi.get_array()) {
                     auto jl = json::Logger(lo);
                     loggers.emplace_back(std::move(jl));
                 }
             } else {
-                throw WiltonInternalException(TRACEMSG(std::string() +
+                throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Unknown 'logging' field: [" + name + "]"));
             }
         }

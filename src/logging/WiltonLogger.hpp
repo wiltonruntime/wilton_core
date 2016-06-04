@@ -12,7 +12,7 @@
 
 #include "staticlib/pimpl.hpp"
 
-#include "WiltonInternalException.hpp"
+#include "common/WiltonInternalException.hpp"
 #include "json/Appender.hpp"
 #include "json/Logger.hpp"
 #include "json/Logging.hpp"

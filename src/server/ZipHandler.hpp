@@ -17,7 +17,7 @@
 #include "staticlib/unzip.hpp"
 
 #include "ResponseStreamSender.hpp"
-#include "WiltonInternalException.hpp"
+#include "common/WiltonInternalException.hpp"
 
 #include "json/DocumentRoot.hpp"
 

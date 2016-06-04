@@ -31,7 +31,7 @@
 
 #include "staticlib/httpserver/http_request.hpp"
 
-#include "WiltonInternalException.hpp"
+#include "common/WiltonInternalException.hpp"
 
 namespace wilton {
 namespace server {
@@ -85,7 +85,7 @@ public:
         if (buffer->length() + n < MAX_LENGTH) {
             buffer->append(s, n);
         } else {
-            throw WiltonInternalException("Request body exceeds 1MB, client connection will be closed");
+            throw common::WiltonInternalException("Request body exceeds 1MB, client connection will be closed");
         }
     }
 

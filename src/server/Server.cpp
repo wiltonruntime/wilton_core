@@ -17,12 +17,12 @@
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
 #include "staticlib/serialization.hpp"
 
-#include "FileHandler.hpp"
-#include "Request.hpp"
-#include "StringPayloadHandler.hpp"
-#include "WiltonInternalException.hpp"
+#include "common/WiltonInternalException.hpp"
 #include "logging/WiltonLogger.hpp"
-#include "ZipHandler.hpp"
+#include "server/FileHandler.hpp"
+#include "server/Request.hpp"
+#include "server/StringPayloadHandler.hpp"
+#include "server/ZipHandler.hpp"
 
 #include "json/ServerConfig.hpp"
 #include "json/Logging.hpp"
@@ -66,7 +66,7 @@ public:
                 server->add_handler("GET", dr.resource, FileHandler(dr));
             } else if (dr.zipPath.length() > 0) {
                 server->add_handler("GET", dr.resource, ZipHandler(dr));
-            } else throw WiltonInternalException(TRACEMSG(std::string() +
+            } else throw common::WiltonInternalException(TRACEMSG(std::string() +
                     "Invalid 'documentRoot': [" + ss::dump_json_to_string(dr.to_json()) + "]"));
         }
         server->start();
@@ -77,8 +77,8 @@ public:
     }
     
 };
-PIMPL_FORWARD_CONSTRUCTOR(Server, (gateway_fun_type)(json::ServerConfig), (), WiltonInternalException)
-PIMPL_FORWARD_METHOD(Server, void, stop, (), (), WiltonInternalException)
+PIMPL_FORWARD_CONSTRUCTOR(Server, (gateway_fun_type)(json::ServerConfig), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Server, void, stop, (), (), common::WiltonInternalException)
 
 } // namespace
 }

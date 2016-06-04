@@ -13,6 +13,7 @@
 #include "staticlib/config/BaseException.hpp"
 
 namespace wilton {
+namespace common {
 
 /**
  * Module specific exception
@@ -35,6 +36,7 @@ public:
 };
 
 } //namespace
+}
 
 #endif	/* WILTONINTERNALEXCEPTION_HPP */
 

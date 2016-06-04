@@ -24,7 +24,7 @@
 #include "mustache/MustacheProcessor.hpp"
 #include "ResponseStreamSender.hpp"
 #include "StringPayloadHandler.hpp"
-#include "WiltonInternalException.hpp"
+#include "common/WiltonInternalException.hpp"
 
 #include "json/Header.hpp"
 #include "json/ResponseMetadata.hpp"
@@ -88,14 +88,14 @@ public:
     }
 
     void send_response(Request&, const char* data, uint32_t data_len) {
-        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw WiltonInternalException(TRACEMSG(std::string() +
+        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(std::string() +
                 "Invalid request lifecycle operation, request is already committed"));
         resp->write(data, data_len);
         resp->send();
     }
 
     void send_file(Request&, std::string file_path, std::function<void(bool) > finalizer) {
-        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw WiltonInternalException(TRACEMSG(std::string() +
+        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(std::string() +
                 "Invalid request lifecycle operation, request is already committed"));
         su::FileDescriptor fd{file_path, 'r'};
         auto fd_ptr = si::make_source_istream_ptr(std::move(fd));
@@ -104,7 +104,7 @@ public:
     }
 
     void send_mustache(Request&, std::string mustache_file_path, ss::JsonValue json) {
-        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw WiltonInternalException(TRACEMSG(std::string() +
+        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(std::string() +
                 "Invalid request lifecycle operation, request is already committed"));
         auto mp = mustache::MustacheProcessor{mustache_file_path, std::move(json)};
         auto mp_ptr = si::make_source_istream_ptr(std::move(mp));
@@ -156,14 +156,14 @@ private:
     }
 
 };
-PIMPL_FORWARD_CONSTRUCTOR(Request, (void*)(void*), (), WiltonInternalException)
-PIMPL_FORWARD_METHOD(Request, json::RequestMetadata, get_request_metadata, (), (), WiltonInternalException)
-PIMPL_FORWARD_METHOD(Request, const std::string&, get_request_data, (), (), WiltonInternalException)
-PIMPL_FORWARD_METHOD(Request, void, set_response_metadata, (json::ResponseMetadata), (), WiltonInternalException)
-PIMPL_FORWARD_METHOD(Request, void, send_response, (const char*)(uint32_t), (), WiltonInternalException)
-PIMPL_FORWARD_METHOD(Request, void, send_file, (std::string)(std::function<void(bool)>), (), WiltonInternalException)
-PIMPL_FORWARD_METHOD(Request, void, send_mustache, (std::string)(ss::JsonValue), (), WiltonInternalException)
-PIMPL_FORWARD_METHOD(Request, void, finish, (), (), WiltonInternalException)
+PIMPL_FORWARD_CONSTRUCTOR(Request, (void*)(void*), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, json::RequestMetadata, get_request_metadata, (), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, const std::string&, get_request_data, (), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, void, set_response_metadata, (json::ResponseMetadata), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, void, send_response, (const char*)(uint32_t), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, void, send_file, (std::string)(std::function<void(bool)>), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, void, send_mustache, (std::string)(ss::JsonValue), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, void, finish, (), (), common::WiltonInternalException)
 
 } // namespace
 }

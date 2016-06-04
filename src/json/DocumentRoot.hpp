@@ -18,7 +18,7 @@
 #include "staticlib/ranges.hpp"
 #include "staticlib/serialization.hpp"
 
-#include "WiltonInternalException.hpp"
+#include "common/WiltonInternalException.hpp"
 #include "MimeType.hpp"
 
 namespace wilton {
@@ -97,44 +97,44 @@ public:
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("resource" == name) {
-                if (0 == fi.get_string().length()) throw WiltonInternalException(TRACEMSG(std::string() +
+                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'documentRoot.resource' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->resource = fi.get_string();
             } else if ("dirPath" == name) {
-                if (0 == fi.get_string().length()) throw WiltonInternalException(TRACEMSG(std::string() +
+                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'documentRoot.dirPath' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->dirPath = fi.get_string();
             } else if ("zipPath" == name) {
-                if (0 == fi.get_string().length()) throw WiltonInternalException(TRACEMSG(std::string() +
+                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'documentRoot.zipPath' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->zipPath = fi.get_string();
             } else if ("zipInnerPrefix" == name) {
-                if (0 == fi.get_string().length()) throw WiltonInternalException(TRACEMSG(std::string() +
+                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'documentRoot.zipInnerPrefix' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->zipInnerPrefix = fi.get_string();                
             } else if ("cacheMaxAgeSeconds" == name) {
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
                         fi.get_integer() > std::numeric_limits<uint32_t>::max()) {
-                    throw WiltonInternalException(TRACEMSG(std::string() +
+                    throw common::WiltonInternalException(TRACEMSG(std::string() +
                             "Invalid 'documentRoot.cacheMaxAgeSeconds' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->cacheMaxAgeSeconds = fi.get_uint32();
             } else if ("mimeTypes" == name) {
-                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw WiltonInternalException(TRACEMSG(std::string() +
+                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'documentRoot.mimeTypes' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 for (const ss::JsonValue& ap : fi.get_array()) {
                     auto ja = json::MimeType(ap);
                     mimeTypes.emplace_back(std::move(ja));
                 }
             } else {
-                throw WiltonInternalException(TRACEMSG(std::string() +
+                throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Unknown 'documentRoot' field: [" + name + "]"));
             }
         }
-        if (0 == resource.length()) throw WiltonInternalException(TRACEMSG(std::string() +
+        if (0 == resource.length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                     "Invalid 'documentRoot.resource' field: []"));
-        if (0 == dirPath.length() && 0 == zipPath.length()) throw WiltonInternalException(TRACEMSG(std::string() +
+        if (0 == dirPath.length() && 0 == zipPath.length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                     "Invalid 'documentRoot.dirPath' and 'documentRoot.zipPath' fields: [], []"));
     }
        

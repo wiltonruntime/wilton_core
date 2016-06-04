@@ -17,7 +17,7 @@
 
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
 
-#include "WiltonInternalException.hpp"
+#include "common/WiltonInternalException.hpp"
 #include "json/Appender.hpp"
 #include "json/Logger.hpp"
 #include "json/Logging.hpp"
@@ -91,14 +91,14 @@ private:
         } else if ("DAILY_ROLLING_FILE" == conf.appenderType) {
             return new log4cplus::DailyRollingFileAppender(conf.filePath);
         } else {
-            throw WiltonInternalException(TRACEMSG(std::string() +
+            throw common::WiltonInternalException(TRACEMSG(std::string() +
                     "Invalid 'logging.appender.appenderType': [" + conf.appenderType + "]"));
         }
     }
 
 };
-PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, log, (const std::string&)(const std::string&)(const std::string&), (), WiltonInternalException)
-PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, apply_config, (const json::Logging&), (), WiltonInternalException)
+PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, log, (const std::string&)(const std::string&)(const std::string&), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, apply_config, (const json::Logging&), (), common::WiltonInternalException)
 
 } // namespace
 }

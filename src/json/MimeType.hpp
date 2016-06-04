@@ -52,21 +52,21 @@ public:
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("extension" == name) {
-                if (0 == fi.get_string().length()) throw WiltonInternalException(TRACEMSG(std::string() +
+                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'mimeType.resource' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->extension = fi.get_string();
             } else if ("mime" == name) {
-                if (0 == fi.get_string().length()) throw WiltonInternalException(TRACEMSG(std::string() +
+                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'mimeType.mime' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->mime = fi.get_string();
             } else {
-                throw WiltonInternalException(TRACEMSG(std::string() +
+                throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Unknown 'mimeType' field: [" + name + "]"));
             }
         }
-        if (0 == extension.length()) throw WiltonInternalException(TRACEMSG(std::string() +
+        if (0 == extension.length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                 "Invalid 'mimeType.extension' field: []"));
-        if (0 == mime.length()) throw WiltonInternalException(TRACEMSG(std::string() +
+        if (0 == mime.length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                 "Invalid 'mimeType.mime' and 'documentRoot.zipPath' field: []"));
     }
     

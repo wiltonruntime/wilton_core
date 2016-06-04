@@ -66,7 +66,7 @@ public:
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
                         fi.get_uint32() > std::numeric_limits<uint16_t>::max()) {
-                    throw WiltonInternalException(TRACEMSG(std::string() +
+                    throw common::WiltonInternalException(TRACEMSG(std::string() +
                             "Invalid 'numberOfThreads' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->numberOfThreads = fi.get_uint16();
@@ -74,14 +74,14 @@ public:
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
                         fi.get_integer() > std::numeric_limits<uint32_t>::max()) {
-                    throw WiltonInternalException(TRACEMSG(std::string() +
+                    throw common::WiltonInternalException(TRACEMSG(std::string() +
                             "Invalid 'tcpPort' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->tcpPort = fi.get_uint32();
             } else if ("ipAddress" == name) {
                 this->ipAddress = asio::ip::address_v4::from_string(fi.get_string());
             } else if ("documentRoots" == name) {
-                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw WiltonInternalException(TRACEMSG(std::string() +
+                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'documentRoots' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 for (const ss::JsonValue& lo : fi.get_array()) {
                     auto jd = json::DocumentRoot(lo);
@@ -90,7 +90,7 @@ public:
             } else if ("logging" == name) {
                 this->logging = Logging(fi.get_value());
             } else {
-                throw WiltonInternalException(TRACEMSG(std::string() +
+                throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Unknown field: [" + name + "]"));
             }
         }
