@@ -36,6 +36,9 @@ public:
     MustacheProcessor(const std::string& mustache_file_path, staticlib::serialization::JsonValue json);
     
     std::streamsize read(char* buffer, std::streamsize length);
+    
+    static std::string process_string(const std::string& template_text, 
+            const staticlib::serialization::JsonValue& json);
    
 };
 

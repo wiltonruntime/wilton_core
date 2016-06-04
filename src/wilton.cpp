@@ -8,10 +8,10 @@
 #include "wilton/wilton.h"
 
 #include "staticlib/config.hpp"
+#include "staticlib/orm.hpp"
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
-#include "logging/WiltonLogger.hpp"
 #include "server/Request.hpp"
 #include "server/Server.hpp"
 
@@ -20,8 +20,9 @@
 namespace { // anonymous
 
 namespace sc = staticlib::config;
-namespace su = staticlib::utils;
+namespace so = staticlib::orm;
 namespace ss = staticlib::serialization;
+namespace su = staticlib::utils;
 
 }
 
@@ -51,46 +52,32 @@ public:
     }
 };
 
-void wilton_free(char* errmsg) {
-    std::free(errmsg);
-}
-
-// todo: fixme message copy
-char* wilton_log(
-        const char* level_name,
-        int level_name_len,
-        const char* logger_name,
-        int logger_name_len,
-        const char* message,
-        int message_len) {
-    if (nullptr == level_name) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'level_name' parameter specified"));
-    if (level_name_len <= 0 ||
-            static_cast<int64_t> (level_name_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
-            "Invalid 'level_name_len' parameter specified: [" + sc::to_string(level_name_len) + "]"));
-    if (nullptr == logger_name) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'logger_name' parameter specified"));
-    if (logger_name_len <= 0 ||
-            static_cast<int64_t> (logger_name_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
-            "Invalid 'logger_name_len' parameter specified: [" + sc::to_string(logger_name_len) + "]"));
-    if (nullptr == message) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'message' parameter specified"));
-    if (message_len <= 0 ||
-            static_cast<int64_t> (message_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
-            "Invalid 'message_len' parameter specified: [" + sc::to_string(message_len) + "]"));
-    try {
-        uint32_t level_name_len_u32 = static_cast<uint32_t> (level_name_len);
-        std::string level_name_str{level_name, level_name_len_u32};
-        uint32_t logger_name_len_u32 = static_cast<uint32_t> (logger_name_len);
-        std::string logger_name_str{logger_name, logger_name_len_u32};
-        uint32_t message_len_u32 = static_cast<uint32_t> (message_len);
-        std::string message_str{message, message_len_u32};
-        wilton::logging::WiltonLogger::log(level_name_str, logger_name_str, message_str);
-        return nullptr;
-    } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+struct wilton_DBConnection {
+private:
+    so::Connection conn;
+    
+public:
+    wilton_DBConnection(so::Connection&& conn) :
+    conn(std::move(conn)) { }
+    
+    so::Connection& impl() {
+        return conn;
     }
-}
+};
+
+struct wilton_DBTransaction {
+private:
+    so::Transaction tran;
+
+public:
+
+    wilton_DBTransaction(so::Transaction&& tran) :
+    tran(std::move(tran)) { }
+
+    so::Transaction& impl() {
+        return tran;
+    }
+};
 
 // TODO: fixme json copy
 char* wilton_Server_create(
@@ -282,5 +269,30 @@ char* wilton_Request_send_mustache(
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
-    }    
+    }
 }
+
+char* wilton_DBConnection_open(
+        wilton_DBConnection** conn_out,
+        const char* conn_url,
+        int conn_url_len) /* noexcept */ {
+    if (nullptr == conn_out) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'conn_out' parameter specified"));
+    if (nullptr == conn_url) return su::alloc_copy(TRACEMSG(std::string() +
+            "Null 'conn_url' parameter specified"));
+    if (conn_url_len <= 0 ||
+            static_cast<uint32_t> (conn_url_len) > std::numeric_limits<uint16_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            "Invalid 'conn_url_len' parameter specified: [" + sc::to_string(conn_url_len) + "]"));    
+    try {
+        uint16_t conn_url_len_u16 = static_cast<uint16_t> (conn_url_len);
+        std::string conn_url_str{conn_url, conn_url_len_u16};
+        so::Connection conn{conn_url_str};
+        wilton_DBConnection* conn_ptr = new wilton_DBConnection{std::move(conn)};
+        *conn_out = conn_ptr;
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+    }
+}
+
+
