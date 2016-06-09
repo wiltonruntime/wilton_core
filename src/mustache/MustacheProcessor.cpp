@@ -47,7 +47,7 @@ public:
         return renderer.read(buffer, length);
     }
 
-    static std::string process_string(const std::string& template_text, const ss::JsonValue& json) {
+    static std::string render_string(const std::string& template_text, const ss::JsonValue& json) {
         mstch::node node = create_node(json);
         return mstch::render(template_text, node);
     }
@@ -95,7 +95,7 @@ private:
 };
 PIMPL_FORWARD_CONSTRUCTOR(MustacheProcessor, (const std::string&)(ss::JsonValue), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(MustacheProcessor, std::streamsize, read, (char*)(std::streamsize), (), common::WiltonInternalException)
-PIMPL_FORWARD_METHOD_STATIC(MustacheProcessor, std::string, process_string, (const std::string&)(const ss::JsonValue&), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD_STATIC(MustacheProcessor, std::string, render_string, (const std::string&)(const ss::JsonValue&), (), common::WiltonInternalException)
 
 } // namespace
 }

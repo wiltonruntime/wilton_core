@@ -25,7 +25,7 @@ namespace wm = wilton::mustache;
 } // namespace
 
 // todo: stream json
-char* wilton_process_mustache(
+char* wilton_render_mustache(
         const char* template_text,
         int template_text_len,
         const char* values_json,
@@ -52,7 +52,7 @@ char* wilton_process_mustache(
         uint32_t values_json_len_u32 = static_cast<uint32_t> (values_json_len);
         std::string values_json_str{values_json, values_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(values_json_str);
-        const std::string res = wm::MustacheProcessor::process_string(template_text_str, json);
+        const std::string res = wm::MustacheProcessor::render_string(template_text_str, json);
         *output_text_out = su::alloc_copy(res);
         *output_text_len_out = res.size();
         return nullptr;

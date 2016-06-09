@@ -37,7 +37,7 @@ public:
     
     std::streamsize read(char* buffer, std::streamsize length);
     
-    static std::string process_string(const std::string& template_text, 
+    static std::string render_string(const std::string& template_text, 
             const staticlib::serialization::JsonValue& json);
    
 };

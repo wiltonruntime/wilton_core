@@ -59,7 +59,7 @@ WILTON_EXPORT char* wilton_log(
 
 // mustache
 
-WILTON_EXPORT char* wilton_process_mustache(
+WILTON_EXPORT char* wilton_render_mustache(
         const char* template_text,
         int template_text_len,
         const char* values_json,
