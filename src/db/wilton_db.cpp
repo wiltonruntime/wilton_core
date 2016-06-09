@@ -103,9 +103,12 @@ char* wilton_DBConnection_query(
     try {
         uint32_t sql_text_len_u32 = static_cast<uint32_t> (sql_text_len);
         std::string sql_text_str{sql_text, sql_text_len_u32};
-        uint32_t params_json_len_u32 = static_cast<uint32_t> (params_json_len);
-        std::string params_json_str{params_json, params_json_len_u32};        
-        ss::JsonValue json = ss::load_json_from_string(params_json_str);
+        ss::JsonValue json{};
+        if (params_json_len > 0) {
+            uint32_t params_json_len_u32 = static_cast<uint32_t> (params_json_len);
+            std::string params_json_str{params_json, params_json_len_u32};        
+            json = ss::load_json_from_string(params_json_str);
+        }
         std::vector<ss::JsonValue> rs = conn->impl().query(sql_text_str, json);
         ss::JsonValue rs_json{std::move(rs)};
         std::string rs_str = ss::dump_json_to_string(rs_json);
@@ -138,9 +141,12 @@ char* wilton_DBConnection_execute(
     try {
         uint32_t sql_text_len_u32 = static_cast<uint32_t> (sql_text_len);
         std::string sql_text_str{sql_text, sql_text_len_u32};
-        uint32_t params_json_len_u32 = static_cast<uint32_t> (params_json_len);
-        std::string params_json_str{params_json, params_json_len_u32};
-        ss::JsonValue json = ss::load_json_from_string(params_json_str);
+        ss::JsonValue json{};
+        if (params_json_len > 0) {
+            uint32_t params_json_len_u32 = static_cast<uint32_t> (params_json_len);
+            std::string params_json_str{params_json, params_json_len_u32};
+            json = ss::load_json_from_string(params_json_str);
+        }
         conn->impl().execute(sql_text_str, json);
         return nullptr;
     } catch (const std::exception& e) {
