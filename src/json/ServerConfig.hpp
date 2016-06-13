@@ -5,8 +5,8 @@
  * Created on May 5, 2016, 7:20 PM
  */
 
-#ifndef WILTON_C_JSON_SERVERCONFIG_HPP
-#define	WILTON_C_JSON_SERVERCONFIG_HPP
+#ifndef WILTON_JSON_SERVERCONFIG_HPP
+#define	WILTON_JSON_SERVERCONFIG_HPP
 
 #include <cstdint>
 #include <string>
@@ -19,6 +19,7 @@
 #include "json/DocumentRoot.hpp"
 #include "json/Appender.hpp"
 #include "json/Logging.hpp"
+#include "json/SslConfig.hpp"
 
 namespace wilton {
 namespace json {
@@ -28,6 +29,7 @@ public:
     uint32_t numberOfThreads = 2;
     uint16_t tcpPort = 8080;
     std::string ipAddress = "0.0.0.0";
+    SslConfig ssl;
     std::vector<DocumentRoot> documentRoots;
     Logging logging;
 
@@ -39,6 +41,7 @@ public:
     numberOfThreads(other.numberOfThreads),
     tcpPort(other.tcpPort),
     ipAddress(std::move(other.ipAddress)),
+    ssl(std::move(other.ssl)),
     documentRoots(std::move(other.documentRoots)),
     logging(std::move(other.logging)) { }
 
@@ -46,6 +49,7 @@ public:
         this->numberOfThreads = other.numberOfThreads;
         this->tcpPort = other.tcpPort;
         this->ipAddress = std::move(other.ipAddress);
+        this->ssl = std::move(other.ssl);
         this->documentRoots = std::move(other.documentRoots);
         this->logging = std::move(other.logging);
         return *this;
@@ -73,6 +77,8 @@ public:
                 this->tcpPort = fi.get_uint32();
             } else if ("ipAddress" == name) {
                 this->ipAddress = fi.get_string();
+            } else if ("ssl" == name) {
+                this->ssl = SslConfig(fi.get_value());
             } else if ("documentRoots" == name) {
                 if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'documentRoots' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
@@ -101,7 +107,8 @@ public:
             {"numberOfThreads", numberOfThreads},
             {"tcpPort", tcpPort},
             {"ipAddress", ipAddress},
-            {"documentRoot", drs},
+            {"ssl", ssl.to_json()},
+            {"documentRoots", drs},
             {"logging", logging.to_json()}
         };
     }
@@ -110,5 +117,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_C_JSON_SERVERCONFIG_HPP */
+#endif	/* WILTON_JSON_SERVERCONFIG_HPP */
 

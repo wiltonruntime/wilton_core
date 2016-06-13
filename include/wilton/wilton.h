@@ -42,6 +42,9 @@ typedef struct wilton_DBConnection wilton_DBConnection;
 struct wilton_DBTransaction;
 typedef struct wilton_DBTransaction wilton_DBTransaction;
 
+struct wilton_HttpClient;
+typedef struct wilton_HttpClient wilton_HttpClient;
+
 // common
 
 WILTON_EXPORT void wilton_free(
@@ -78,7 +81,7 @@ WILTON_EXPORT char* wilton_render_mustache(
             "keyFile": "path/to/file",
             "keyPassword": "pwd",
             "verifyFile": "path/to/file",
-            "verifyOrganization_unit": "ou_name",
+            "verifySubjectSubstr": "CN=some_name",
         },
         "documentRoots": [{
             "resource": "/path/to/hanldler",
@@ -217,6 +220,46 @@ WILTON_EXPORT char* wilton_DBTransaction_commit(
 
 WILTON_EXPORT char* wilton_DBTransaction_rollback(
         wilton_DBTransaction* tran);
+
+// HttpClient
+
+WILTON_EXPORT char* wilton_HttpClient_create(
+        wilton_HttpClient** http_out,
+        const char* conf_json,
+        int conf_json_len);
+
+WILTON_EXPORT char* wilton_HttpClient_execute(
+        wilton_HttpClient* http,
+        const char* url,
+        int url_len,
+        const char* request_data,
+        int request_data_len,
+        const char* request_metadata_json,
+        int request_metadata_len,
+        char** response_data_out,
+        int* response_data_len_out,
+        char** response_metadata_out,
+        int* response_metadata_len_out);
+
+WILTON_EXPORT char* wilton_HttpClient_send_file(
+        wilton_HttpClient* http,
+        const char* url,
+        int url_len,
+        const char* file_path,
+        int file_path_len,
+        void* finalizer_ctx,
+        void (*finalizer_cb)(
+                void* finalizer_ctx,
+                int sent_successfully),
+        const char* request_metadata_json,
+        int request_metadata_len,
+        char** response_data_out,
+        int* response_data_len_out,
+        char** response_metadata_out,
+        int* response_metadata_len_out);
+
+WILTON_EXPORT char* wilton_HttpClient_close(
+        wilton_HttpClient* http);
 
 #ifdef	__cplusplus
 }

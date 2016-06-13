@@ -32,12 +32,15 @@ staticlib_enable_deplibs_cache ( )
 # options
 set ( wilton_SHARED ON CACHE BOOL "Use shared - cannot link to static libwilton from C code" )
 set ( staticlib_httpserver_USE_LOG4CPLUS ON CACHE BOOL "Use log4cplus lib for logging" )
+set ( staticlib_httpserver_USE_OPENSSL ON CACHE BOOL "Use OpenSSL lib for https" )
 
 # dependencies
 if ( NOT STATICLIB_TOOLCHAIN MATCHES "linux_[^_]+_[^_]+" )    
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_zlib )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_openssl )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_sqlite )
 endif ( )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_mstch )
@@ -52,6 +55,7 @@ staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_serialization )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_orm )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpclient )
 add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../libwilton ${CMAKE_BINARY_DIR}/libwilton )
 set ( ${PROJECT_NAME}_DEPS_PUBLIC wilton )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PUBLIC_PC REQUIRED ${PROJECT_NAME}_DEPS_PUBLIC )
@@ -67,6 +71,9 @@ set ( ${PROJECT_NAME}_DEPS_PRIVATE
         soci
         sqlite3
         jansson
+        libcurl
+        libssl
+        libcrypto
         zlib )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PRIVATE_PC REQUIRED ${PROJECT_NAME}_DEPS_PRIVATE )
 

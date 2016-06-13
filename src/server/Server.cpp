@@ -40,15 +40,54 @@ namespace ss = staticlib::serialization;
 
 typedef std::function<void(Request& req)> gateway_fun_type;
 
+std::function<std::string(std::size_t, asio::ssl::context::password_purpose)> create_pwd_cb(const std::string& password) {
+    return [password](std::size_t, asio::ssl::context::password_purpose) {
+        return password;
+    };
 }
+
+std::string extract_subject(asio::ssl::verify_context& ctx) {
+    if (ctx.native_handle() && ctx.native_handle()->current_cert && ctx.native_handle()->current_cert->name) {
+        return std::string(ctx.native_handle()->current_cert->name);
+    } else return "";
+}
+
+std::function<bool(bool, asio::ssl::verify_context&)> create_verifier_cb(const std::string& subject_part) {
+    return [subject_part](bool preverify_ok, asio::ssl::verify_context& ctx) {
+        // cert validation fail
+        if (!preverify_ok) {
+            return false;
+        }
+        // not the leaf certificate
+        if (ctx.native_handle()->error_depth > 0) {
+            return true;
+        }
+        // no subject restrictions
+        if (subject_part.empty()) {
+            return true;
+        }
+        // check substr
+        std::string subject = extract_subject(ctx);
+        auto pos = subject.find(subject_part);
+        return std::string::npos != pos;
+    };
+}
+
+} // namespace
 
 class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
     std::unique_ptr<sh::http_server> server;
 
 public:
     Impl(gateway_fun_type gateway, json::ServerConfig conf) :
-    server(sc::make_unique<sh::http_server>(conf.numberOfThreads, conf.tcpPort,
-            asio::ip::address_v4::from_string(conf.ipAddress))) {
+    server(sc::make_unique<sh::http_server>(
+            conf.numberOfThreads, 
+            conf.tcpPort,
+            asio::ip::address_v4::from_string(conf.ipAddress),
+            conf.ssl.keyFile,
+            create_pwd_cb(conf.ssl.keyPassword),
+            conf.ssl.verifyFile,
+            create_verifier_cb(conf.ssl.verifySubjectSubstr))) {
         logging::WiltonLogger::apply_config(conf.logging);
         std::vector<std::string> methods = {"GET", "POST", "PUT", "DELETE"};
         std::string path = "/";
@@ -58,10 +97,10 @@ public:
                     [gateway](sh::http_request_ptr& req, sh::tcp_connection_ptr & conn) {
                         auto finfun = std::bind(&sh::tcp_connection::finish, conn);
                         auto writer = sh::http_response_writer::create(conn, *req, finfun);
-                                Request req_pass{static_cast<void*> (std::addressof(req)),
-                            static_cast<void*> (std::addressof(writer))};
+                        Request req_pass{static_cast<void*> (std::addressof(req)),
+                                static_cast<void*> (std::addressof(writer))};
                         gateway(req_pass);
-                                req_pass.finish();
+                        req_pass.finish();
                     });
         }
         for (const auto& dr : conf.documentRoots) {

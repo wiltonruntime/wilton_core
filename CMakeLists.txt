@@ -29,6 +29,7 @@ endif ( )
 
 # dep options
 set ( staticlib_httpserver_USE_LOG4CPLUS ON CACHE BOOL "Use log4cplus lib for logging" )
+set ( staticlib_httpserver_USE_OPENSSL ON CACHE BOOL "Use OpenSSL lib for https" )
 
 # docs
 option ( ${PROJECT_NAME}_ENABLE_DOCS "Generate doxyfile and exit build" OFF )
@@ -46,6 +47,8 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_zlib )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
+        wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_openssl )
+        wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_sqlite )
     endif ( )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_mstch )
@@ -54,27 +57,32 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_endian )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpserver )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpserver )    
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_serialization )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_orm )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpclient )
 endif ( )
 
 # dependencies
 set ( ${PROJECT_NAME}_DEPS
-        jansson
-        log4cplus
-        mstch
-        sqlite3
-        soci
         staticlib_config
         staticlib_utils
         staticlib_httpserver
         staticlib_serialization
         staticlib_unzip
-        staticlib_orm )
+        staticlib_orm 
+        jansson
+        log4cplus
+        mstch
+        sqlite3
+        soci
+        libcurl
+        libssl
+        libcrypto
+        zlib )
 wilton_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
 # build steps
