@@ -69,11 +69,13 @@ endif ( )
 # dependencies
 set ( ${PROJECT_NAME}_DEPS
         staticlib_config
-        staticlib_utils
         staticlib_httpserver
         staticlib_serialization
         staticlib_unzip
         staticlib_orm 
+        staticlib_httpclient
+        staticlib_utils
+        staticlib_pimpl
         jansson
         log4cplus
         mstch

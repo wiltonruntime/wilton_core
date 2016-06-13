@@ -64,6 +64,7 @@ set ( ${PROJECT_NAME}_DEPS_PRIVATE
         staticlib_serialization
         staticlib_unzip
         staticlib_orm
+        staticlib_httpclient
         staticlib_pimpl
         staticlib_utils
         log4cplus
