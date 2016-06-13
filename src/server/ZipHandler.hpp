@@ -19,7 +19,7 @@
 #include "ResponseStreamSender.hpp"
 #include "common/WiltonInternalException.hpp"
 
-#include "json/DocumentRoot.hpp"
+#include "serverconf/DocumentRoot.hpp"
 
 namespace wilton {
 namespace server {
@@ -34,7 +34,7 @@ namespace su = staticlib::utils;
 } // namespace
 
 class ZipHandler {
-    std::shared_ptr<json::DocumentRoot> conf;
+    std::shared_ptr<serverconf::DocumentRoot> conf;
     std::shared_ptr<uz::UnzipFileIndex> idx;
     
 public:
@@ -49,8 +49,8 @@ public:
         return *this;
     }
     
-    ZipHandler(const json::DocumentRoot& conf) :
-    conf(std::make_shared<json::DocumentRoot>(conf.clone())),
+    ZipHandler(const serverconf::DocumentRoot& conf) :
+    conf(std::make_shared<serverconf::DocumentRoot>(conf.clone())),
     idx(std::make_shared<uz::UnzipFileIndex>(conf.zipPath)) { }    
     
     // todo: error messages format

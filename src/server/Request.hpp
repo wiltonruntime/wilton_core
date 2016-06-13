@@ -16,8 +16,8 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "json/ResponseMetadata.hpp"
-#include "json/RequestMetadata.hpp"
+#include "serverconf/ResponseMetadata.hpp"
+#include "serverconf/RequestMetadata.hpp"
 
 namespace wilton {
 namespace server {
@@ -36,11 +36,11 @@ public:
      */
     PIMPL_CONSTRUCTOR(Request)
     
-    json::RequestMetadata get_request_metadata();
+    serverconf::RequestMetadata get_request_metadata();
     
     const std::string& get_request_data();
     
-    void set_response_metadata(json::ResponseMetadata rm);
+    void set_response_metadata(serverconf::ResponseMetadata rm);
     
     void send_response(const char* data, uint32_t data_len);
     

@@ -15,7 +15,7 @@
 #include "staticlib/serialization.hpp"
 
 namespace wilton {
-namespace json {
+namespace serverconf {
 
 class MimeType {
 public:

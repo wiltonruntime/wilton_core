@@ -13,7 +13,7 @@
 #include "staticlib/pimpl.hpp"
 
 #include "server/Request.hpp"
-#include "json/ServerConfig.hpp"
+#include "serverconf/ServerConfig.hpp"
 
 namespace wilton {
 namespace server {
@@ -32,7 +32,7 @@ public:
      */
     PIMPL_CONSTRUCTOR(Server)
             
-    Server(std::function<void(Request& req)> gateway, json::ServerConfig conf);
+    Server(std::function<void(Request& req)> gateway, serverconf::ServerConfig conf);
     
     void stop();
     

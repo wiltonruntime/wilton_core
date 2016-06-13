@@ -5,8 +5,8 @@
  * Created on May 5, 2016, 7:27 PM
  */
 
-#ifndef WILTON_JSON_DOCUMENTROOT_HPP
-#define	WILTON_JSON_DOCUMENTROOT_HPP
+#ifndef WILTON_SERVERCONF_DOCUMENTROOT_HPP
+#define	WILTON_SERVERCONF_DOCUMENTROOT_HPP
 
 #include <cstdint>
 #include <string>
@@ -17,10 +17,10 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "json/MimeType.hpp"
+#include "serverconf/MimeType.hpp"
 
 namespace wilton {
-namespace json {
+namespace serverconf {
 
 class DocumentRoot {
 public:
@@ -97,7 +97,7 @@ public:
                 if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'documentRoot.mimeTypes' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 for (const ss::JsonValue& ap : fi.get_array()) {
-                    auto ja = json::MimeType(ap);
+                    auto ja = serverconf::MimeType(ap);
                     mimeTypes.emplace_back(std::move(ja));
                 }
             } else {
@@ -160,5 +160,5 @@ private:
 } // namespace
 }
 
-#endif	/* WILTON_JSON_DOCUMENTROOT_HPP */
+#endif	/* WILTON_SERVERCONF_DOCUMENTROOT_HPP */
 

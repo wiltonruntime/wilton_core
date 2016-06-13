@@ -5,8 +5,8 @@
  * Created on May 10, 2016, 5:12 PM
  */
 
-#ifndef WILTON_JSON_LOGGING_HPP
-#define	WILTON_JSON_LOGGING_HPP
+#ifndef WILTON_SERVERCONF_LOGGING_HPP
+#define	WILTON_SERVERCONF_LOGGING_HPP
 
 #include <string>
 #include <vector>
@@ -15,11 +15,11 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "json/Appender.hpp"
-#include "json/Logger.hpp"
+#include "serverconf/Appender.hpp"
+#include "serverconf/Logger.hpp"
 
 namespace wilton {
-namespace json {
+namespace serverconf {
 
 class Logging {
 public:
@@ -50,14 +50,14 @@ public:
                 if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'logging.appenders' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 for (const ss::JsonValue& ap : fi.get_array()) {
-                    auto ja = json::Appender(ap);
+                    auto ja = serverconf::Appender(ap);
                     appenders.emplace_back(std::move(ja));
                 }
             } else if ("loggers" == name) {
                 if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'logging.loggers' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 for (const ss::JsonValue& lo : fi.get_array()) {
-                    auto jl = json::Logger(lo);
+                    auto jl = serverconf::Logger(lo);
                     loggers.emplace_back(std::move(jl));
                 }
             } else {
@@ -69,10 +69,10 @@ public:
 
     staticlib::serialization::JsonValue to_json() const {
         namespace sr = staticlib::ranges;
-        auto japps = sr::transform(sr::refwrap(appenders), [](const json::Appender& el) {
+        auto japps = sr::transform(sr::refwrap(appenders), [](const serverconf::Appender& el) {
             return el.to_json();
         });
-        auto jlogs = sr::transform(sr::refwrap(loggers), [](const json::Logger& el) {
+        auto jlogs = sr::transform(sr::refwrap(loggers), [](const serverconf::Logger& el) {
             return el.to_json();
         });
         return {
@@ -85,5 +85,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_JSON_LOGGING_HPP */
+#endif	/* WILTON_SERVERCONF_LOGGING_HPP */
 

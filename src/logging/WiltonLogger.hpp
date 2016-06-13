@@ -13,9 +13,9 @@
 #include "staticlib/pimpl.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "json/Appender.hpp"
-#include "json/Logger.hpp"
-#include "json/Logging.hpp"
+#include "serverconf/Appender.hpp"
+#include "serverconf/Logger.hpp"
+#include "serverconf/Logging.hpp"
 
 namespace wilton {
 namespace logging {
@@ -36,7 +36,7 @@ public:
 
     static void log(const std::string& level_name, const std::string& logger_name, const std::string& message);
     
-    static void apply_config(const json::Logging& config);
+    static void apply_config(const serverconf::Logging& config);
     
 };
 

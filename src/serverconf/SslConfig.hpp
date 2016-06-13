@@ -5,8 +5,8 @@
  * Created on June 13, 2016, 11:35 AM
  */
 
-#ifndef WILTON_JSON_SSLCONFIG_HPP
-#define	WILTON_JSON_SSLCONFIG_HPP
+#ifndef WILTON_SERVERCONF_SSLCONFIG_HPP
+#define	WILTON_SERVERCONF_SSLCONFIG_HPP
 
 #include <string>
 
@@ -16,7 +16,7 @@
 
 
 namespace wilton {
-namespace json {
+namespace serverconf {
 
 class SslConfig {
 public:
@@ -88,5 +88,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_JSON_SSLCONFIG_HPP */
+#endif	/* WILTON_SERVERCONF_SSLCONFIG_HPP */
 

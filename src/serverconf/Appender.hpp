@@ -5,8 +5,8 @@
  * Created on May 10, 2016, 7:55 PM
  */
 
-#ifndef WILTON_JSON_APPENDER_HPP
-#define	WILTON_JSON_APPENDER_HPP
+#ifndef WILTON_SERVERCONF_APPENDER_HPP
+#define	WILTON_SERVERCONF_APPENDER_HPP
 
 #include <string>
 
@@ -16,7 +16,7 @@
 #include "common/WiltonInternalException.hpp"
 
 namespace wilton {
-namespace json {
+namespace serverconf {
 
 class Appender {
 public:
@@ -95,5 +95,5 @@ public:
 } // namepspace
 }
 
-#endif	/* WILTON_JSON_APPENDER_HPP */
+#endif	/* WILTON_SERVERCONF_APPENDER_HPP */
 

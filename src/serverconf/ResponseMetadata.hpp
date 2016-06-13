@@ -5,8 +5,8 @@
  * Created on May 5, 2016, 7:21 PM
  */
 
-#ifndef WILTON_JSON_RESPONSEMETADATA_HPP
-#define	WILTON_JSON_RESPONSEMETADATA_HPP
+#ifndef WILTON_SERVERCONF_RESPONSEMETADATA_HPP
+#define	WILTON_SERVERCONF_RESPONSEMETADATA_HPP
 
 #include <cstdint>
 #include <string>
@@ -16,16 +16,16 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "json/Header.hpp"
+#include "serverconf/Header.hpp"
 
 namespace wilton {
-namespace json {
+namespace serverconf {
 
 class ResponseMetadata {
 public:
     uint16_t statusCode = 200;
     std::string statusMessage = "OK";
-    std::vector<json::Header> headers;
+    std::vector<serverconf::Header> headers;
 
     ResponseMetadata(const ResponseMetadata&) = delete;
 
@@ -77,7 +77,7 @@ public:
     staticlib::serialization::JsonValue to_json() const {
         namespace sr = staticlib::ranges;
         namespace ss = staticlib::serialization;
-        auto ha = sr::transform(sr::refwrap(headers), [](const json::Header & el) {
+        auto ha = sr::transform(sr::refwrap(headers), [](const serverconf::Header & el) {
             return el.to_json();
         });
         std::vector<ss::JsonField> hfields = sr::emplace_to_vector(std::move(ha));
@@ -93,5 +93,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_JSON_RESPONSEMETADATA_HPP */
+#endif	/* WILTON_SERVERCONF_RESPONSEMETADATA_HPP */
 

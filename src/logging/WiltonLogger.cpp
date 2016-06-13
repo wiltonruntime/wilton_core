@@ -18,9 +18,9 @@
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "json/Appender.hpp"
-#include "json/Logger.hpp"
-#include "json/Logging.hpp"
+#include "serverconf/Appender.hpp"
+#include "serverconf/Logger.hpp"
+#include "serverconf/Logging.hpp"
 
 namespace wilton {
 namespace logging {
@@ -61,7 +61,7 @@ public:
         }
     }
 
-    static void apply_config(const json::Logging& config) {
+    static void apply_config(const serverconf::Logging& config) {
         if (INITIALIZED.compare_exchange_strong(THE_FALSE, true)) {
 #ifndef STATICLIB_LINUX
             log4cplus::initialize();
@@ -81,7 +81,7 @@ public:
 
 private:
     // todo: check invalid file behaviour
-    static log4cplus::Appender* create_appender_ptr(const json::Appender& conf) {
+    static log4cplus::Appender* create_appender_ptr(const serverconf::Appender& conf) {
         if ("NULL" == conf.appenderType) {
             return new log4cplus::NullAppender();
         } else if ("CONSOLE" == conf.appenderType) {
@@ -98,7 +98,7 @@ private:
 
 };
 PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, log, (const std::string&)(const std::string&)(const std::string&), (), common::WiltonInternalException)
-PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, apply_config, (const json::Logging&), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, apply_config, (const serverconf::Logging&), (), common::WiltonInternalException)
 
 } // namespace
 }

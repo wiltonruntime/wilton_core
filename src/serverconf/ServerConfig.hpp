@@ -5,8 +5,8 @@
  * Created on May 5, 2016, 7:20 PM
  */
 
-#ifndef WILTON_JSON_SERVERCONFIG_HPP
-#define	WILTON_JSON_SERVERCONFIG_HPP
+#ifndef WILTON_SERVERCONF_SERVERCONFIG_HPP
+#define	WILTON_SERVERCONF_SERVERCONFIG_HPP
 
 #include <cstdint>
 #include <string>
@@ -16,13 +16,13 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "json/DocumentRoot.hpp"
-#include "json/Appender.hpp"
-#include "json/Logging.hpp"
-#include "json/SslConfig.hpp"
+#include "serverconf/DocumentRoot.hpp"
+#include "serverconf/Appender.hpp"
+#include "serverconf/Logging.hpp"
+#include "serverconf/SslConfig.hpp"
 
 namespace wilton {
-namespace json {
+namespace serverconf {
 
 class ServerConfig {
 public:    
@@ -83,7 +83,7 @@ public:
                 if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(std::string() +
                         "Invalid 'documentRoots' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 for (const ss::JsonValue& lo : fi.get_array()) {
-                    auto jd = json::DocumentRoot(lo);
+                    auto jd = serverconf::DocumentRoot(lo);
                     this->documentRoots.emplace_back(std::move(jd));
                 }
             } else if ("logging" == name) {
@@ -94,13 +94,13 @@ public:
             }
         }
         if (0 == logging.appenders.size()) {
-            logging.appenders.emplace_back(json::Appender());
+            logging.appenders.emplace_back(serverconf::Appender());
         }
     }
     
     staticlib::serialization::JsonValue to_json() const {
         namespace sr = staticlib::ranges;
-        auto drs = sr::transform(sr::refwrap(documentRoots), [](const json::DocumentRoot& el) {
+        auto drs = sr::transform(sr::refwrap(documentRoots), [](const serverconf::DocumentRoot& el) {
             return el.to_json();
         });
         return {
@@ -117,5 +117,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_JSON_SERVERCONFIG_HPP */
+#endif	/* WILTON_SERVERCONF_SERVERCONFIG_HPP */
 

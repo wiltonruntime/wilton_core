@@ -14,7 +14,7 @@
 #include "server/Request.hpp"
 #include "server/Server.hpp"
 
-#include "json/ResponseMetadata.hpp"
+#include "serverconf/ResponseMetadata.hpp"
 
 namespace { // anonymous
 
@@ -22,7 +22,7 @@ namespace sc = staticlib::config;
 namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
 namespace ws = wilton::server;
-namespace wj = wilton::json;
+namespace wj = wilton::serverconf;
 
 }
 

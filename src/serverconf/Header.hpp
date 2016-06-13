@@ -5,8 +5,8 @@
  * Created on May 5, 2016, 9:00 PM
  */
 
-#ifndef WILTON_JSON_HEADER_HPP
-#define	WILTON_JSON_HEADER_HPP
+#ifndef WILTON_SERVERCONF_HEADER_HPP
+#define	WILTON_SERVERCONF_HEADER_HPP
 
 #include <string>
 
@@ -16,7 +16,7 @@
 #include "common/WiltonInternalException.hpp"
 
 namespace wilton {
-namespace json {
+namespace serverconf {
 
 class Header {
 public:
@@ -76,5 +76,5 @@ public:
 } // namepspace
 }
 
-#endif	/* WILTON_JSON_HEADER_HPP */
+#endif	/* WILTON_SERVERCONF_HEADER_HPP */
 

@@ -5,8 +5,8 @@
  * Created on May 5, 2016, 7:20 PM
  */
 
-#ifndef WILTON_JSON_REQUESTMETADATA_HPP
-#define	WILTON_JSON_REQUESTMETADATA_HPP
+#ifndef WILTON_SERVERCONF_REQUESTMETADATA_HPP
+#define	WILTON_SERVERCONF_REQUESTMETADATA_HPP
 
 #include <cstdint>
 #include <string>
@@ -17,10 +17,10 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "json/Header.hpp"
+#include "serverconf/Header.hpp"
 
 namespace wilton {
-namespace json {
+namespace serverconf {
 
 class RequestMetadata {
     std::string httpVersion;
@@ -28,7 +28,7 @@ class RequestMetadata {
     std::string method;
     std::string pathname;
     std::string query;
-    std::vector<json::Header> headers;
+    std::vector<serverconf::Header> headers;
 
 public:
     RequestMetadata(const RequestMetadata&) = delete;
@@ -55,7 +55,7 @@ public:
     
     RequestMetadata(const std::string& httpVersion, const std::string& protocol, 
             const std::string& method, const std::string& pathname,
-            const std::string& query, std::vector<json::Header> headers) :
+            const std::string& query, std::vector<serverconf::Header> headers) :
     httpVersion(httpVersion.data(), httpVersion.length()),
     protocol(protocol.data(), protocol.length()),
     method(method.data(), method.length()),
@@ -66,7 +66,7 @@ public:
     staticlib::serialization::JsonValue to_json() const {
         namespace ss = staticlib::serialization;
         namespace sr = staticlib::ranges;
-        auto ha = sr::transform(sr::refwrap(headers), [](const json::Header& el) {
+        auto ha = sr::transform(sr::refwrap(headers), [](const serverconf::Header& el) {
             return el.to_json();
         });
         std::vector<ss::JsonField> hfields = sr::emplace_to_vector(std::move(ha));
@@ -95,5 +95,5 @@ private:
 } // namespace
 }
 
-#endif	/* WILTON_JSON_REQUESTMETADATA_HPP */
+#endif	/* WILTON_SERVERCONF_REQUESTMETADATA_HPP */
 

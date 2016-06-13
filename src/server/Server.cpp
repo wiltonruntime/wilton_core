@@ -26,8 +26,8 @@
 #include "server/StringPayloadHandler.hpp"
 #include "server/ZipHandler.hpp"
 
-#include "json/ServerConfig.hpp"
-#include "json/Logging.hpp"
+#include "serverconf/ServerConfig.hpp"
+#include "serverconf/Logging.hpp"
 
 namespace wilton {
 namespace server {
@@ -79,7 +79,7 @@ class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
     std::unique_ptr<sh::http_server> server;
 
 public:
-    Impl(gateway_fun_type gateway, json::ServerConfig conf) :
+    Impl(gateway_fun_type gateway, serverconf::ServerConfig conf) :
     server(sc::make_unique<sh::http_server>(
             conf.numberOfThreads, 
             conf.tcpPort,
@@ -119,7 +119,7 @@ public:
     }
     
 };
-PIMPL_FORWARD_CONSTRUCTOR(Server, (gateway_fun_type)(json::ServerConfig), (), common::WiltonInternalException)
+PIMPL_FORWARD_CONSTRUCTOR(Server, (gateway_fun_type)(serverconf::ServerConfig), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Server, void, stop, (), (), common::WiltonInternalException)
 
 } // namespace

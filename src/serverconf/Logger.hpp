@@ -5,8 +5,8 @@
  * Created on May 10, 2016, 8:01 PM
  */
 
-#ifndef WILTON_JSON_LOGGER_HPP
-#define	WILTON_JSON_LOGGER_HPP
+#ifndef WILTON_SERVERCONF_LOGGER_HPP
+#define	WILTON_SERVERCONF_LOGGER_HPP
 
 #include <string>
 
@@ -16,7 +16,7 @@
 #include "common/WiltonInternalException.hpp"
 
 namespace wilton {
-namespace json {
+namespace serverconf {
 
 class Logger {
 public:
@@ -73,5 +73,5 @@ public:
 } // namepspace
 }
 
-#endif	/* WILTON_JSON_LOGGER_HPP */
+#endif	/* WILTON_SERVERCONF_LOGGER_HPP */
 
