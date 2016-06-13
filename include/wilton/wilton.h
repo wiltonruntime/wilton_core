@@ -223,10 +223,23 @@ WILTON_EXPORT char* wilton_DBTransaction_rollback(
 
 // HttpClient
 
+/*
+ {
+    // https://curl.haxx.se/libcurl/c/CURLMOPT_MAX_HOST_CONNECTIONS.html
+    "maxHostConnections" : uint32_t,
+    // https://curl.haxx.se/libcurl/c/CURLMOPT_MAX_TOTAL_CONNECTIONS.html
+    "maxTotalConnections" : uint32_t,
+    // https://curl.haxx.se/libcurl/c/CURLMOPT_MAXCONNECTS.html
+    "maxconnects" : uint32_t
+ }
+ */
 WILTON_EXPORT char* wilton_HttpClient_create(
         wilton_HttpClient** http_out,
         const char* conf_json,
         int conf_json_len);
+
+WILTON_EXPORT char* wilton_HttpClient_close(
+        wilton_HttpClient* http);
 
 WILTON_EXPORT char* wilton_HttpClient_execute(
         wilton_HttpClient* http,
@@ -257,9 +270,6 @@ WILTON_EXPORT char* wilton_HttpClient_send_file(
         int* response_data_len_out,
         char** response_metadata_out,
         int* response_metadata_len_out);
-
-WILTON_EXPORT char* wilton_HttpClient_close(
-        wilton_HttpClient* http);
 
 #ifdef	__cplusplus
 }
