@@ -14,14 +14,15 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
+#include "common/utils.hpp"
 
 namespace wilton {
 namespace serverconf {
 
 class Logger {
 public:
-    std::string name;
-    std::string level;
+    std::string name = "";
+    std::string level = "";
 
     Logger(const Logger&) = delete;
 
@@ -44,16 +45,11 @@ public:
         for (const ss::JsonField& fi : json.get_object()) {
             auto& fname = fi.get_name();
             if ("name" == fname) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'logging.loggers.name' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->name = fi.get_string();
+                this->name = common::get_json_string(fi, "logging.loggers.name");
             } else if ("level" == fname) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'logging.loggers.level' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->level = fi.get_string();
+                this->level = common::get_json_string(fi, "logging.loggers.level");
             } else {
-                throw common::WiltonInternalException(TRACEMSG(
-                        "Unknown 'logging.loggers' field: [" + fname + "]"));
+                throw common::WiltonInternalException(TRACEMSG("Unknown 'logging.loggers' field: [" + fname + "]"));
             }
         }
         if (0 == name.length()) throw common::WiltonInternalException(TRACEMSG(

@@ -13,17 +13,17 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
-
+#include "common/utils.hpp"
 
 namespace wilton {
 namespace serverconf {
 
 class SslConfig {
 public:
-    std::string keyFile;
-    std::string keyPassword;
-    std::string verifyFile;
-    std::string verifySubjectSubstr;
+    std::string keyFile = "";
+    std::string keyPassword = "";
+    std::string verifyFile = "";
+    std::string verifySubjectSubstr = "";
 
     SslConfig(const SslConfig&) = delete;
 
@@ -50,22 +50,16 @@ public:
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("keyFile" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'ssl.loggers.keyFile' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->keyFile = fi.get_string();
+                this->keyFile = common::get_json_string(fi, "ssl.keyFile");
             } else if ("keyPassword" == name) {
+                // empty string allowed
                 this->keyPassword = fi.get_string();
             } else if ("verifyFile" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'ssl.loggers.verifyFile' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->verifyFile = fi.get_string();
+                this->verifyFile = common::get_json_string(fi, "ssl.verifyFile");
             } else if ("verifySubjectSubstr" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'ssl.loggers.verifySubjectSubstr' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->verifySubjectSubstr = fi.get_string();
+                this->verifySubjectSubstr = common::get_json_string(fi, "ssl.verifySubjectSubstr");
             } else {
-                throw common::WiltonInternalException(TRACEMSG(
-                        "Unknown 'ssl' field: [" + name + "]"));                
+                throw common::WiltonInternalException(TRACEMSG("Unknown 'ssl' field: [" + name + "]"));                
             }
         }
     }

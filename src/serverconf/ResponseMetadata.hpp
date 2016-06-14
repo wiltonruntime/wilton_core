@@ -16,6 +16,7 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
+#include "common/utils.hpp"
 #include "serverconf/Header.hpp"
 
 namespace wilton {
@@ -48,28 +49,16 @@ public:
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("statusCode" == name) {
-                if (ss::JsonType::INTEGER != fi.get_type() ||
-                        fi.get_int32() < 0 ||
-                        fi.get_uint32() > std::numeric_limits<uint16_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(
-                            "Invalid 'statusCode' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                }
-                this->statusCode = fi.get_uint16();
+                this->statusCode = common::get_json_uint16(fi, "statusCode");
             } else if ("statusMessage" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'statusMessage' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->statusMessage = fi.get_string();
+                this->statusMessage = common::get_json_string(fi, "statusMessage");
             } else if ("headers" == name) {
-                if (ss::JsonType::OBJECT != fi.get_type()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'headers' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                for (const auto& hf : fi.get_object()) {
-                    if (ss::JsonType::STRING != hf.get_type()) throw common::WiltonInternalException(TRACEMSG(
-                            "Invalid 'headers' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                    this->headers.emplace_back(hf.get_name(), hf.get_string());
+                for (const ss::JsonField& hf : common::get_json_object(fi, "headers")) {
+                    std::string val = common::get_json_string(hf, std::string("headers.") + hf.get_name());
+                    this->headers.emplace_back(hf.get_name(), std::move(val));
                 }
             } else {
-                throw common::WiltonInternalException(TRACEMSG(
-                        "Unknown field: [" + name + "]"));
+                throw common::WiltonInternalException(TRACEMSG("Unknown field: [" + name + "]"));
             }
         }
     }

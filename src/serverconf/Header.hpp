@@ -14,14 +14,15 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
+#include "common/utils.hpp"
 
 namespace wilton {
 namespace serverconf {
 
 class Header {
 public:
-    std::string name;
-    std::string value;
+    std::string name = "";
+    std::string value = "";
 
     Header(const Header&) = delete;
 
@@ -48,16 +49,11 @@ public:
         for (const ss::JsonField& fi : json.get_object()) {
             auto& fname = fi.get_name();
             if ("name" == fname) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'header' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->name = fi.get_string();
+                this->name = common::get_json_string(fi, "header.name");
             } else if ("value" == fname) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'header' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->value = fi.get_string();
+                this->value = common::get_json_string(fi, "header.value");
             } else {
-                throw common::WiltonInternalException(TRACEMSG(
-                        "Unknown 'header' field: [" + fname + "]"));
+                throw common::WiltonInternalException(TRACEMSG("Unknown 'header' field: [" + fname + "]"));
             }
         }
         if (0 == name.length()) throw common::WiltonInternalException(TRACEMSG(

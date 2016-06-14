@@ -14,6 +14,7 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
+#include "common/utils.hpp"
 
 namespace wilton {
 namespace serverconf {
@@ -50,35 +51,20 @@ public:
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("appenderType" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'logging.appenders.appenderType' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->appenderType = fi.get_string();
+                this->appenderType = common::get_json_string(fi, "logging.appenders.appenderType");
             } else if ("filePath" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'logging.appenders.filePath' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->filePath = fi.get_string();
+                this->filePath = common::get_json_string(fi, "logging.appenders.filePath");
             } else if ("layout" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'logging.appenders.layout' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->layout = fi.get_string();
+                this->layout = common::get_json_string(fi, "logging.appenders.layout");
             } else if ("thresholdLevel" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'logging.appenders.thresholdLevel' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                this->thresholdLevel = fi.get_string();
+                this->thresholdLevel = common::get_json_string(fi, "logging.appenders.thresholdLevel");
             } else {
-                throw common::WiltonInternalException(TRACEMSG(
-                        "Unknown 'logging.appenders' field: [" + name + "]"));
+                throw common::WiltonInternalException(TRACEMSG("Unknown 'logging.appenders' field: [" + name + "]"));
             }
         }
-        if (0 == appenderType.length()) throw common::WiltonInternalException(TRACEMSG(
-                "Invalid 'logging.appenders.appenderType' field: []"));
         if (("FILE" == appenderType || "DAILY_ROLLING_FILE" == appenderType) &&
-                0 == filePath.length()) throw common::WiltonInternalException(TRACEMSG(
+                filePath.empty()) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid 'logging.appenders.filePath' field: []"));
-        if (0 == layout.length()) throw common::WiltonInternalException(TRACEMSG(
-                "Invalid 'logging.appenders.layout' field: []"));
-        if (0 == thresholdLevel.length()) throw common::WiltonInternalException(TRACEMSG(
-                "Invalid 'logging.appenders.thresholdLevel' field: []"));
     }
 
     staticlib::serialization::JsonValue to_json() const {

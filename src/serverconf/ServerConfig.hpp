@@ -16,6 +16,7 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
+#include "common/utils.hpp"
 #include "serverconf/DocumentRoot.hpp"
 #include "serverconf/Appender.hpp"
 #include "serverconf/Logging.hpp"
@@ -60,37 +61,22 @@ public:
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("numberOfThreads" == name) {
-                if (ss::JsonType::INTEGER != fi.get_type() ||
-                        fi.get_int32() < 0 ||
-                        fi.get_uint32() > std::numeric_limits<uint16_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(
-                            "Invalid 'numberOfThreads' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                }
-                this->numberOfThreads = fi.get_uint16();
+                this->numberOfThreads = common::get_json_uint16(fi, "numberOfThreads");
             } else if ("tcpPort" == name) {
-                if (ss::JsonType::INTEGER != fi.get_type() ||
-                        fi.get_int32() < 0 ||
-                        fi.get_integer() > std::numeric_limits<uint32_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(
-                            "Invalid 'tcpPort' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                }
-                this->tcpPort = fi.get_uint32();
+                this->tcpPort = common::get_json_uint16(fi, "tcpPort");
             } else if ("ipAddress" == name) {
-                this->ipAddress = fi.get_string();
+                this->ipAddress = common::get_json_string(fi, "ipAddress");
             } else if ("ssl" == name) {
                 this->ssl = SslConfig(fi.get_value());
             } else if ("documentRoots" == name) {
-                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(
-                        "Invalid 'documentRoots' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                for (const ss::JsonValue& lo : fi.get_array()) {
+                for (const ss::JsonValue& lo : common::get_json_array(fi, "documentRoots")) {
                     auto jd = serverconf::DocumentRoot(lo);
                     this->documentRoots.emplace_back(std::move(jd));
                 }
             } else if ("logging" == name) {
                 this->logging = Logging(fi.get_value());
             } else {
-                throw common::WiltonInternalException(TRACEMSG(
-                        "Unknown field: [" + name + "]"));
+                throw common::WiltonInternalException(TRACEMSG("Unknown field: [" + name + "]"));
             }
         }
         if (0 == logging.appenders.size()) {
