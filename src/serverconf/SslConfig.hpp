@@ -50,21 +50,21 @@ public:
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("keyFile" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
+                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
                         "Invalid 'ssl.loggers.keyFile' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->keyFile = fi.get_string();
             } else if ("keyPassword" == name) {
                 this->keyPassword = fi.get_string();
             } else if ("verifyFile" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
+                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
                         "Invalid 'ssl.loggers.verifyFile' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->verifyFile = fi.get_string();
             } else if ("verifySubjectSubstr" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
+                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
                         "Invalid 'ssl.loggers.verifySubjectSubstr' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->verifySubjectSubstr = fi.get_string();
             } else {
-                throw common::WiltonInternalException(TRACEMSG(std::string() +
+                throw common::WiltonInternalException(TRACEMSG(
                         "Unknown 'ssl' field: [" + name + "]"));                
             }
         }

@@ -88,14 +88,14 @@ public:
     }
 
     void send_response(Request&, const char* data, uint32_t data_len) {
-        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(std::string() +
+        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         resp->write(data, data_len);
         resp->send();
     }
 
     void send_file(Request&, std::string file_path, std::function<void(bool) > finalizer) {
-        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(std::string() +
+        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         su::FileDescriptor fd{file_path, 'r'};
         auto fd_ptr = si::make_source_istream_ptr(std::move(fd));
@@ -104,7 +104,7 @@ public:
     }
 
     void send_mustache(Request&, std::string mustache_file_path, ss::JsonValue json) {
-        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(std::string() +
+        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         auto mp = mustache::MustacheProcessor{mustache_file_path, std::move(json)};
         auto mp_ptr = si::make_source_istream_ptr(std::move(mp));

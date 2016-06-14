@@ -45,7 +45,7 @@ public:
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
                         fi.get_integer() > std::numeric_limits<uint32_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(std::string() +
+                    throw common::WiltonInternalException(TRACEMSG(
                             "Invalid 'maxHostConnections' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->options.max_host_connections = fi.get_uint32();
@@ -53,7 +53,7 @@ public:
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
                         fi.get_integer() > std::numeric_limits<uint32_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(std::string() +
+                    throw common::WiltonInternalException(TRACEMSG(
                             "Invalid 'maxTotalConnections' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->options.max_total_connections = fi.get_uint32();
@@ -61,12 +61,12 @@ public:
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
                         fi.get_integer() > std::numeric_limits<uint32_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(std::string() +
+                    throw common::WiltonInternalException(TRACEMSG(
                             "Invalid 'maxconnects' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->options.maxconnects = fi.get_uint32();
             } else {
-                throw common::WiltonInternalException(TRACEMSG(std::string() +
+                throw common::WiltonInternalException(TRACEMSG(
                         "Unknown 'logging.appenders' field: [" + name + "]"));
             }
         }
@@ -79,6 +79,9 @@ public:
             { "maxconnects", options.maxconnects }
         };
     }
+    
+    
+    
     
 };
 

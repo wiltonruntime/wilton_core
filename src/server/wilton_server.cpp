@@ -61,14 +61,11 @@ char* wilton_Server_create(
         wilton_Request* request),
         const char* conf_json,
         int conf_json_len) /* noexcept */ {
-    if (nullptr == server_out) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'server_out' parameter specified"));
-    if (nullptr == gateway_cb) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'gateway_cb' parameter specified"));
-    if (nullptr == conf_json) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'conf_json' parameter specified"));
+    if (nullptr == server_out) return su::alloc_copy(TRACEMSG("Null 'server_out' parameter specified"));
+    if (nullptr == gateway_cb) return su::alloc_copy(TRACEMSG("Null 'gateway_cb' parameter specified"));
+    if (nullptr == conf_json) return su::alloc_copy(TRACEMSG("Null 'conf_json' parameter specified"));
     if (conf_json_len <= 0 ||
-            static_cast<int64_t> (conf_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<int64_t> (conf_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(
             "Invalid 'conf_json_len' parameter specified: [" + sc::to_string(conf_json_len) + "]"));
     try {
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
@@ -87,30 +84,30 @@ char* wilton_Server_create(
         *server_out = server_ptr;
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 char* wilton_Server_stop_server(wilton_Server* server) /* noexcept */ {
-    if (nullptr == server) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == server) return su::alloc_copy(TRACEMSG(
             "Null 'server' parameter specified"));
     try {
         server->impl().stop();
         delete server;
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 // TODO: fixme json copy
 char* wilton_Request_get_request_metadata(wilton_Request* request, char** metadata_json_out,
         int* metadata_json_len_out) /* noexcept */ {
-    if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == request) return su::alloc_copy(TRACEMSG(
             "Null 'server' parameter specified"));
-    if (nullptr == metadata_json_out) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == metadata_json_out) return su::alloc_copy(TRACEMSG(
             "Null 'metadata_json_out' parameter specified"));
-    if (nullptr == metadata_json_len_out) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == metadata_json_len_out) return su::alloc_copy(TRACEMSG(
             "Null 'metadata_json_len_out' parameter specified"));
     try {
         auto meta = request->impl().get_request_metadata();
@@ -120,18 +117,18 @@ char* wilton_Request_get_request_metadata(wilton_Request* request, char** metada
         *metadata_json_len_out = res.size();
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 // TODO: think about copy
 char* wilton_Request_get_request_data(wilton_Request* request, char** data_out,
         int* data_len_out) /* noexcept */ {
-    if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == request) return su::alloc_copy(TRACEMSG(
             "Null 'request' parameter specified"));
-    if (nullptr == data_out) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == data_out) return su::alloc_copy(TRACEMSG(
             "Null 'data_out' parameter specified"));
-    if (nullptr == data_len_out) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == data_len_out) return su::alloc_copy(TRACEMSG(
             "Null 'data_len_out' parameter specified"));
     try {
         const std::string& res = request->impl().get_request_data();
@@ -139,19 +136,19 @@ char* wilton_Request_get_request_data(wilton_Request* request, char** data_out,
         *data_len_out = res.size();
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 // TODO: fixme json copy
 char* wilton_Request_set_response_metadata(wilton_Request* request,
         const char* metadata_json, int metadata_json_len) /* noexcept */ {
-    if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == request) return su::alloc_copy(TRACEMSG(
             "Null 'request' parameter specified"));
-    if (nullptr == metadata_json) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == metadata_json) return su::alloc_copy(TRACEMSG(
             "Null 'metadata_json' parameter specified"));
     if (metadata_json_len <= 0 ||
-            static_cast<uint64_t> (metadata_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<uint64_t> (metadata_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(
             "Invalid 'metadata_json_len' parameter specified: [" + sc::to_string(metadata_json_len) + "]"));
     try {
         uint32_t metadata_json_len_u32 = static_cast<uint32_t> (metadata_json_len);
@@ -161,25 +158,25 @@ char* wilton_Request_set_response_metadata(wilton_Request* request,
         request->impl().set_response_metadata(std::move(rm));
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 char* wilton_Request_send_response(wilton_Request* request, const char* data,
         int data_len) /* noexcept */ {
-    if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == request) return su::alloc_copy(TRACEMSG(
             "Null 'request' parameter specified"));
-    if (nullptr == data) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == data) return su::alloc_copy(TRACEMSG(
             "Null 'data' parameter specified"));
     if (data_len < 0 ||
-            static_cast<uint64_t> (data_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<uint64_t> (data_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(
             "Invalid 'data_len' parameter specified: [" + sc::to_string(data_len) + "]"));
     try {
         uint32_t data_len_u32 = static_cast<uint32_t> (data_len);
         request->impl().send_response(data, data_len_u32);
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
@@ -191,14 +188,14 @@ char* wilton_Request_send_file(
         void (*finalizer_cb)(
         void* finalizer_ctx,
         int sent_successfully)) /* noexcept */ {
-    if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == request) return su::alloc_copy(TRACEMSG(
             "Null 'request' parameter specified"));
-    if (nullptr == file_path) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == file_path) return su::alloc_copy(TRACEMSG(
             "Null 'file_path' parameter specified"));
     if (file_path_len <= 0 ||
-            static_cast<uint32_t> (file_path_len) > std::numeric_limits<uint16_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<uint32_t> (file_path_len) > std::numeric_limits<uint16_t>::max()) return su::alloc_copy(TRACEMSG(
             "Invalid 'file_path_len' parameter specified: [" + sc::to_string(file_path_len) + "]"));
-    if (nullptr == finalizer_cb) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == finalizer_cb) return su::alloc_copy(TRACEMSG(
             "Null 'finalizer_cb' parameter specified"));
     try {
         uint16_t file_path_len_u16 = static_cast<uint16_t> (file_path_len);
@@ -210,7 +207,7 @@ char* wilton_Request_send_file(
                 });
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
@@ -220,17 +217,17 @@ char* wilton_Request_send_mustache(
         int mustache_file_path_len,
         const char* values_json,
         int values_json_len) /* noexcept */ {
-    if (nullptr == request) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == request) return su::alloc_copy(TRACEMSG(
             "Null 'request' parameter specified"));
-    if (nullptr == mustache_file_path) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == mustache_file_path) return su::alloc_copy(TRACEMSG(
             "Null 'mustache_file_path' parameter specified"));
     if (mustache_file_path_len <= 0 ||
-            static_cast<uint32_t> (mustache_file_path_len) > std::numeric_limits<uint16_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<uint32_t> (mustache_file_path_len) > std::numeric_limits<uint16_t>::max()) return su::alloc_copy(TRACEMSG(
             "Invalid 'mustache_file_path_len' parameter specified: [" + sc::to_string(mustache_file_path_len) + "]"));
-    if (nullptr == values_json) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == values_json) return su::alloc_copy(TRACEMSG(
             "Null 'values_json' parameter specified"));
     if (values_json_len <= 0 ||
-            static_cast<uint64_t> (values_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<uint64_t> (values_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(
             "Invalid 'values_json_len' parameter specified: [" + sc::to_string(values_json_len) + "]"));
     try {
         uint16_t mustache_file_path_len_u16 = static_cast<uint16_t> (mustache_file_path_len);
@@ -241,6 +238,6 @@ char* wilton_Request_send_mustache(
         request->impl().send_mustache(std::move(mustache_file_path_str), std::move(json));
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }

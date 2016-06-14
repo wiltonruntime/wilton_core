@@ -38,7 +38,7 @@ public:
     Impl(const std::string& mustache_file_path, ss::JsonValue json) try :
         renderer(read_file(mustache_file_path), create_node(json)) {
     } catch (const std::exception& e) {
-        throw common::WiltonInternalException(TRACEMSG(std::string() + e.what() +
+        throw common::WiltonInternalException(TRACEMSG(e.what() +
                 "\nError processing mustache template: [" + mustache_file_path + "]" +
                 " with values: [" + ss::dump_json_to_string(json) + "]"));
     }
@@ -71,7 +71,7 @@ private:
         case (ss::JsonType::INTEGER): return mstch::node(static_cast<int> (value.get_integer()));
         case (ss::JsonType::REAL): return mstch::node(value.get_real());
         case (ss::JsonType::BOOLEAN): return mstch::node(value.get_boolean());
-        default: throw common::WiltonInternalException(TRACEMSG(std::string() +
+        default: throw common::WiltonInternalException(TRACEMSG(
                     "Unsupported JSON type:[" + sc::to_string(static_cast<char> (value.get_type())) + "]"));
         }
     }

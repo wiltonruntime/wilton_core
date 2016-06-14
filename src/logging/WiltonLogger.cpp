@@ -91,7 +91,7 @@ private:
         } else if ("DAILY_ROLLING_FILE" == conf.appenderType) {
             return new log4cplus::DailyRollingFileAppender(conf.filePath);
         } else {
-            throw common::WiltonInternalException(TRACEMSG(std::string() +
+            throw common::WiltonInternalException(TRACEMSG(
                     "Invalid 'logging.appender.appenderType': [" + conf.appenderType + "]"));
         }
     }

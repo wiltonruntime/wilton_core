@@ -51,24 +51,24 @@ public:
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
                         fi.get_uint32() > std::numeric_limits<uint16_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(std::string() +
+                    throw common::WiltonInternalException(TRACEMSG(
                             "Invalid 'statusCode' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->statusCode = fi.get_uint16();
             } else if ("statusMessage" == name) {
-                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(std::string() +
+                if (0 == fi.get_string().length()) throw common::WiltonInternalException(TRACEMSG(
                         "Invalid 'statusMessage' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 this->statusMessage = fi.get_string();
             } else if ("headers" == name) {
-                if (ss::JsonType::OBJECT != fi.get_type()) throw common::WiltonInternalException(TRACEMSG(std::string() +
+                if (ss::JsonType::OBJECT != fi.get_type()) throw common::WiltonInternalException(TRACEMSG(
                         "Invalid 'headers' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 for (const auto& hf : fi.get_object()) {
-                    if (ss::JsonType::STRING != hf.get_type()) throw common::WiltonInternalException(TRACEMSG(std::string() +
+                    if (ss::JsonType::STRING != hf.get_type()) throw common::WiltonInternalException(TRACEMSG(
                             "Invalid 'headers' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                     this->headers.emplace_back(hf.get_name(), hf.get_string());
                 }
             } else {
-                throw common::WiltonInternalException(TRACEMSG(std::string() +
+                throw common::WiltonInternalException(TRACEMSG(
                         "Unknown field: [" + name + "]"));
             }
         }

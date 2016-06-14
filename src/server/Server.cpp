@@ -40,39 +40,6 @@ namespace ss = staticlib::serialization;
 
 typedef std::function<void(Request& req)> gateway_fun_type;
 
-std::function<std::string(std::size_t, asio::ssl::context::password_purpose)> create_pwd_cb(const std::string& password) {
-    return [password](std::size_t, asio::ssl::context::password_purpose) {
-        return password;
-    };
-}
-
-std::string extract_subject(asio::ssl::verify_context& ctx) {
-    if (ctx.native_handle() && ctx.native_handle()->current_cert && ctx.native_handle()->current_cert->name) {
-        return std::string(ctx.native_handle()->current_cert->name);
-    } else return "";
-}
-
-std::function<bool(bool, asio::ssl::verify_context&)> create_verifier_cb(const std::string& subject_part) {
-    return [subject_part](bool preverify_ok, asio::ssl::verify_context& ctx) {
-        // cert validation fail
-        if (!preverify_ok) {
-            return false;
-        }
-        // not the leaf certificate
-        if (ctx.native_handle()->error_depth > 0) {
-            return true;
-        }
-        // no subject restrictions
-        if (subject_part.empty()) {
-            return true;
-        }
-        // check substr
-        std::string subject = extract_subject(ctx);
-        auto pos = subject.find(subject_part);
-        return std::string::npos != pos;
-    };
-}
-
 } // namespace
 
 class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
@@ -108,7 +75,7 @@ public:
                 server->add_handler("GET", dr.resource, FileHandler(dr));
             } else if (dr.zipPath.length() > 0) {
                 server->add_handler("GET", dr.resource, ZipHandler(dr));
-            } else throw common::WiltonInternalException(TRACEMSG(std::string() +
+            } else throw common::WiltonInternalException(TRACEMSG(
                     "Invalid 'documentRoot': [" + ss::dump_json_to_string(dr.to_json()) + "]"));
         }
         server->start();
@@ -116,6 +83,40 @@ public:
 
     void stop(Server&) {
         server->stop();
+    }
+    
+private:
+    static std::function<std::string(std::size_t, asio::ssl::context::password_purpose) > create_pwd_cb(const std::string& password) {
+        return [password](std::size_t, asio::ssl::context::password_purpose) {
+            return password;
+        };
+    }
+
+    static std::string extract_subject(asio::ssl::verify_context& ctx) {
+        if (ctx.native_handle() && ctx.native_handle()->current_cert && ctx.native_handle()->current_cert->name) {
+            return std::string(ctx.native_handle()->current_cert->name);
+        } else return "";
+    }
+
+    static std::function<bool(bool, asio::ssl::verify_context&) > create_verifier_cb(const std::string& subject_part) {
+        return [subject_part](bool preverify_ok, asio::ssl::verify_context & ctx) {
+            // cert validation fail
+            if (!preverify_ok) {
+                return false;
+            }
+            // not the leaf certificate
+            if (ctx.native_handle()->error_depth > 0) {
+                return true;
+            }
+            // no subject restrictions
+            if (subject_part.empty()) {
+                return true;
+            }
+            // check substr
+            std::string subject = extract_subject(ctx);
+            auto pos = subject.find(subject_part);
+            return std::string::npos != pos;
+        };
     }
     
 };

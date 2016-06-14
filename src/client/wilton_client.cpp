@@ -41,12 +41,10 @@ char* wilton_HttpClient_create(
         wilton_HttpClient** http_out,
         const char* conf_json,
         int conf_json_len) {
-    if (nullptr == http_out) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'http_out' parameter specified"));
-    if (nullptr == conf_json) return su::alloc_copy(TRACEMSG(std::string() +
-            "Null 'conf_json' parameter specified"));
+    if (nullptr == http_out) return su::alloc_copy(TRACEMSG("Null 'http_out' parameter specified"));
+    if (nullptr == conf_json) return su::alloc_copy(TRACEMSG("Null 'conf_json' parameter specified"));
     if (conf_json_len <= 0 ||
-            static_cast<int64_t> (conf_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<int64_t> (conf_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(
             "Invalid 'conf_json_len' parameter specified: [" + sc::to_string(conf_json_len) + "]"));
     try {
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
@@ -58,18 +56,18 @@ char* wilton_HttpClient_create(
         *http_out = http_ptr;
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 WILTON_EXPORT char* wilton_HttpClient_close(
         wilton_HttpClient* http) {
-    if (nullptr == http) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == http) return su::alloc_copy(TRACEMSG(
             "Null 'http' parameter specified"));
     try {
         delete http;
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }

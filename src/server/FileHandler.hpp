@@ -49,7 +49,7 @@ public:
     // todo: path leading slash check
     FileHandler(const serverconf::DocumentRoot& conf) :
     conf(std::make_shared<serverconf::DocumentRoot>(conf.clone())) {
-        if (0 == this->conf->dirPath.length()) throw common::WiltonInternalException(TRACEMSG(std::string() + 
+        if (0 == this->conf->dirPath.length()) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid empty 'dirPath' specified"));
     }
     

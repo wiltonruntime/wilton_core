@@ -63,7 +63,7 @@ public:
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
                         fi.get_uint32() > std::numeric_limits<uint16_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(std::string() +
+                    throw common::WiltonInternalException(TRACEMSG(
                             "Invalid 'numberOfThreads' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->numberOfThreads = fi.get_uint16();
@@ -71,7 +71,7 @@ public:
                 if (ss::JsonType::INTEGER != fi.get_type() ||
                         fi.get_int32() < 0 ||
                         fi.get_integer() > std::numeric_limits<uint32_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(std::string() +
+                    throw common::WiltonInternalException(TRACEMSG(
                             "Invalid 'tcpPort' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 }
                 this->tcpPort = fi.get_uint32();
@@ -80,7 +80,7 @@ public:
             } else if ("ssl" == name) {
                 this->ssl = SslConfig(fi.get_value());
             } else if ("documentRoots" == name) {
-                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(std::string() +
+                if (ss::JsonType::ARRAY != fi.get_type() || 0 == fi.get_array().size()) throw common::WiltonInternalException(TRACEMSG(
                         "Invalid 'documentRoots' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
                 for (const ss::JsonValue& lo : fi.get_array()) {
                     auto jd = serverconf::DocumentRoot(lo);
@@ -89,7 +89,7 @@ public:
             } else if ("logging" == name) {
                 this->logging = Logging(fi.get_value());
             } else {
-                throw common::WiltonInternalException(TRACEMSG(std::string() +
+                throw common::WiltonInternalException(TRACEMSG(
                         "Unknown field: [" + name + "]"));
             }
         }

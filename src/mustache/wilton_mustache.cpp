@@ -32,19 +32,19 @@ char* wilton_render_mustache(
         int values_json_len,
         char** output_text_out,
         int* output_text_len_out) /* noexcept */ {
-    if (nullptr == template_text) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == template_text) return su::alloc_copy(TRACEMSG(
             "Null 'template_text' parameter specified"));
     if (template_text_len < 0 ||
-            static_cast<uint64_t> (template_text_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<uint64_t> (template_text_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(
             "Invalid 'template_text_len' parameter specified: [" + sc::to_string(template_text_len) + "]"));
-    if (nullptr == values_json) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == values_json) return su::alloc_copy(TRACEMSG(
             "Null 'values_json' parameter specified"));
     if (values_json_len < 0 ||
-            static_cast<uint64_t> (values_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(std::string() +
+            static_cast<uint64_t> (values_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(
             "Invalid 'values_json_len' parameter specified: [" + sc::to_string(values_json_len) + "]"));
-    if (nullptr == output_text_out) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == output_text_out) return su::alloc_copy(TRACEMSG(
             "Null 'output_text_out' parameter specified"));
-    if (nullptr == output_text_len_out) return su::alloc_copy(TRACEMSG(std::string() +
+    if (nullptr == output_text_len_out) return su::alloc_copy(TRACEMSG(
             "Null 'output_text_len_out' parameter specified"));
     try {
         uint32_t template_text_len_u32 = static_cast<uint32_t> (template_text_len);
@@ -57,6 +57,6 @@ char* wilton_render_mustache(
         *output_text_len_out = res.size();
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(std::string() + e.what() + "\nException raised"));
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
