@@ -30,20 +30,14 @@ char* wilton_log(
         int logger_name_len,
         const char* message,
         int message_len) {
-    if (nullptr == level_name) return su::alloc_copy(TRACEMSG(
-            "Null 'level_name' parameter specified"));
-    if (level_name_len <= 0 ||
-            static_cast<int64_t> (level_name_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(
+    if (nullptr == level_name) return su::alloc_copy(TRACEMSG("Null 'level_name' parameter specified"));
+    if (!su::is_positive_uint16(level_name_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'level_name_len' parameter specified: [" + sc::to_string(level_name_len) + "]"));
-    if (nullptr == logger_name) return su::alloc_copy(TRACEMSG(
-            "Null 'logger_name' parameter specified"));
-    if (logger_name_len <= 0 ||
-            static_cast<int64_t> (logger_name_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(
+    if (nullptr == logger_name) return su::alloc_copy(TRACEMSG("Null 'logger_name' parameter specified"));
+    if (!su::is_positive_uint16(logger_name_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'logger_name_len' parameter specified: [" + sc::to_string(logger_name_len) + "]"));
-    if (nullptr == message) return su::alloc_copy(TRACEMSG(
-            "Null 'message' parameter specified"));
-    if (message_len <= 0 ||
-            static_cast<int64_t> (message_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(
+    if (nullptr == message) return su::alloc_copy(TRACEMSG("Null 'message' parameter specified"));
+    if (!su::is_uint32(message_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'message_len' parameter specified: [" + sc::to_string(message_len) + "]"));
     try {
         uint32_t level_name_len_u32 = static_cast<uint32_t> (level_name_len);

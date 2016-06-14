@@ -43,8 +43,7 @@ char* wilton_HttpClient_create(
         int conf_json_len) {
     if (nullptr == http_out) return su::alloc_copy(TRACEMSG("Null 'http_out' parameter specified"));
     if (nullptr == conf_json) return su::alloc_copy(TRACEMSG("Null 'conf_json' parameter specified"));
-    if (conf_json_len <= 0 ||
-            static_cast<int64_t> (conf_json_len) > std::numeric_limits<uint32_t>::max()) return su::alloc_copy(TRACEMSG(
+    if (!su::is_positive_uint32(conf_json_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'conf_json_len' parameter specified: [" + sc::to_string(conf_json_len) + "]"));
     try {
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
@@ -62,8 +61,7 @@ char* wilton_HttpClient_create(
 
 WILTON_EXPORT char* wilton_HttpClient_close(
         wilton_HttpClient* http) {
-    if (nullptr == http) return su::alloc_copy(TRACEMSG(
-            "Null 'http' parameter specified"));
+    if (nullptr == http) return su::alloc_copy(TRACEMSG("Null 'http' parameter specified"));
     try {
         delete http;
         return nullptr;
