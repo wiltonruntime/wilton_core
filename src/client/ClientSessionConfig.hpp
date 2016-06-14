@@ -15,6 +15,7 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
+#include "common/utils.hpp"
 
 namespace wilton {
 namespace client {
@@ -42,32 +43,13 @@ public:
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("maxHostConnections" == name) {
-                if (ss::JsonType::INTEGER != fi.get_type() ||
-                        fi.get_int32() < 0 ||
-                        fi.get_integer() > std::numeric_limits<uint32_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(
-                            "Invalid 'maxHostConnections' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                }
-                this->options.max_host_connections = fi.get_uint32();
+                this->options.max_host_connections = common::get_json_uint32(fi, "maxHostConnections");
             } else if ("maxTotalConnections" == name) {
-                if (ss::JsonType::INTEGER != fi.get_type() ||
-                        fi.get_int32() < 0 ||
-                        fi.get_integer() > std::numeric_limits<uint32_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(
-                            "Invalid 'maxTotalConnections' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                }
-                this->options.max_total_connections = fi.get_uint32();
+                this->options.max_total_connections = common::get_json_uint32(fi, "maxTotalConnections");
             } else if ("maxconnects" == name) {
-                if (ss::JsonType::INTEGER != fi.get_type() ||
-                        fi.get_int32() < 0 ||
-                        fi.get_integer() > std::numeric_limits<uint32_t>::max()) {
-                    throw common::WiltonInternalException(TRACEMSG(
-                            "Invalid 'maxconnects' field: [" + ss::dump_json_to_string(fi.get_value()) + "]"));
-                }
-                this->options.maxconnects = fi.get_uint32();
+                this->options.maxconnects = common::get_json_uint32(fi, "maxconnects");
             } else {
-                throw common::WiltonInternalException(TRACEMSG(
-                        "Unknown 'logging.appenders' field: [" + name + "]"));
+                throw common::WiltonInternalException(TRACEMSG("Unknown 'ClientSession' field: [" + name + "]"));
             }
         }
     }
@@ -79,9 +61,6 @@ public:
             { "maxconnects", options.maxconnects }
         };
     }
-    
-    
-    
     
 };
 

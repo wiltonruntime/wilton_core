@@ -57,8 +57,8 @@ char* wilton_Server_create(
         wilton_Server** server_out,
         void* gateway_ctx,
         void (*gateway_cb)(
-        void* gateway_ctx,
-        wilton_Request* request),
+                void* gateway_ctx,
+                wilton_Request* request),
         const char* conf_json,
         int conf_json_len) /* noexcept */ {
     if (nullptr == server_out) return su::alloc_copy(TRACEMSG("Null 'server_out' parameter specified"));

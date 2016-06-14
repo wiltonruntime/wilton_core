@@ -46,6 +46,15 @@ uint16_t get_json_uint16(const staticlib::serialization::JsonField& field, const
     return field.get_uint16();
 }
 
+bool get_json_bool(const ss::JsonField& field, const std::string& name) {
+    if (ss::JsonType::BOOLEAN != field.get_type()) {
+        throw common::WiltonInternalException(TRACEMSG("Invalid '" + name + "' field,"
+                " type: [" + ss::stringify_json_type(field.get_type()) + "]," +
+                " value: [" + ss::dump_json_to_string(field.get_value()) + "]"));
+    }
+    return field.get_boolean();
+}
+
 const std::vector<staticlib::serialization::JsonValue>& get_json_array(
         const staticlib::serialization::JsonField& field, const std::string& name) {
     if (ss::JsonType::ARRAY != field.get_type() || 0 == field.get_array().size()) {

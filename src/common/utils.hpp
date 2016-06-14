@@ -25,6 +25,8 @@ uint32_t get_json_uint32(const staticlib::serialization::JsonField& field, const
 
 uint16_t get_json_uint16(const staticlib::serialization::JsonField& field, const std::string& name);
 
+bool get_json_bool(const staticlib::serialization::JsonField& field, const std::string& name);
+
 const std::vector<staticlib::serialization::JsonValue>& get_json_array(
         const staticlib::serialization::JsonField& field, const std::string& name);
 
