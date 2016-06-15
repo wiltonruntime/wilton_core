@@ -1,12 +1,12 @@
 /* 
- * File:   ClientResponseMetadata.hpp
+ * File:   ClientResponse.hpp
  * Author: alex
  *
  * Created on June 13, 2016, 4:26 PM
  */
 
-#ifndef WILTON_CLIENT_CLIENTRESPONSEMETADATA_HPP
-#define	WILTON_CLIENT_CLIENTRESPONSEMETADATA_HPP
+#ifndef WILTON_CLIENT_CLIENTRESPONSE_HPP
+#define	WILTON_CLIENT_CLIENTRESPONSE_HPP
 
 #include <cstdint>
 #include <string>
@@ -20,9 +20,10 @@
 namespace wilton {
 namespace client {
 
-class ClientResponseMetadata {
+class ClientResponse {
 public:
-    static staticlib::serialization::JsonValue to_json(const staticlib::httpclient::HttpResourceInfo& info) {
+    static staticlib::serialization::JsonValue to_json(std::string&& data,
+            const staticlib::httpclient::HttpResourceInfo& info) {
         namespace sr = staticlib::ranges;
         namespace ss = staticlib::serialization;
         auto ha = sr::transform(sr::refwrap(info.get_headers()), [](const std::pair<std::string, std::string>& el) {
@@ -31,6 +32,7 @@ public:
         std::vector<ss::JsonField> hfields = sr::emplace_to_vector(std::move(ha));
         return {
             {"headers", std::move(hfields)},
+            {"data", std::move(data)},
             {"effectiveUrl", info.effective_url},
             {"responseCode", static_cast<int64_t> (info.response_code)},
             {"totalTimeSecs", info.total_time_secs},
@@ -55,7 +57,7 @@ public:
 };
     
 } // namespace
-} 
+}
 
-#endif	/* WILTON_CLIENT_CLIENTRESPONSEMETADATA_HPP */
+#endif	/* WILTON_CLIENT_CLIENTRESPONSE_HPP */
 

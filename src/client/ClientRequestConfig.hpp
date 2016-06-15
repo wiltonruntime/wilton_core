@@ -57,6 +57,8 @@ public:
                 options.read_timeout_millis = common::get_json_uint32(fi, "readTimeoutMillis");
             } else if ("fdsetTimeoutMillis" == name) {
                 options.fdset_timeout_millis = common::get_json_uint32(fi, "fdsetTimeoutMillis");
+            } else if ("forceHttp10" == name) {
+                options.force_http_10 = common::get_json_bool(fi, "forceHttp10");
             } else if ("noprogress" == name) {
                 options.noprogress = common::get_json_bool(fi, "noprogress");
             } else if ("nosignal" == name) {
@@ -132,6 +134,7 @@ public:
             {"abortOnResponseError", options.abort_on_response_error},
             {"readTimeoutMillis", options.read_timeout_millis},
             {"fdsetTimeoutMillis", options.fdset_timeout_millis},
+            {"forceHttp10", options.force_http_10},
             {"noprogress", options.noprogress},
             {"nosignal", options.nosignal},
             {"failonerror", options.failonerror},

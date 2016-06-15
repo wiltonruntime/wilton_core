@@ -16,7 +16,7 @@
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
-#include "client/ClientResponseMetadata.hpp"
+#include "client/ClientResponse.hpp"
 #include "client/ClientRequestConfig.hpp"
 #include "client/ClientSessionConfig.hpp"
 
@@ -88,9 +88,7 @@ char* wilton_HttpClient_execute(
         const char* request_metadata_json,
         int request_metadata_len,
         char** response_data_out,
-        int* response_data_len_out,
-        char** response_metadata_out,
-        int* response_metadata_len_out) {
+        int* response_data_len_out) {
     if (nullptr == http) return su::alloc_copy(TRACEMSG("Null 'http' parameter specified"));    
     if (nullptr == url) return su::alloc_copy(TRACEMSG("Null 'url' parameter specified"));
     if (!su::is_positive_uint32(url_len)) return su::alloc_copy(TRACEMSG(
@@ -104,28 +102,26 @@ char* wilton_HttpClient_execute(
         ss::JsonValue opts_json{};
         if (request_metadata_len > 0) {
             std::string meta_str{request_metadata_json, static_cast<uint32_t> (request_metadata_len)};
-            ss::JsonValue opts_json = ss::load_json_from_string(meta_str);
+            opts_json = ss::load_json_from_string(meta_str);
         }
         wc::ClientRequestConfig opts{std::move(opts_json)};
         std::array<char, 4096> buf;
         si::string_sink sink{};
-        ss::JsonValue meta{};
+        ss::JsonValue resp_json{};
         if (request_data_len > 0) {
             std::string data_str{request_data, static_cast<uint32_t> (request_data_len)};
             si::string_source data_src{std::move(data_str)};
             sh::HttpResource resp = http->impl().open_url(url_str, std::move(data_src), opts.options);            
             si::copy_all(resp, sink, buf.data(), buf.size());
-            meta = wc::ClientResponseMetadata::to_json(resp.get_info());
+            resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
         } else {
             sh::HttpResource resp = http->impl().open_url(url_str, opts.options);
             si::copy_all(resp, sink, buf.data(), buf.size());
-            meta = wc::ClientResponseMetadata::to_json(resp.get_info());
+            resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
         }
-        std::string meta_json = ss::dump_json_to_string(meta);
-        *response_data_out = su::alloc_copy(sink.get_string());
-        *response_data_len_out = sink.get_string().length();
-        *response_metadata_out = su::alloc_copy(meta_json);
-        *response_metadata_len_out = meta_json.size();
+        std::string resp_complete = ss::dump_json_to_string(resp_json);
+        *response_data_out = su::alloc_copy(resp_complete);
+        *response_data_len_out = resp_complete.length();
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -138,16 +134,14 @@ char* wilton_HttpClient_send_file(
         int url_len,
         const char* file_path,
         int file_path_len,
-        void* finalizer_ctx,
-        void (*finalizer_cb)(
-                void* finalizer_ctx,
-                int sent_successfully),
         const char* request_metadata_json,
         int request_metadata_len,
         char** response_data_out,
         int* response_data_len_out,
-        char** response_metadata_out,
-        int* response_metadata_len_out) {
+        void* finalizer_ctx,
+        void (*finalizer_cb)(
+                void* finalizer_ctx,
+                int sent_successfully)) {
     if (nullptr == http) return su::alloc_copy(TRACEMSG("Null 'http' parameter specified"));
     if (nullptr == url) return su::alloc_copy(TRACEMSG("Null 'url' parameter specified"));
     if (!su::is_positive_uint32(url_len)) return su::alloc_copy(TRACEMSG(
@@ -162,7 +156,7 @@ char* wilton_HttpClient_send_file(
         ss::JsonValue opts_json{};
         if (request_metadata_len > 0) {
             std::string meta_str{request_metadata_json, static_cast<uint32_t> (request_metadata_len)};
-            ss::JsonValue opts_json = ss::load_json_from_string(meta_str);
+            opts_json = ss::load_json_from_string(meta_str);
         }
         wc::ClientRequestConfig opts{std::move(opts_json)};
         std::array<char, 4096> buf;
@@ -171,19 +165,17 @@ char* wilton_HttpClient_send_file(
         sh::HttpResource resp = http->impl().open_url(url_str, std::move(fd), opts.options);
         si::string_sink sink{};
         si::copy_all(resp, sink, buf.data(), buf.size());
-        ss::JsonValue meta = wc::ClientResponseMetadata::to_json(resp.get_info());
-        std::string meta_json = ss::dump_json_to_string(meta);
+        ss::JsonValue resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
+        std::string resp_complete = ss::dump_json_to_string(resp_json);
         if (nullptr != finalizer_cb) {
-            finalizer_cb(finalizer_ctx, true);
+            finalizer_cb(finalizer_ctx, 1);
         }
-        *response_data_out = su::alloc_copy(sink.get_string());
-        *response_data_len_out = sink.get_string().length();
-        *response_metadata_out = su::alloc_copy(meta_json);
-        *response_metadata_len_out = meta_json.size();
+        *response_data_out = su::alloc_copy(resp_complete);
+        *response_data_len_out = resp_complete.length();
         return nullptr;
     } catch (const std::exception& e) {
         if (nullptr != finalizer_cb) {
-            finalizer_cb(finalizer_ctx, false);
+            finalizer_cb(finalizer_ctx, 0);
         }
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }   

@@ -256,15 +256,14 @@ WILTON_EXPORT char* wilton_HttpClient_close(
 
 // general behavior options
 
+    // https://curl.haxx.se/libcurl/c/CURLOPT_HTTP_VERSION.html
+    "forceHttp10": false,
     // https://curl.haxx.se/libcurl/c/CURLOPT_NOPROGRESS.html
     "noprogress": true,
-
     // https://curl.haxx.se/libcurl/c/CURLOPT_NOSIGNAL.html
     "nosignal": true,
-
     // https://curl.haxx.se/libcurl/c/CURLOPT_FAILONERROR.html
     "failonerror": false,
-  
     // https://curl.haxx.se/libcurl/c/CURLOPT_PATH_AS_IS.html
     "pathAsIs": true,
 
@@ -385,26 +384,22 @@ WILTON_EXPORT char* wilton_HttpClient_execute(
         const char* request_metadata_json,
         int request_metadata_len,
         char** response_data_out,
-        int* response_data_len_out,
-        char** response_metadata_out,
-        int* response_metadata_len_out);
+        int* response_data_len_out);
 
 WILTON_EXPORT char* wilton_HttpClient_send_file(
         wilton_HttpClient* http,
         const char* url,
         int url_len,
         const char* file_path,
-        int file_path_len,
-        void* finalizer_ctx,
-        void (*finalizer_cb)(
-                void* finalizer_ctx,
-                int sent_successfully),
+        int file_path_len,       
         const char* request_metadata_json,
         int request_metadata_len,
         char** response_data_out,
         int* response_data_len_out,
-        char** response_metadata_out,
-        int* response_metadata_len_out);
+        void* finalizer_ctx,
+        void (*finalizer_cb)(
+                void* finalizer_ctx,
+                int sent_successfully));
 
 #ifdef	__cplusplus
 }
