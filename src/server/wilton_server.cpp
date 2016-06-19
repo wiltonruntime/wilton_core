@@ -12,6 +12,7 @@
 #include "staticlib/utils.hpp"
 
 #include "server/Request.hpp"
+#include "server/ResponseWriter.hpp"
 #include "server/Server.hpp"
 
 #include "serverconf/ResponseMetadata.hpp"
@@ -41,6 +42,7 @@ public:
 
 struct wilton_Request {
 private:
+    // note: NON-owning
     ws::Request& delegate;
 
 public:
@@ -48,6 +50,20 @@ public:
     delegate(delegate) { }
 
     ws::Request& impl() {
+        return delegate;
+    }
+};
+
+struct wilton_ResponseWriter {
+private:
+    ws::ResponseWriter delegate;
+
+public:
+
+    wilton_ResponseWriter(ws::ResponseWriter&& delegate) :
+    delegate(std::move(delegate)) { }
+
+    ws::ResponseWriter& impl() {
         return delegate;
     }
 };
@@ -217,4 +233,38 @@ char* wilton_Request_send_mustache(
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
+}
+
+char* wilton_Request_send_later(
+        wilton_Request* request,
+        wilton_ResponseWriter** writer_out) /* noexcept */ {
+    if (nullptr == request) return su::alloc_copy(TRACEMSG("Null 'request' parameter specified"));    
+    if (nullptr == writer_out) return su::alloc_copy(TRACEMSG("Null 'writer_out' parameter specified"));
+    try {
+        ws::ResponseWriter writer = request->impl().send_later();
+        wilton_ResponseWriter* writer_ptr = new wilton_ResponseWriter(std::move(writer));
+        *writer_out = writer_ptr;
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}
+
+char* wilton_ResponseWriter_send(
+        wilton_ResponseWriter* writer,
+        const char* data,
+        int data_len) /* noexcept */ {
+    if (nullptr == writer) return su::alloc_copy(TRACEMSG("Null 'writer' parameter specified"));
+    if (nullptr == data) return su::alloc_copy(TRACEMSG("Null 'data' parameter specified"));
+    if (!su::is_uint32(data_len)) return su::alloc_copy(TRACEMSG(
+            "Invalid 'data_len' parameter specified: [" + sc::to_string(data_len) + "]"));
+    try {
+        uint32_t data_len_u32 = static_cast<uint32_t> (data_len);
+        writer->impl().send(data, data_len_u32);
+        delete writer;
+        return nullptr;
+    } catch (const std::exception& e) {
+        delete writer;
+        return su::alloc_copy(TRACEMSG("WRITER_INVALIDATED\n" + e.what() + "\nException raised"));
+    }    
 }

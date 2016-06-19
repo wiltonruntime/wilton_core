@@ -16,6 +16,7 @@
 #include "staticlib/serialization.hpp"
 
 #include "common/WiltonInternalException.hpp"
+#include "server/ResponseWriter.hpp"
 #include "serverconf/ResponseMetadata.hpp"
 #include "serverconf/RequestMetadata.hpp"
 
@@ -47,6 +48,8 @@ public:
     void send_file(std::string file_path, std::function<void(bool)> finalizer);
     
     void send_mustache(std::string mustache_file_path, staticlib::serialization::JsonValue json);
+    
+    ResponseWriter send_later();
     
     void finish();
     

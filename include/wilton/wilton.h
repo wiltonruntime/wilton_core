@@ -29,6 +29,14 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
+    
+// common
+
+WILTON_EXPORT void wilton_free(
+        char* errmsg);
+
+
+// server
 
 struct wilton_Server;
 typedef struct wilton_Server wilton_Server;
@@ -36,41 +44,8 @@ typedef struct wilton_Server wilton_Server;
 struct wilton_Request;
 typedef struct wilton_Request wilton_Request;
 
-struct wilton_DBConnection;
-typedef struct wilton_DBConnection wilton_DBConnection;
-
-struct wilton_DBTransaction;
-typedef struct wilton_DBTransaction wilton_DBTransaction;
-
-struct wilton_HttpClient;
-typedef struct wilton_HttpClient wilton_HttpClient;
-
-// common
-
-WILTON_EXPORT void wilton_free(
-        char* errmsg);
-
-// logging
-
-WILTON_EXPORT char* wilton_log(
-        const char* level_name,
-        int level_name_len,
-        const char* logger_name,
-        int logger_name_len,
-        const char* message,
-        int message_len);
-
-// mustache
-
-WILTON_EXPORT char* wilton_render_mustache(
-        const char* template_text,
-        int template_text_len,
-        const char* values_json,
-        int values_json_len,
-        char** output_text_out,
-        int* output_text_len_out);
-
-// server
+struct wilton_ResponseWriter;
+typedef struct wilton_ResponseWriter wilton_ResponseWriter;
 
 /*
     {
@@ -105,7 +80,8 @@ WILTON_EXPORT char* wilton_render_mustache(
                 "name": "my.logger.name",
                 "level": "TRACE | DEBUG | INFO | WARN | ERROR | FATAL"
             }, ...]
-        }
+        },
+        "natProxyPaths": ["/path/to/proxy1", "/path/to/proxy2"]
     }
  */
 WILTON_EXPORT char* wilton_Server_create(
@@ -185,7 +161,45 @@ WILTON_EXPORT char* wilton_Request_send_mustache(
         const char* values_json,
         int values_json_len);
 
+WILTON_EXPORT char* wilton_Request_send_later(
+        wilton_Request* request,
+        wilton_ResponseWriter** writer_out);
+
+WILTON_EXPORT char* wilton_ResponseWriter_send(
+        wilton_ResponseWriter* writer,
+        const char* data,
+        int data_len);
+
+
+// logging
+
+WILTON_EXPORT char* wilton_log(
+        const char* level_name,
+        int level_name_len,
+        const char* logger_name,
+        int logger_name_len,
+        const char* message,
+        int message_len);
+
+
+// mustache
+
+WILTON_EXPORT char* wilton_render_mustache(
+        const char* template_text,
+        int template_text_len,
+        const char* values_json,
+        int values_json_len,
+        char** output_text_out,
+        int* output_text_len_out);
+
+
 // DB
+
+struct wilton_DBConnection;
+typedef struct wilton_DBConnection wilton_DBConnection;
+
+struct wilton_DBTransaction;
+typedef struct wilton_DBTransaction wilton_DBTransaction;
 
 WILTON_EXPORT char* wilton_DBConnection_open(
         wilton_DBConnection** conn_out,
@@ -222,6 +236,9 @@ WILTON_EXPORT char* wilton_DBTransaction_rollback(
         wilton_DBTransaction* tran);
 
 // HttpClient
+
+struct wilton_HttpClient;
+typedef struct wilton_HttpClient wilton_HttpClient;
 
 /*
  {
@@ -400,6 +417,21 @@ WILTON_EXPORT char* wilton_HttpClient_send_file(
         void (*finalizer_cb)(
                 void* finalizer_ctx,
                 int sent_successfully));
+
+
+// NAT proxy
+
+struct wilton_NatProxy;
+typedef struct wilton_NatProxy wilton_NatProxy;
+
+WILTON_EXPORT char* wilton_NatProxy_create(
+        wilton_NatProxy** proxy_out,
+        const char* conf_json,
+        int conf_json_len);
+
+WILTON_EXPORT char* wilton_NatProxy_stop(
+        wilton_NatProxy* proxy);
+
 
 #ifdef	__cplusplus
 }

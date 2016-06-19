@@ -43,8 +43,7 @@ class ResponseStreamSender : public std::enable_shared_from_this<ResponseStreamS
     std::unique_ptr<std::istream> stream;
     std::function<void(bool)> finalizer;
 
-    // TODO: up me to 4096, 4 used for callbacks test only 
-    std::array<char, 4> buf;
+    std::array<char, 4096> buf;
 
 public:
     ResponseStreamSender(staticlib::httpserver::http_response_writer_ptr writer, 

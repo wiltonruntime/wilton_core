@@ -52,7 +52,7 @@ const std::unordered_set<std::string> HEADERS_DISCARD_DUPLICATES{
 class Request::Impl : public staticlib::pimpl::PimplObject::Impl {
 
     enum class State {
-        CREATED, CHUNK_SENT, COMMITTED
+        CREATED, COMMITTED
     };
     std::atomic<const State> state;
     // owning ptrs here to not restrict clients async ops
@@ -94,7 +94,7 @@ public:
         resp->send();
     }
 
-    void send_file(Request&, std::string file_path, std::function<void(bool) > finalizer) {
+    void send_file(Request&, std::string file_path, std::function<void(bool)> finalizer) {
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         su::FileDescriptor fd{file_path, 'r'};
@@ -110,6 +110,13 @@ public:
         auto mp_ptr = si::make_source_istream_ptr(std::move(mp));
         auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(mp_ptr));
         sender->send();
+    }
+    
+    ResponseWriter send_later(Request&) {
+        if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
+                "Invalid request lifecycle operation, request is already committed"));
+        sh::http_response_writer_ptr writer = this->resp;
+        return ResponseWriter{static_cast<void*>(std::addressof(writer))};
     }
 
     void finish(Request&) {
@@ -163,6 +170,7 @@ PIMPL_FORWARD_METHOD(Request, void, set_response_metadata, (serverconf::Response
 PIMPL_FORWARD_METHOD(Request, void, send_response, (const char*)(uint32_t), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, void, send_file, (std::string)(std::function<void(bool)>), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, void, send_mustache, (std::string)(ss::JsonValue), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, ResponseWriter, send_later, (), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, void, finish, (), (), common::WiltonInternalException)
 
 } // namespace
