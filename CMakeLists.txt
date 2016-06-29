@@ -26,6 +26,7 @@ option ( ${PROJECT_NAME}_SHARED "Build shared library instead of a static one" O
 if ( NOT DEFINED STATICLIB_DEPS )
     set ( STATICLIB_DEPS ${CMAKE_CURRENT_LIST_DIR}/../../staticlibs/ CACHE INTERNAL "" )    
 endif ( )
+option ( STATICLIB_WITH_ICU "Build with ICU support" OFF )
 
 # dep options
 set ( staticlib_httpserver_USE_LOG4CPLUS ON CACHE BOOL "Use log4cplus lib for logging" )
@@ -50,6 +51,9 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_openssl )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
         wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_sqlite )
+        if ( STATICLIB_WITH_ICU )
+            wilton_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../external_icu )
+        endif ( )
     endif ( )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_mstch )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_soci )
@@ -59,6 +63,9 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_endian )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpserver )    
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
+    if ( STATICLIB_WITH_ICU )
+        wilton_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../staticlib_icu )
+    endif ( )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_serialization )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
@@ -87,6 +94,11 @@ set ( ${PROJECT_NAME}_DEPS
         libssl
         libcrypto
         zlib )
+if ( STATICLIB_WITH_ICU )
+    set ( ${PROJECT_NAME}_DEPS ${${PROJECT_NAME}_DEPS} 
+            icu-uc
+            staticlib_icu )
+endif ( )
 wilton_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
 # build steps
@@ -116,9 +128,15 @@ if ( ${PROJECT_NAME}_SHARED )
     target_compile_definitions ( ${PROJECT_NAME} PRIVATE -DWILTON_SHARED )
     target_link_libraries ( ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS_PC_LIBRARIES} )
 endif ( )
+if ( STATICLIB_WITH_ICU )
+    target_compile_definitions ( ${PROJECT_NAME} PRIVATE -DSTATICLIB_WITH_ICU )
+endif ( )
 
 # pkg-config
 set ( ${PROJECT_NAME}_PC_CFLAGS "-I${CMAKE_CURRENT_LIST_DIR}/include" )
+if ( STATICLIB_WITH_ICU )
+    set ( ${PROJECT_NAME}_PC_CFLAGS "${${PROJECT_NAME}_PC_CFLAGS} -DSTATICLIB_WITH_ICU" )
+endif ( )
 if ( ${PROJECT_NAME}_SHARED )
     set ( ${PROJECT_NAME}_PC_CFLAGS "${${PROJECT_NAME}_PC_CFLAGS} -DWILTON_SHARED -DWILTON_SHARED_IMPORT" )
 endif ( )

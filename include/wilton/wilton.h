@@ -68,7 +68,7 @@ typedef struct wilton_ResponseWriter wilton_ResponseWriter;
                 "extension": ".css",
                 "mime": "text/css"
             }, ...]
-        }, ...], 
+        }, ...],
         "logging": {
             "appenders": [{
                 "appenderType": "NULL | CONSOLE | FILE | DAILY_ROLLING_FILE",
