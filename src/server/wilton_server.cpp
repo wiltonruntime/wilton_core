@@ -148,6 +148,21 @@ char* wilton_Request_get_request_data(wilton_Request* request, char** data_out,
     }
 }
 
+WILTON_EXPORT char* wilton_Request_get_request_data_filename(wilton_Request* request, 
+        char** filename_out, int* filename_len_out) /* noexcept */ {
+    if (nullptr == request) return su::alloc_copy(TRACEMSG("Null 'request' parameter specified"));
+    if (nullptr == filename_out) return su::alloc_copy(TRACEMSG("Null 'filename_out' parameter specified"));
+    if (nullptr == filename_len_out) return su::alloc_copy(TRACEMSG("Null 'filename_len_out' parameter specified"));
+    try {
+        const std::string& res = request->impl().get_request_data_filename();
+        *filename_out = su::alloc_copy(res);
+        *filename_len_out = res.size();
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}
+
 // TODO: fixme json copy
 char* wilton_Request_set_response_metadata(wilton_Request* request,
         const char* metadata_json, int metadata_json_len) /* noexcept */ {

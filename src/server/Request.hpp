@@ -41,6 +41,8 @@ public:
     
     const std::string& get_request_data();
     
+    const std::string& get_request_data_filename();
+    
     void set_response_metadata(serverconf::ResponseMetadata rm);
     
     void send_response(const char* data, uint32_t data_len);

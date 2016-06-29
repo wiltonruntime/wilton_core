@@ -23,7 +23,7 @@
 #include "logging/WiltonLogger.hpp"
 #include "server/FileHandler.hpp"
 #include "server/Request.hpp"
-#include "server/StringPayloadHandler.hpp"
+#include "server/RequestPayloadHandler.hpp"
 #include "server/ZipHandler.hpp"
 
 #include "serverconf/ServerConfig.hpp"
@@ -59,7 +59,10 @@ public:
         std::vector<std::string> methods = {"GET", "POST", "PUT", "DELETE"};
         std::string path = "/";
         for (const std::string& me : methods) {
-            server->add_payload_handler(me, path, StringPayloadHandler::create);
+            auto conf_ptr = std::make_shared<serverconf::RequestPayloadConfig>(conf.requestPayload.clone());
+            server->add_payload_handler(me, path, [conf_ptr](staticlib::httpserver::http_request_ptr& /* request */) {
+                return RequestPayloadHandler{*conf_ptr};
+            });
             server->add_handler(me, path,
                     [gateway](sh::http_request_ptr& req, sh::tcp_connection_ptr & conn) {
                         auto finfun = std::bind(&sh::tcp_connection::finish, conn);

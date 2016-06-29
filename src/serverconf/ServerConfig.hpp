@@ -20,6 +20,7 @@
 #include "serverconf/DocumentRoot.hpp"
 #include "serverconf/Appender.hpp"
 #include "serverconf/Logging.hpp"
+#include "serverconf/RequestPayloadConfig.hpp"
 #include "serverconf/SslConfig.hpp"
 
 namespace wilton {
@@ -32,6 +33,7 @@ public:
     std::string ipAddress = "0.0.0.0";
     SslConfig ssl;
     std::vector<DocumentRoot> documentRoots;
+    RequestPayloadConfig requestPayload;
     Logging logging;
 
     ServerConfig(const ServerConfig&) = delete;
@@ -44,6 +46,7 @@ public:
     ipAddress(std::move(other.ipAddress)),
     ssl(std::move(other.ssl)),
     documentRoots(std::move(other.documentRoots)),
+    requestPayload(std::move(other.requestPayload)),
     logging(std::move(other.logging)) { }
 
     ServerConfig& operator=(ServerConfig&& other) {
@@ -53,6 +56,7 @@ public:
         this->ssl = std::move(other.ssl);
         this->documentRoots = std::move(other.documentRoots);
         this->logging = std::move(other.logging);
+        this->requestPayload = std::move(other.requestPayload);
         return *this;
     }
 
@@ -73,6 +77,8 @@ public:
                     auto jd = serverconf::DocumentRoot(lo);
                     this->documentRoots.emplace_back(std::move(jd));
                 }
+            } else if ("requestPayload" == name) {
+                this->requestPayload = serverconf::RequestPayloadConfig(fi.get_value());
             } else if ("logging" == name) {
                 this->logging = Logging(fi.get_value());
             } else {
@@ -95,6 +101,7 @@ public:
             {"ipAddress", ipAddress},
             {"ssl", ssl.to_json()},
             {"documentRoots", drs},
+            {"requestPayload", logging.to_json()},
             {"logging", logging.to_json()}
         };
     }

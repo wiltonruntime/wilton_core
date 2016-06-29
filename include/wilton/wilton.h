@@ -69,6 +69,11 @@ typedef struct wilton_ResponseWriter wilton_ResponseWriter;
                 "mime": "text/css"
             }, ...]
         }, ...],
+        "requestPayload": {
+            "tmpDirPath": "path/to/writable/directory",
+            "tmpFilenameLength": uint16_t,
+            "memoryLimitBytes": uint32_t
+        },
         "logging": {
             "appenders": [{
                 "appenderType": "NULL | CONSOLE | FILE | DAILY_ROLLING_FILE",
@@ -124,6 +129,11 @@ WILTON_EXPORT char* wilton_Request_get_request_data(
         wilton_Request* request,
         char** data_out,
         int* data_len_out);
+
+WILTON_EXPORT char* wilton_Request_get_request_data_filename(
+        wilton_Request* request,
+        char** filename_out,
+        int* filename_len_out);
 
 /*
 {

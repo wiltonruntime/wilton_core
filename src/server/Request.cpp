@@ -21,10 +21,10 @@
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
-#include "mustache/MustacheProcessor.hpp"
-#include "ResponseStreamSender.hpp"
-#include "StringPayloadHandler.hpp"
 #include "common/WiltonInternalException.hpp"
+#include "mustache/MustacheProcessor.hpp"
+#include "server/ResponseStreamSender.hpp"
+#include "server/RequestPayloadHandler.hpp"
 
 #include "serverconf/Header.hpp"
 #include "serverconf/ResponseMetadata.hpp"
@@ -76,7 +76,11 @@ public:
     }
 
     const std::string& get_request_data(Request&) {
-        return StringPayloadHandler::get_payload(req);
+        return RequestPayloadHandler::get_data_string(req);
+    }
+
+    const std::string& get_request_data_filename(Request&) {
+        return RequestPayloadHandler::get_data_filename(req);
     }
 
     void set_response_metadata(Request&, serverconf::ResponseMetadata rm) {
@@ -166,6 +170,7 @@ private:
 PIMPL_FORWARD_CONSTRUCTOR(Request, (void*)(void*), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, serverconf::RequestMetadata, get_request_metadata, (), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, const std::string&, get_request_data, (), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, const std::string&, get_request_data_filename, (), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, void, set_response_metadata, (serverconf::ResponseMetadata), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, void, send_response, (const char*)(uint32_t), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, void, send_file, (std::string)(std::function<void(bool)>), (), common::WiltonInternalException)
