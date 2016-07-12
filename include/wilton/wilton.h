@@ -191,6 +191,13 @@ WILTON_EXPORT char* wilton_log(
         const char* message,
         int message_len);
 
+WILTON_EXPORT char* wilton_log_is_level_enabled(
+        const char* logger_name,
+        int logger_name_len,
+        const char* level_name,
+        int level_name_len,
+        int* res_out
+);
 
 // mustache
 

@@ -38,6 +38,8 @@ public:
     
     static void apply_config(const serverconf::Logging& config);
     
+    static bool is_enabled_for_level(const std::string& logger_name, const std::string& level_name);
+    
 };
 
 } // namespace

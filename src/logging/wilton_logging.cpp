@@ -52,3 +52,34 @@ char* wilton_log(
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
+
+char* wilton_log_is_level_enabled(
+        const char* logger_name,
+        int logger_name_len,
+        const char* level_name,
+        int level_name_len,
+        int* res_out
+        ) {
+    if (nullptr == logger_name) return su::alloc_copy(TRACEMSG("Null 'logger_name' parameter specified"));
+    if (!su::is_positive_uint16(logger_name_len)) return su::alloc_copy(TRACEMSG(
+            "Invalid 'logger_name_len' parameter specified: [" + sc::to_string(logger_name_len) + "]"));
+    if (nullptr == level_name) return su::alloc_copy(TRACEMSG("Null 'level_name' parameter specified"));
+    if (!su::is_positive_uint16(level_name_len)) return su::alloc_copy(TRACEMSG(
+            "Invalid 'level_name_len' parameter specified: [" + sc::to_string(level_name_len) + "]"));
+    if (nullptr == res_out) return su::alloc_copy(TRACEMSG("Null 'res_out' parameter specified"));
+    try {
+        uint32_t logger_name_len_u32 = static_cast<uint32_t> (logger_name_len);
+        std::string logger_name_str{logger_name, logger_name_len_u32};
+        uint32_t level_name_len_u32 = static_cast<uint32_t> (level_name_len);
+        std::string level_name_str{level_name, level_name_len_u32};
+        bool res = wl::WiltonLogger::is_enabled_for_level(logger_name_str, level_name_str);
+        if (res) {
+            *res_out = 1;
+        } else {
+            *res_out = 0;
+        }
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}

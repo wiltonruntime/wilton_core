@@ -78,6 +78,12 @@ public:
             lo.setLogLevel(to_level(cf.level));
         }
     }
+    
+    static bool is_enabled_for_level(const std::string& logger_name, const std::string& level_name) {
+        const auto& logger = log4cplus::Logger::getInstance(logger_name);
+        log4cplus::LogLevel level = to_level(level_name);
+        return logger.isEnabledFor(level);
+    }
 
 private:
     // todo: check invalid file behaviour
@@ -99,6 +105,7 @@ private:
 };
 PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, log, (const std::string&)(const std::string&)(const std::string&), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, apply_config, (const serverconf::Logging&), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, bool, is_enabled_for_level, (const std::string&)(const std::string&), (), common::WiltonInternalException)
 
 } // namespace
 }
