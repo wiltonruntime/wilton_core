@@ -57,7 +57,7 @@ bool get_json_bool(const ss::JsonField& field, const std::string& name) {
 
 const std::vector<staticlib::serialization::JsonValue>& get_json_array(
         const staticlib::serialization::JsonField& field, const std::string& name) {
-    if (ss::JsonType::ARRAY != field.get_type() || 0 == field.get_array().size()) {
+    if (ss::JsonType::ARRAY != field.get_type()) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + name + "' field,"
                 " type: [" + ss::stringify_json_type(field.get_type()) + "]," +
                 " value: [" + ss::dump_json_to_string(field.get_value()) + "]"));
@@ -67,7 +67,7 @@ const std::vector<staticlib::serialization::JsonValue>& get_json_array(
 
 const std::vector<staticlib::serialization::JsonField>& get_json_object(
         const staticlib::serialization::JsonField& field, const std::string& name) {
-    if (ss::JsonType::OBJECT != field.get_type() || 0 == field.get_object().size()) {
+    if (ss::JsonType::OBJECT != field.get_type()) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + name + "' field,"
                 " type: [" + ss::stringify_json_type(field.get_type()) + "]," +
                 " value: [" + ss::dump_json_to_string(field.get_value()) + "]"));
