@@ -56,8 +56,7 @@ public:
     // todo: error messages format
     // todo: path checks
     void operator()(sh::http_request_ptr& req, sh::tcp_connection_ptr& conn) {
-        auto finfun = std::bind(&sh::tcp_connection::finish, conn);
-        auto resp = sh::http_response_writer::create(conn, *req, finfun);
+        auto resp = sh::http_response_writer::create(conn, req);
         std::string url_path = conf->zipInnerPrefix + std::string{req->get_resource(), conf->resource.length()};
         uz::FileEntry en = idx->find_zip_entry(url_path);        
         if (!en.is_empty()) {

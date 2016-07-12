@@ -56,8 +56,7 @@ public:
     // todo: error messages format
     // todo: path checks
     void operator()(sh::http_request_ptr& req, sh::tcp_connection_ptr& conn) {
-        auto finfun = std::bind(&sh::tcp_connection::finish, conn);
-        auto resp = sh::http_response_writer::create(conn, *req, finfun);
+        auto resp = sh::http_response_writer::create(conn, req);
         std::string url_path = std::string{req->get_resource(), conf->resource.length()};
         std::string file_path = std::string{conf->dirPath} + "/" + url_path;
         if (file_path.find("..") != std::string::npos) {

@@ -38,7 +38,7 @@ namespace sc = staticlib::config;
 namespace sh = staticlib::httpserver;
 namespace ss = staticlib::serialization;
 
-typedef std::function<void(Request& req)> gateway_fun_type;
+using gateway_fun_type = std::function<void(Request& req)>;
 
 } // namespace
 
@@ -65,8 +65,7 @@ public:
             });
             server->add_handler(me, path,
                     [gateway](sh::http_request_ptr& req, sh::tcp_connection_ptr & conn) {
-                        auto finfun = std::bind(&sh::tcp_connection::finish, conn);
-                        auto writer = sh::http_response_writer::create(conn, *req, finfun);
+                        auto writer = sh::http_response_writer::create(conn, req);
                         Request req_pass{static_cast<void*> (std::addressof(req)),
                                 static_cast<void*> (std::addressof(writer))};
                         gateway(req_pass);
