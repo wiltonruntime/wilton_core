@@ -18,9 +18,9 @@
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "serverconf/Appender.hpp"
-#include "serverconf/Logger.hpp"
-#include "serverconf/Logging.hpp"
+#include "logging/AppenderConfig.hpp"
+#include "logging/LoggerConfig.hpp"
+#include "logging/LoggingConfig.hpp"
 
 namespace wilton {
 namespace logging {
@@ -61,21 +61,21 @@ public:
         }
     }
 
-    static void apply_config(const serverconf::Logging& config) {
+    static void apply_config(const LoggingConfig& config) {
         if (INITIALIZED.compare_exchange_strong(THE_FALSE, true)) {
 #ifndef STATICLIB_LINUX
             log4cplus::initialize();
 #endif // STATICLIB_LINUX
-        }
-        for (const auto& cf : config.appenders) {
-            log4cplus::SharedAppenderPtr app{create_appender_ptr(cf)};
-            app->setLayout(std::auto_ptr<log4cplus::Layout>(new log4cplus::PatternLayout(cf.layout)));
-            app->setThreshold(to_level(cf.thresholdLevel));
-            log4cplus::Logger::getRoot().addAppender(app);
-        }
-        for (const auto& cf : config.loggers) {
-            auto lo = log4cplus::Logger::getInstance(cf.name);
-            lo.setLogLevel(to_level(cf.level));
+            for (const auto& cf : config.appenders) {
+                log4cplus::SharedAppenderPtr app{create_appender_ptr(cf)};
+                app->setLayout(std::auto_ptr<log4cplus::Layout>(new log4cplus::PatternLayout(cf.layout)));
+                app->setThreshold(to_level(cf.thresholdLevel));
+                log4cplus::Logger::getRoot().addAppender(app);
+            }
+            for (const auto& cf : config.loggers) {
+                auto lo = log4cplus::Logger::getInstance(cf.name);
+                lo.setLogLevel(to_level(cf.level));
+            }
         }
     }
     
@@ -87,7 +87,7 @@ public:
 
 private:
     // todo: check invalid file behaviour
-    static log4cplus::Appender* create_appender_ptr(const serverconf::Appender& conf) {
+    static log4cplus::Appender* create_appender_ptr(const AppenderConfig& conf) {
         if ("NULL" == conf.appenderType) {
             return new log4cplus::NullAppender();
         } else if ("CONSOLE" == conf.appenderType) {
@@ -104,7 +104,7 @@ private:
 
 };
 PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, log, (const std::string&)(const std::string&)(const std::string&), (), common::WiltonInternalException)
-PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, apply_config, (const serverconf::Logging&), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, apply_config, (const LoggingConfig&), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, bool, is_enabled_for_level, (const std::string&)(const std::string&), (), common::WiltonInternalException)
 
 } // namespace

@@ -1,12 +1,12 @@
 /* 
- * File:   Appender.hpp
+ * File:   AppenderConfig.hpp
  * Author: alex
  *
  * Created on May 10, 2016, 7:55 PM
  */
 
-#ifndef WILTON_SERVERCONF_APPENDER_HPP
-#define	WILTON_SERVERCONF_APPENDER_HPP
+#ifndef WILTON_LOGGING_APPENDERCONFIG_HPP
+#define	WILTON_LOGGING_APPENDERCONFIG_HPP
 
 #include <string>
 
@@ -17,26 +17,26 @@
 #include "common/utils.hpp"
 
 namespace wilton {
-namespace serverconf {
+namespace logging {
 
-class Appender {
+class AppenderConfig {
 public:
     std::string appenderType = "NULL";
     std::string filePath = "";
     std::string layout = "%d{%Y-%m-%d %H:%M:%S,%q} [%-5p %-5.5t %-20.20c] %m%n";
     std::string thresholdLevel = "TRACE";
 
-    Appender(const Appender&) = delete;
+    AppenderConfig(const AppenderConfig&) = delete;
 
-    Appender& operator=(const Appender&) = delete;
+    AppenderConfig& operator=(const AppenderConfig&) = delete;
 
-    Appender(Appender&& other) :
+    AppenderConfig(AppenderConfig&& other) :
     appenderType(std::move(other.appenderType)),
     filePath(std::move(other.filePath)),
     layout(std::move(other.layout)),
     thresholdLevel(std::move(other.thresholdLevel)) { }
 
-    Appender& operator=(Appender&& other) {
+    AppenderConfig& operator=(AppenderConfig&& other) {
         this->appenderType = std::move(other.appenderType);
         this->filePath = std::move(other.filePath);
         this->layout = std::move(other.layout);
@@ -44,9 +44,9 @@ public:
         return *this;
     }
 
-    Appender() { }
+    AppenderConfig() { }
 
-    Appender(const staticlib::serialization::JsonValue& json) {
+    AppenderConfig(const staticlib::serialization::JsonValue& json) {
         namespace ss = staticlib::serialization;
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
@@ -81,5 +81,5 @@ public:
 } // namepspace
 }
 
-#endif	/* WILTON_SERVERCONF_APPENDER_HPP */
+#endif	/* WILTON_LOGGING_APPENDERCONFIG_HPP */
 

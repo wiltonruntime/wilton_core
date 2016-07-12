@@ -1,12 +1,12 @@
 /* 
- * File:   Logger.hpp
+ * File:   LoggerConfig.hpp
  * Author: alex
  *
  * Created on May 10, 2016, 8:01 PM
  */
 
-#ifndef WILTON_SERVERCONF_LOGGER_HPP
-#define	WILTON_SERVERCONF_LOGGER_HPP
+#ifndef WILTON_LOGGING_LOGGERCONFIG_HPP
+#define	WILTON_LOGGING_LOGGERCONFIG_HPP
 
 #include <string>
 
@@ -17,30 +17,30 @@
 #include "common/utils.hpp"
 
 namespace wilton {
-namespace serverconf {
+namespace logging {
 
-class Logger {
+class LoggerConfig {
 public:
     std::string name = "";
     std::string level = "";
 
-    Logger(const Logger&) = delete;
+    LoggerConfig(const LoggerConfig&) = delete;
 
-    Logger& operator=(const Logger&) = delete;
+    LoggerConfig& operator=(const LoggerConfig&) = delete;
 
-    Logger(Logger&& other) :
+    LoggerConfig(LoggerConfig&& other) :
     name(std::move(other.name)),
     level(std::move(other.level)) { }
 
-    Logger& operator=(Logger&& other) {
+    LoggerConfig& operator=(LoggerConfig&& other) {
         this->name = std::move(other.name);
         this->level = std::move(other.level);
         return *this;
     }
 
-    Logger() { }
+    LoggerConfig() { }
 
-    Logger(const staticlib::serialization::JsonValue& json) {
+    LoggerConfig(const staticlib::serialization::JsonValue& json) {
         namespace ss = staticlib::serialization;
         for (const ss::JsonField& fi : json.get_object()) {
             auto& fname = fi.get_name();
@@ -69,5 +69,5 @@ public:
 } // namepspace
 }
 
-#endif	/* WILTON_SERVERCONF_LOGGER_HPP */
+#endif	/* WILTON_LOGGING_LOGGERCONFIG_HPP */
 

@@ -26,8 +26,8 @@
 #include "server/RequestPayloadHandler.hpp"
 #include "server/ZipHandler.hpp"
 
+#include "logging/LoggingConfig.hpp"
 #include "serverconf/ServerConfig.hpp"
-#include "serverconf/Logging.hpp"
 
 namespace wilton {
 namespace server {

@@ -10,20 +10,41 @@
 #include <cstdint>
 
 #include "staticlib/config.hpp"
+#include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
 #include "logging/WiltonLogger.hpp"
+#include "logging/LoggingConfig.hpp"
 
 namespace { // anonymous
 
 namespace sc = staticlib::config;
+namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
 namespace wl = wilton::logging;
 
 } // namespace
 
+char* wilton_logger_initialize(
+        const char* conf_json,
+        int conf_json_len) {
+    if (nullptr == conf_json) return su::alloc_copy(TRACEMSG("Null 'conf_json' parameter specified"));
+    if (!su::is_positive_uint32(conf_json_len)) return su::alloc_copy(TRACEMSG(
+            "Invalid 'conf_json_len' parameter specified: [" + sc::to_string(conf_json_len) + "]"));
+    try {
+        uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
+        std::string conf_json_str{conf_json, conf_json_len_u32};
+        ss::JsonValue conf = ss::load_json_from_string(conf_json_str);
+        wl::LoggingConfig lc{conf};
+        wl::WiltonLogger::apply_config(std::move(lc));
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}
+
 // todo: fixme message copy
-char* wilton_log(
+char* wilton_logger_log(
         const char* level_name,
         int level_name_len,
         const char* logger_name,
@@ -53,7 +74,7 @@ char* wilton_log(
     }
 }
 
-char* wilton_log_is_level_enabled(
+char* wilton_logger_is_level_enabled(
         const char* logger_name,
         int logger_name_len,
         const char* level_name,

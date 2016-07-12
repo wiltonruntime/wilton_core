@@ -1,12 +1,12 @@
 /* 
- * File:   Logging.hpp
+ * File:   LoggingConfig.hpp
  * Author: alex
  *
  * Created on May 10, 2016, 5:12 PM
  */
 
-#ifndef WILTON_SERVERCONF_LOGGING_HPP
-#define	WILTON_SERVERCONF_LOGGING_HPP
+#ifndef WILTON_LOGGING_LOGGINGCONFIG_HPP
+#define	WILTON_LOGGING_LOGGINGCONFIG_HPP
 
 #include <string>
 #include <vector>
@@ -16,45 +16,45 @@
 
 #include "common/WiltonInternalException.hpp"
 #include "common/utils.hpp"
-#include "serverconf/Appender.hpp"
-#include "serverconf/Logger.hpp"
+#include "logging/AppenderConfig.hpp"
+#include "logging/LoggerConfig.hpp"
 
 namespace wilton {
-namespace serverconf {
+namespace logging {
 
-class Logging {
+class LoggingConfig {
 public:
-    std::vector<Appender> appenders;
-    std::vector<Logger> loggers;
+    std::vector<AppenderConfig> appenders;
+    std::vector<LoggerConfig> loggers;
 
-    Logging(const Logging&) = delete;
+    LoggingConfig(const LoggingConfig&) = delete;
 
-    Logging& operator=(const Logging&) = delete;
+    LoggingConfig& operator=(const LoggingConfig&) = delete;
 
-    Logging(Logging&& other) :
+    LoggingConfig(LoggingConfig&& other) :
     appenders(std::move(other.appenders)),
     loggers(std::move(other.loggers)) { }
 
-    Logging& operator=(Logging&& other) {
+    LoggingConfig& operator=(LoggingConfig&& other) {
         this->appenders = std::move(other.appenders);
         this->loggers = std::move(other.loggers);
         return *this;
     }
 
-    Logging() { }
+    LoggingConfig() { }
 
-    Logging(const staticlib::serialization::JsonValue& json) {
+    LoggingConfig(const staticlib::serialization::JsonValue& json) {
         namespace ss = staticlib::serialization;
         for (const ss::JsonField& fi : json.get_object()) {
             auto& name = fi.get_name();
             if ("appenders" == name) {
                 for (const ss::JsonValue& ap : common::get_json_array(fi, "logging.appenders")) {
-                    auto ja = serverconf::Appender(ap);
+                    auto ja = AppenderConfig(ap);
                     appenders.emplace_back(std::move(ja));
                 }
             } else if ("loggers" == name) {
                 for (const ss::JsonValue& lo : common::get_json_array(fi, "logging.loggers")) {
-                    auto jl = serverconf::Logger(lo);
+                    auto jl = LoggerConfig(lo);
                     loggers.emplace_back(std::move(jl));
                 }
             } else {
@@ -65,10 +65,10 @@ public:
 
     staticlib::serialization::JsonValue to_json() const {
         namespace sr = staticlib::ranges;
-        auto japps = sr::transform(sr::refwrap(appenders), [](const serverconf::Appender& el) {
+        auto japps = sr::transform(sr::refwrap(appenders), [](const AppenderConfig& el) {
             return el.to_json();
         });
-        auto jlogs = sr::transform(sr::refwrap(loggers), [](const serverconf::Logger& el) {
+        auto jlogs = sr::transform(sr::refwrap(loggers), [](const LoggerConfig& el) {
             return el.to_json();
         });
         return {
@@ -81,5 +81,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_SERVERCONF_LOGGING_HPP */
+#endif	/* WILTON_LOGGING_LOGGINGCONFIG_HPP */
 

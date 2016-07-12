@@ -13,9 +13,7 @@
 #include "staticlib/pimpl.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "serverconf/Appender.hpp"
-#include "serverconf/Logger.hpp"
-#include "serverconf/Logging.hpp"
+#include "logging/LoggingConfig.hpp"
 
 namespace wilton {
 namespace logging {
@@ -36,7 +34,7 @@ public:
 
     static void log(const std::string& level_name, const std::string& logger_name, const std::string& message);
     
-    static void apply_config(const serverconf::Logging& config);
+    static void apply_config(const LoggingConfig& config);
     
     static bool is_enabled_for_level(const std::string& logger_name, const std::string& level_name);
     

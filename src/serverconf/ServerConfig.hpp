@@ -17,9 +17,9 @@
 
 #include "common/WiltonInternalException.hpp"
 #include "common/utils.hpp"
+#include "logging/AppenderConfig.hpp"
+#include "logging/LoggingConfig.hpp"
 #include "serverconf/DocumentRoot.hpp"
-#include "serverconf/Appender.hpp"
-#include "serverconf/Logging.hpp"
 #include "serverconf/RequestPayloadConfig.hpp"
 #include "serverconf/SslConfig.hpp"
 
@@ -34,7 +34,7 @@ public:
     SslConfig ssl;
     std::vector<DocumentRoot> documentRoots;
     RequestPayloadConfig requestPayload;
-    Logging logging;
+    logging::LoggingConfig logging;
 
     ServerConfig(const ServerConfig&) = delete;
 
@@ -80,13 +80,13 @@ public:
             } else if ("requestPayload" == name) {
                 this->requestPayload = serverconf::RequestPayloadConfig(fi.get_value());
             } else if ("logging" == name) {
-                this->logging = Logging(fi.get_value());
+                this->logging = logging::LoggingConfig(fi.get_value());
             } else {
                 throw common::WiltonInternalException(TRACEMSG("Unknown field: [" + name + "]"));
             }
         }
         if (0 == logging.appenders.size()) {
-            logging.appenders.emplace_back(serverconf::Appender());
+            logging.appenders.emplace_back(logging::AppenderConfig());
         }
     }
     

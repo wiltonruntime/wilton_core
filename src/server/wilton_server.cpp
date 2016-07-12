@@ -103,7 +103,7 @@ char* wilton_Server_create(
     }
 }
 
-char* wilton_Server_stop_server(wilton_Server* server) /* noexcept */ {
+char* wilton_Server_stop(wilton_Server* server) /* noexcept */ {
     if (nullptr == server) return su::alloc_copy(TRACEMSG("Null 'server' parameter specified"));
     try {
         server->impl().stop();

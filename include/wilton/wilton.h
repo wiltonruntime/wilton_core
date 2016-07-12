@@ -98,7 +98,7 @@ WILTON_EXPORT char* wilton_Server_create(
         const char* conf_json,
         int conf_json_len);
 
-WILTON_EXPORT char* wilton_Server_stop_server(
+WILTON_EXPORT char* wilton_Server_stop(
         wilton_Server* server);
 
 /*
@@ -183,7 +183,25 @@ WILTON_EXPORT char* wilton_ResponseWriter_send(
 
 // logging
 
-WILTON_EXPORT char* wilton_log(
+/*
+    "logging": {
+        "appenders": [{
+            "appenderType": "NULL | CONSOLE | FILE | DAILY_ROLLING_FILE",
+            "filePath": "path/to/log/file",
+            "layout": "%d{%Y-%m-%d %H:%M:%S,%q} [%-5p %-5.5t %-20.20c] %m%n",
+            "thresholdLevel": "TRACE | DEBUG | INFO | WARN | ERROR | FATAL"
+        }, ... ],
+        "loggers": [{
+            "name": "my.logger.name",
+            "level": "TRACE | DEBUG | INFO | WARN | ERROR | FATAL"
+        }, ...]
+    }
+ */
+WILTON_EXPORT char* wilton_logger_initialize(
+        const char* conf_json,
+        int conf_json_len);
+
+WILTON_EXPORT char* wilton_logger_log(
         const char* level_name,
         int level_name_len,
         const char* logger_name,
@@ -191,7 +209,7 @@ WILTON_EXPORT char* wilton_log(
         const char* message,
         int message_len);
 
-WILTON_EXPORT char* wilton_log_is_level_enabled(
+WILTON_EXPORT char* wilton_logger_is_level_enabled(
         const char* logger_name,
         int logger_name_len,
         const char* level_name,

@@ -32,7 +32,7 @@ int main() {
 
     // getchar();
 
-    err = wilton_Server_stop_server(server);
+    err = wilton_Server_stop(server);
     check_err(err);
 
     return 0;
