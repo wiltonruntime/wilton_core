@@ -58,8 +58,7 @@ public:
     void operator()(sh::http_request_ptr& req, sh::tcp_connection_ptr& conn) {
         auto resp = sh::http_response_writer::create(conn, req);
         std::string url_path = std::string{req->get_resource(), conf->resource.length()};
-        std::string file_path = std::string{conf->dirPath} + "/" + url_path;
-        if (file_path.find("..") != std::string::npos) {
+        if (url_path.find("..") != std::string::npos) {
             resp->get_response().set_status_code(sh::http_request::RESPONSE_CODE_BAD_REQUEST);
             resp->get_response().set_status_message(sh::http_request::RESPONSE_MESSAGE_BAD_REQUEST);
             resp << sh::http_request::RESPONSE_CODE_BAD_REQUEST << " "
@@ -68,6 +67,7 @@ public:
             resp->send();
         } else {
             try {
+                std::string file_path = std::string{conf->dirPath} +"/" + url_path;
                 su::FileDescriptor fd{file_path, 'r'};
                 auto fd_ptr = si::make_source_istream_ptr(std::move(fd));
                 auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(fd_ptr));
