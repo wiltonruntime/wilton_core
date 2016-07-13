@@ -111,10 +111,12 @@ char* wilton_HttpClient_execute(
         if (request_data_len > 0) {
             std::string data_str{request_data, static_cast<uint32_t> (request_data_len)};
             si::string_source data_src{std::move(data_str)};
+            // POST will be used by default for this API call
             sh::HttpResource resp = http->impl().open_url(url_str, std::move(data_src), opts.options);            
             si::copy_all(resp, sink, buf.data(), buf.size());
             resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
         } else {
+            // GET will be used by default for this API call
             sh::HttpResource resp = http->impl().open_url(url_str, opts.options);
             si::copy_all(resp, sink, buf.data(), buf.size());
             resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
