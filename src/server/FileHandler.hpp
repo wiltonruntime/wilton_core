@@ -73,7 +73,7 @@ public:
                 auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(fd_ptr));
                 set_resp_headers(url_path, resp->get_response());
                 sender->send();
-            } catch (const std::exception& e) {
+            } catch (const std::exception&) {
                 resp->get_response().set_status_code(sh::http_request::RESPONSE_CODE_NOT_FOUND);
                 resp->get_response().set_status_message(sh::http_request::RESPONSE_MESSAGE_NOT_FOUND);
                 resp << sh::http_request::RESPONSE_CODE_NOT_FOUND << " "

@@ -91,8 +91,7 @@ set ( ${PROJECT_NAME}_DEPS
         sqlite3
         soci
         libcurl
-        libssl
-        libcrypto
+        openssl
         zlib )
 if ( STATICLIB_WITH_ICU )
     set ( ${PROJECT_NAME}_DEPS ${${PROJECT_NAME}_DEPS} 
