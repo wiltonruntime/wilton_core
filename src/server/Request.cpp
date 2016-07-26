@@ -99,9 +99,9 @@ public:
     }
 
     void send_file(Request&, std::string file_path, std::function<void(bool)> finalizer) {
+        su::FileDescriptor fd{file_path, 'r'};
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
-        su::FileDescriptor fd{file_path, 'r'};
         auto fd_ptr = si::make_source_istream_ptr(std::move(fd));
         auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(fd_ptr), std::move(finalizer));
         sender->send();
