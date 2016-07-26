@@ -56,7 +56,7 @@ public:
             conf.ssl.verifyFile,
             create_verifier_cb(conf.ssl.verifySubjectSubstr))) {
         logging::WiltonLogger::apply_config(conf.logging);
-        std::vector<std::string> methods = {"GET", "POST", "PUT", "DELETE"};
+        std::vector<std::string> methods = {"GET", "POST", "PUT", "DELETE", "OPTIONS"};
         std::string path = "/";
         for (const std::string& me : methods) {
             auto conf_ptr = std::make_shared<serverconf::RequestPayloadConfig>(conf.requestPayload.clone());
