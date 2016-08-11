@@ -16,6 +16,7 @@
 #include "log4cplus/fileappender.h"
 
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
+#include "staticlib/utils.hpp"
 
 #include "common/WiltonInternalException.hpp"
 #include "logging/AppenderConfig.hpp"
@@ -26,6 +27,8 @@ namespace wilton {
 namespace logging {
 
 namespace { // anonymous
+
+namespace su = staticlib::utils;
 
 std::atomic_bool INITIALIZED{false};
 bool THE_FALSE{false};
@@ -93,13 +96,23 @@ private:
         } else if ("CONSOLE" == conf.appenderType) {
             return new log4cplus::ConsoleAppender();
         } else if ("FILE" == conf.appenderType) {
-            return new log4cplus::FileAppender(conf.filePath);
+            return new log4cplus::FileAppender(resolve_file_path(conf.filePath));
         } else if ("DAILY_ROLLING_FILE" == conf.appenderType) {
-            return new log4cplus::DailyRollingFileAppender(conf.filePath);
+            return new log4cplus::DailyRollingFileAppender(resolve_file_path(conf.filePath));
         } else {
             throw common::WiltonInternalException(TRACEMSG(
                     "Invalid 'logging.appender.appenderType': [" + conf.appenderType + "]"));
         }
+    }
+    
+    static std::string resolve_file_path(const std::string& path) {
+        if ((path.length() > 0 && '/' == path[0]) || 
+                (path.length() > 1 && ':' == path[1])) {
+            return path;
+        }
+        std::string execpath = su::current_executable_path();
+        std::string dirpath = su::strip_filename(execpath);
+        return dirpath + path;
     }
 
 };
