@@ -48,8 +48,8 @@ public:
 
     AppenderConfig(const staticlib::serialization::JsonValue& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.get_object()) {
-            auto& name = fi.get_name();
+        for (const ss::JsonField& fi : json.as_object()) {
+            auto& name = fi.name();
             if ("appenderType" == name) {
                 this->appenderType = common::get_json_string(fi, "logging.appenders.appenderType");
             } else if ("filePath" == name) {

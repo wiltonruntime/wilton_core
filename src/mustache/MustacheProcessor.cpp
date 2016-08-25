@@ -63,30 +63,30 @@ private:
     }
 
     static mstch::node create_node(const ss::JsonValue& value) {
-        switch (value.get_type()) {
+        switch (value.type()) {
         case (ss::JsonType::NULL_T): return mstch::node();
         case (ss::JsonType::OBJECT): return create_map(value);
         case (ss::JsonType::ARRAY): return create_array(value);
-        case (ss::JsonType::STRING): return mstch::node(value.get_string());
-        case (ss::JsonType::INTEGER): return mstch::node(static_cast<int> (value.get_integer()));
-        case (ss::JsonType::REAL): return mstch::node(value.get_real());
-        case (ss::JsonType::BOOLEAN): return mstch::node(value.get_boolean());
+        case (ss::JsonType::STRING): return mstch::node(value.as_string());
+        case (ss::JsonType::INTEGER): return mstch::node(static_cast<int> (value.as_int64()));
+        case (ss::JsonType::REAL): return mstch::node(value.as_double());
+        case (ss::JsonType::BOOLEAN): return mstch::node(value.as_bool());
         default: throw common::WiltonInternalException(TRACEMSG(
-                    "Unsupported JSON type:[" + sc::to_string(static_cast<char> (value.get_type())) + "]"));
+                    "Unsupported JSON type:[" + sc::to_string(static_cast<char> (value.type())) + "]"));
         }
     }
 
     static mstch::node create_map(const ss::JsonValue& value) {
         std::map<const std::string, mstch::node> map;
-        for (const auto& fi : value.get_object()) {
-            map.insert({fi.get_name(), create_node(fi.get_value())});
+        for (const auto& fi : value.as_object()) {
+            map.insert({fi.name(), create_node(fi.value())});
         }
         return mstch::node(std::move(map));
     }
 
     static mstch::node create_array(const ss::JsonValue& value) {
         std::vector<mstch::node> array;
-        for (const auto& va : value.get_array()) {
+        for (const auto& va : value.as_array()) {
             array.emplace_back(create_node(va));
         }
         return mstch::node(std::move(array));

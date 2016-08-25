@@ -45,8 +45,8 @@ public:
 
     MimeType(const staticlib::serialization::JsonValue& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.get_object()) {
-            auto& name = fi.get_name();
+        for (const ss::JsonField& fi : json.as_object()) {
+            auto& name = fi.name();
             if ("extension" == name) {
                 this->extension = common::get_json_string(fi, "documentRoot.mimeType.extension");
             } else if ("mime" == name) {

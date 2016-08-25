@@ -42,8 +42,8 @@ public:
 
     LoggerConfig(const staticlib::serialization::JsonValue& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.get_object()) {
-            auto& fname = fi.get_name();
+        for (const ss::JsonField& fi : json.as_object()) {
+            auto& fname = fi.name();
             if ("name" == fname) {
                 this->name = common::get_json_string(fi, "logging.loggers.name");
             } else if ("level" == fname) {

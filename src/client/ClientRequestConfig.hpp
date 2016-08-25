@@ -42,12 +42,12 @@ public:
 
     ClientRequestConfig(const staticlib::serialization::JsonValue& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.get_object()) {
-            auto& name = fi.get_name();
+        for (const ss::JsonField& fi : json.as_object()) {
+            auto& name = fi.name();
             if ("headers" == name) {
                 for (const ss::JsonField& hf : common::get_json_object(fi, "headers")) {
-                    std::string val = common::get_json_string(hf, std::string("headers.") + hf.get_name());
-                    options.headers.emplace_back(hf.get_name(), std::move(val));
+                    std::string val = common::get_json_string(hf, std::string("headers.") + hf.name());
+                    options.headers.emplace_back(hf.name(), std::move(val));
                 }
             } else if ("method" == name) {
                 options.method = common::get_json_string(fi, "method");

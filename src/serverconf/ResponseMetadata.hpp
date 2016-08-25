@@ -46,16 +46,16 @@ public:
     
     ResponseMetadata(const staticlib::serialization::JsonValue& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.get_object()) {
-            auto& name = fi.get_name();
+        for (const ss::JsonField& fi : json.as_object()) {
+            auto& name = fi.name();
             if ("statusCode" == name) {
                 this->statusCode = common::get_json_uint16(fi, "statusCode");
             } else if ("statusMessage" == name) {
                 this->statusMessage = common::get_json_string(fi, "statusMessage");
             } else if ("headers" == name) {
                 for (const ss::JsonField& hf : common::get_json_object(fi, "headers")) {
-                    std::string val = common::get_json_string(hf, std::string("headers.") + hf.get_name());
-                    this->headers.emplace_back(hf.get_name(), std::move(val));
+                    std::string val = common::get_json_string(hf, std::string("headers.") + hf.name());
+                    this->headers.emplace_back(hf.name(), std::move(val));
                 }
             } else {
                 throw common::WiltonInternalException(TRACEMSG("Unknown field: [" + name + "]"));

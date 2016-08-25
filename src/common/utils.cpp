@@ -20,59 +20,59 @@ namespace su = staticlib::utils;
 } //namespace
 
 const std::string& get_json_string(const ss::JsonField& field, const std::string& name) {
-    if (ss::JsonType::STRING != field.get_type() || field.get_string().empty()) {
+    if (ss::JsonType::STRING != field.type() || field.as_string().empty()) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + name + "' field,"
-            " type: [" + ss::stringify_json_type(field.get_type()) + "]," +
-            " value: [" + ss::dump_json_to_string(field.get_value()) + "]"));
+            " type: [" + ss::stringify_json_type(field.type()) + "]," +
+            " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
-    return field.get_string();
+    return field.as_string();
 }
 
 uint32_t get_json_uint32(const staticlib::serialization::JsonField& field, const std::string& name) {
-    if (ss::JsonType::INTEGER != field.get_type() || !su::is_uint32(field.get_integer())) {
+    if (ss::JsonType::INTEGER != field.type() || !su::is_uint32(field.as_int64())) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + name + "' field,"
-                " type: [" + ss::stringify_json_type(field.get_type()) + "]," +
-                " value: [" + ss::dump_json_to_string(field.get_value()) + "]"));
+                " type: [" + ss::stringify_json_type(field.type()) + "]," +
+                " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
-    return field.get_uint32();
+    return field.as_uint32();
 }
 
 uint16_t get_json_uint16(const staticlib::serialization::JsonField& field, const std::string& name) {
-    if (ss::JsonType::INTEGER != field.get_type() || !su::is_uint16(field.get_integer())) {
+    if (ss::JsonType::INTEGER != field.type() || !su::is_uint16(field.as_int64())) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + name + "' field,"
-                " type: [" + ss::stringify_json_type(field.get_type()) + "]," +
-                " value: [" + ss::dump_json_to_string(field.get_value()) + "]"));
+                " type: [" + ss::stringify_json_type(field.type()) + "]," +
+                " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
-    return field.get_uint16();
+    return field.as_uint16();
 }
 
 bool get_json_bool(const ss::JsonField& field, const std::string& name) {
-    if (ss::JsonType::BOOLEAN != field.get_type()) {
+    if (ss::JsonType::BOOLEAN != field.type()) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + name + "' field,"
-                " type: [" + ss::stringify_json_type(field.get_type()) + "]," +
-                " value: [" + ss::dump_json_to_string(field.get_value()) + "]"));
+                " type: [" + ss::stringify_json_type(field.type()) + "]," +
+                " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
-    return field.get_boolean();
+    return field.as_bool();
 }
 
 const std::vector<staticlib::serialization::JsonValue>& get_json_array(
         const staticlib::serialization::JsonField& field, const std::string& name) {
-    if (ss::JsonType::ARRAY != field.get_type()) {
+    if (ss::JsonType::ARRAY != field.type()) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + name + "' field,"
-                " type: [" + ss::stringify_json_type(field.get_type()) + "]," +
-                " value: [" + ss::dump_json_to_string(field.get_value()) + "]"));
+                " type: [" + ss::stringify_json_type(field.type()) + "]," +
+                " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
-    return field.get_array();
+    return field.as_array();
 }
 
 const std::vector<staticlib::serialization::JsonField>& get_json_object(
         const staticlib::serialization::JsonField& field, const std::string& name) {
-    if (ss::JsonType::OBJECT != field.get_type()) {
+    if (ss::JsonType::OBJECT != field.type()) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + name + "' field,"
-                " type: [" + ss::stringify_json_type(field.get_type()) + "]," +
-                " value: [" + ss::dump_json_to_string(field.get_value()) + "]"));
+                " type: [" + ss::stringify_json_type(field.type()) + "]," +
+                " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
-    return field.get_object();    
+    return field.as_object();    
 }
 
 } //namespace

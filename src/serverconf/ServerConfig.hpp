@@ -62,8 +62,8 @@ public:
 
     ServerConfig(const staticlib::serialization::JsonValue& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.get_object()) {
-            auto& name = fi.get_name();
+        for (const ss::JsonField& fi : json.as_object()) {
+            auto& name = fi.name();
             if ("numberOfThreads" == name) {
                 this->numberOfThreads = common::get_json_uint16(fi, "numberOfThreads");
             } else if ("tcpPort" == name) {
@@ -71,16 +71,16 @@ public:
             } else if ("ipAddress" == name) {
                 this->ipAddress = common::get_json_string(fi, "ipAddress");
             } else if ("ssl" == name) {
-                this->ssl = SslConfig(fi.get_value());
+                this->ssl = SslConfig(fi.value());
             } else if ("documentRoots" == name) {
                 for (const ss::JsonValue& lo : common::get_json_array(fi, "documentRoots")) {
                     auto jd = serverconf::DocumentRoot(lo);
                     this->documentRoots.emplace_back(std::move(jd));
                 }
             } else if ("requestPayload" == name) {
-                this->requestPayload = serverconf::RequestPayloadConfig(fi.get_value());
+                this->requestPayload = serverconf::RequestPayloadConfig(fi.value());
             } else if ("logging" == name) {
-                this->logging = logging::LoggingConfig(fi.get_value());
+                this->logging = logging::LoggingConfig(fi.value());
             } else {
                 throw common::WiltonInternalException(TRACEMSG("Unknown field: [" + name + "]"));
             }

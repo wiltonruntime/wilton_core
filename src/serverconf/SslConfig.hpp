@@ -47,13 +47,13 @@ public:
     
     SslConfig(const staticlib::serialization::JsonValue& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.get_object()) {
-            auto& name = fi.get_name();
+        for (const ss::JsonField& fi : json.as_object()) {
+            auto& name = fi.name();
             if ("keyFile" == name) {
                 this->keyFile = common::get_json_string(fi, "ssl.keyFile");
             } else if ("keyPassword" == name) {
                 // empty string allowed
-                this->keyPassword = fi.get_string();
+                this->keyPassword = fi.as_string();
             } else if ("verifyFile" == name) {
                 this->verifyFile = common::get_json_string(fi, "ssl.verifyFile");
             } else if ("verifySubjectSubstr" == name) {
