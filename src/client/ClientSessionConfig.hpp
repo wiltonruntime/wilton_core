@@ -40,7 +40,10 @@ public:
 
     ClientSessionConfig(const staticlib::serialization::JsonValue& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.as_object()) {
+        // msvs complains to different vectors in foreach here
+        auto& vec = json.as_object();
+        for (size_t i = 0; i < vec.size(); i++) {
+            const ss::JsonField& fi = vec[i];
             auto& name = fi.name();
             if ("maxHostConnections" == name) {
                 this->options.max_host_connections = common::get_json_uint32(fi, "maxHostConnections");
