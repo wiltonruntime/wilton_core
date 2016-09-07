@@ -456,7 +456,24 @@ WILTON_EXPORT char* wilton_HttpClient_send_file(
                 int sent_successfully));
 
 
-// NAT proxy
+// Cron
+
+struct wilton_CronTask;
+typedef struct wilton_CronTask wilton_CronTask;
+
+WILTON_EXPORT char* wilton_CronTask_start(
+        wilton_CronTask** cron_out,
+        const char* cronexpr,
+        int cronexpr_len,
+        void* task_ctx,
+        void (*task_cb)(
+                void* task_ctx));
+
+
+WILTON_EXPORT char* wilton_CronTask_stop(
+        wilton_CronTask* cron);
+
+// TODO: NAT proxy
 
 struct wilton_NatProxy;
 typedef struct wilton_NatProxy wilton_NatProxy;
