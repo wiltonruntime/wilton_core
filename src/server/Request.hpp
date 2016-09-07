@@ -9,8 +9,9 @@
 #define	WILTON_SERVER_REQUEST_HPP
 
 #include <cstdint>
-#include <string>
 #include <functional>
+#include <map>
+#include <string>
 
 #include "staticlib/pimpl.hpp"
 #include "staticlib/serialization.hpp"
@@ -58,7 +59,8 @@ public:
     // private api
     
     Request(void* /* staticlib::httpserver::http_request_ptr&& */ req, 
-            void* /* staticlib::httpserver::http_response_writer_ptr&& */ resp);
+            void* /* staticlib::httpserver::http_response_writer_ptr&& */ resp,
+            const std::map<std::string, std::string>& mustache_partials);
 };
 
 } // namespace

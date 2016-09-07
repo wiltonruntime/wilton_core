@@ -25,6 +25,7 @@
 #include "mustache/MustacheProcessor.hpp"
 #include "server/ResponseStreamSender.hpp"
 #include "server/RequestPayloadHandler.hpp"
+#include "server/Server.hpp"
 
 #include "serverconf/Header.hpp"
 #include "serverconf/ResponseMetadata.hpp"
@@ -40,6 +41,8 @@ namespace si = staticlib::io;
 namespace sh = staticlib::httpserver;
 namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
+
+using partmap_type = const std::map<std::string, std::string>&;
 
 const std::unordered_set<std::string> HEADERS_DISCARD_DUPLICATES{
     "age", "authorization", "content-length", "content-type", "etag", "expires",
@@ -58,13 +61,16 @@ class Request::Impl : public staticlib::pimpl::PimplObject::Impl {
     // owning ptrs here to not restrict clients async ops
     sh::http_request_ptr req;
     sh::http_response_writer_ptr resp;
+    const std::map<std::string, std::string>& mustache_partials;
 
 public:
 
-    Impl(void* /* sh::http_request_ptr&& */ req, void* /* sh::http_response_writer_ptr&& */ resp) :
+    Impl(void* /* sh::http_request_ptr&& */ req, void* /* sh::http_response_writer_ptr&& */ resp,
+            const std::map<std::string, std::string>& mustache_partials) :
     state(State::CREATED),
     req(std::move(*static_cast<sh::http_request_ptr*>(req))),
-    resp(std::move(*static_cast<sh::http_response_writer_ptr*> (resp))) { }
+    resp(std::move(*static_cast<sh::http_response_writer_ptr*> (resp))),
+    mustache_partials(mustache_partials) { }
 
     serverconf::RequestMetadata get_request_metadata(Request&) {
         std::string http_ver = sc::to_string(req->get_version_major()) +
@@ -110,7 +116,7 @@ public:
     void send_mustache(Request&, std::string mustache_file_path, ss::JsonValue json) {
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
-        auto mp = mustache::MustacheProcessor{mustache_file_path, std::move(json)};
+        auto mp = mustache::MustacheProcessor(mustache_file_path, std::move(json), mustache_partials);
         auto mp_ptr = si::make_source_istream_ptr(std::move(mp));
         auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(mp_ptr));
         sender->send();
@@ -167,7 +173,7 @@ private:
     }
 
 };
-PIMPL_FORWARD_CONSTRUCTOR(Request, (void*)(void*), (), common::WiltonInternalException)
+PIMPL_FORWARD_CONSTRUCTOR(Request, (void*)(void*)(partmap_type), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, serverconf::RequestMetadata, get_request_metadata, (), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, const std::string&, get_request_data, (), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, const std::string&, get_request_data_filename, (), (), common::WiltonInternalException)

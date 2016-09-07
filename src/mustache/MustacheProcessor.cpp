@@ -27,6 +27,8 @@ namespace si = staticlib::io;
 namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
 
+using partmap_type = const std::map<std::string, std::string>&;
+
 } //namespace
 
 class MustacheProcessor::Impl : public staticlib::pimpl::PimplObject::Impl {
@@ -35,8 +37,9 @@ class MustacheProcessor::Impl : public staticlib::pimpl::PimplObject::Impl {
 public:
     ~Impl() STATICLIB_NOEXCEPT { }
     
-    Impl(const std::string& mustache_file_path, ss::JsonValue json) try :
-        renderer(read_file(mustache_file_path), create_node(json)) {
+    Impl(const std::string& mustache_file_path, ss::JsonValue json,
+            const std::map<std::string, std::string>& partials) try :
+        renderer(read_file(mustache_file_path), create_node(json), partials) {
     } catch (const std::exception& e) {
         throw common::WiltonInternalException(TRACEMSG(e.what() +
                 "\nError processing mustache template: [" + mustache_file_path + "]" +
@@ -54,7 +57,7 @@ public:
     
 private:       
 
-    static std::string read_file(const std::string path) {
+    static std::string read_file(const std::string& path) {
         su::FileDescriptor fd{path, 'r'};
         std::array<char, 4096> buf;
         si::string_sink sink{};
@@ -93,7 +96,7 @@ private:
     }
 
 };
-PIMPL_FORWARD_CONSTRUCTOR(MustacheProcessor, (const std::string&)(ss::JsonValue), (), common::WiltonInternalException)
+PIMPL_FORWARD_CONSTRUCTOR(MustacheProcessor, (const std::string&)(ss::JsonValue)(partmap_type), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(MustacheProcessor, std::streamsize, read, (char*)(std::streamsize), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD_STATIC(MustacheProcessor, std::string, render_string, (const std::string&)(const ss::JsonValue&), (), common::WiltonInternalException)
 

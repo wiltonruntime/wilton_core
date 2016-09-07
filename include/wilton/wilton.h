@@ -86,7 +86,9 @@ typedef struct wilton_ResponseWriter wilton_ResponseWriter;
                 "level": "TRACE | DEBUG | INFO | WARN | ERROR | FATAL"
             }, ...]
         },
-        "natProxyPaths": ["/path/to/proxy1", "/path/to/proxy2"]
+        "mustache": {
+            "partialsDirs": ["path/to/dir1", "path/to/dir2" ...]
+        }
     }
  */
 WILTON_EXPORT char* wilton_Server_create(

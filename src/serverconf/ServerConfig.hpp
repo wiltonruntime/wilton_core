@@ -20,6 +20,7 @@
 #include "logging/AppenderConfig.hpp"
 #include "logging/LoggingConfig.hpp"
 #include "serverconf/DocumentRoot.hpp"
+#include "serverconf/MustacheConfig.hpp"
 #include "serverconf/RequestPayloadConfig.hpp"
 #include "serverconf/SslConfig.hpp"
 
@@ -35,6 +36,7 @@ public:
     std::vector<DocumentRoot> documentRoots;
     RequestPayloadConfig requestPayload;
     logging::LoggingConfig logging;
+    MustacheConfig mustache;
 
     ServerConfig(const ServerConfig&) = delete;
 
@@ -47,7 +49,8 @@ public:
     ssl(std::move(other.ssl)),
     documentRoots(std::move(other.documentRoots)),
     requestPayload(std::move(other.requestPayload)),
-    logging(std::move(other.logging)) { }
+    logging(std::move(other.logging)),
+    mustache(std::move(other.mustache)) { }
 
     ServerConfig& operator=(ServerConfig&& other) {
         this->numberOfThreads = other.numberOfThreads;
@@ -55,8 +58,9 @@ public:
         this->ipAddress = std::move(other.ipAddress);
         this->ssl = std::move(other.ssl);
         this->documentRoots = std::move(other.documentRoots);
-        this->logging = std::move(other.logging);
         this->requestPayload = std::move(other.requestPayload);
+        this->logging = std::move(other.logging);
+        this->mustache = std::move(other.mustache);
         return *this;
     }
 
@@ -81,6 +85,8 @@ public:
                 this->requestPayload = serverconf::RequestPayloadConfig(fi.value());
             } else if ("logging" == name) {
                 this->logging = logging::LoggingConfig(fi.value());
+            } else if ("mustache" == name) {
+                this->mustache = MustacheConfig(fi.value());
             } else {
                 throw common::WiltonInternalException(TRACEMSG("Unknown field: [" + name + "]"));
             }
@@ -102,7 +108,8 @@ public:
             {"ssl", ssl.to_json()},
             {"documentRoots", drs},
             {"requestPayload", logging.to_json()},
-            {"logging", logging.to_json()}
+            {"logging", logging.to_json()},
+            {"mustache", mustache.to_json()}
         };
     }
 };

@@ -9,6 +9,7 @@
 #define	WILTON_MUSTACHE_MUSTACHEPROCESSOR_HPP
 
 #include <ios>
+#include <map>
 #include <string>
 
 #include "staticlib/pimpl.hpp"
@@ -33,7 +34,8 @@ public:
      */
     PIMPL_CONSTRUCTOR(MustacheProcessor)
     
-    MustacheProcessor(const std::string& mustache_file_path, staticlib::serialization::JsonValue json);
+    MustacheProcessor(const std::string& mustache_file_path, staticlib::serialization::JsonValue json,
+            const std::map<std::string, std::string>& partials = std::map<std::string, std::string>());
     
     std::streamsize read(char* buffer, std::streamsize length);
     

@@ -16,8 +16,11 @@
 
 #include "staticlib/config.hpp"
 #include "staticlib/httpserver.hpp"
+#include "staticlib/io.hpp"
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
 #include "staticlib/serialization.hpp"
+#include "staticlib/tinydir.hpp"
+#include "staticlib/utils.hpp"
 
 #include "common/WiltonInternalException.hpp"
 #include "logging/WiltonLogger.hpp"
@@ -36,17 +39,23 @@ namespace { // anonymous
 
 namespace sc = staticlib::config;
 namespace sh = staticlib::httpserver;
+namespace si = staticlib::io;
 namespace ss = staticlib::serialization;
+namespace st = staticlib::tinydir;
+namespace su = staticlib::utils;
 
 using gateway_fun_type = std::function<void(Request& req)>;
+using partmap_type = const std::map<std::string, std::string>&;
 
 } // namespace
 
 class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
+    std::map<std::string, std::string> mustache_partials;
     std::unique_ptr<sh::http_server> server;
 
 public:
     Impl(gateway_fun_type gateway, serverconf::ServerConfig conf) :
+    mustache_partials(load_partials(conf.mustache)),
     server(sc::make_unique<sh::http_server>(
             conf.numberOfThreads, 
             conf.tcpPort,
@@ -64,10 +73,10 @@ public:
                 return RequestPayloadHandler{*conf_ptr};
             });
             server->add_handler(me, path,
-                    [gateway](sh::http_request_ptr& req, sh::tcp_connection_ptr & conn) {
+                    [gateway, this](sh::http_request_ptr& req, sh::tcp_connection_ptr & conn) {
                         auto writer = sh::http_response_writer::create(conn, req);
                         Request req_pass{static_cast<void*> (std::addressof(req)),
-                                static_cast<void*> (std::addressof(writer))};
+                                static_cast<void*> (std::addressof(writer)), this->mustache_partials};
                         gateway(req_pass);
                         req_pass.finish();
                     });
@@ -79,7 +88,7 @@ public:
                 server->add_handler("GET", dr.resource, ZipHandler(dr));
             } else throw common::WiltonInternalException(TRACEMSG(
                     "Invalid 'documentRoot': [" + ss::dump_json_to_string(dr.to_json()) + "]"));
-        }
+        }        
         server->start();
     }
 
@@ -100,7 +109,7 @@ private:
         } else return "";
     }
 
-    static std::function<bool(bool, asio::ssl::verify_context&) > create_verifier_cb(const std::string& subject_part) {
+    static std::function<bool(bool, asio::ssl::verify_context&)> create_verifier_cb(const std::string& subject_part) {
         return [subject_part](bool preverify_ok, asio::ssl::verify_context & ctx) {
             // cert validation fail
             if (!preverify_ok) {
@@ -119,6 +128,31 @@ private:
             auto pos = subject.find(subject_part);
             return std::string::npos != pos;
         };
+    }
+    
+    static std::map<std::string, std::string> load_partials(const serverconf::MustacheConfig& cf) {
+        static std::string MUSTACHE_EXT = ".mustache";
+        std::map<std::string, std::string> res;
+        for (const std::string& dirpath : cf.partialsDirs) {
+            for (const st::TinydirFile& tf : st::list_directory(dirpath)) {
+                if (!su::ends_with(tf.get_name(), MUSTACHE_EXT)) continue;
+                std::string name = std::string(tf.get_name().data(), tf.get_name().length() - MUSTACHE_EXT.length());
+                std::string val = read_file(tf);
+                auto pa = res.insert(std::make_pair(std::move(name), std::move(val)));
+                if (!pa.second) throw common::WiltonInternalException(TRACEMSG(
+                        "Invalid duplicate 'mustache.partialsDirs' element," +
+                        " dirpath: [" + dirpath + "], path: [" + tf.get_path() + "]"));
+            }
+        }
+        return res;
+    }
+
+    static std::string read_file(const st::TinydirFile& tf) {
+        auto fd = tf.open_read();
+        std::array<char, 4096> buf;
+        si::string_sink sink{};
+        si::copy_all(fd, sink, buf.data(), buf.size());
+        return std::move(sink.get_string());
     }
     
 };

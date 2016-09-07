@@ -83,6 +83,7 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_orm )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpclient )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
 endif ( )
 
 # dependencies
@@ -95,6 +96,7 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_httpclient
         staticlib_utils
         staticlib_cron
+        staticlib_tinydir
         staticlib_pimpl
         jansson
         log4cplus
