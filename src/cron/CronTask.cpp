@@ -33,16 +33,19 @@ public:
     ~Impl() STATICLIB_NOEXCEPT { }; 
     
     Impl(const std::string& cronexpr, std::function<void()> task) :
-    running(true),
-    worker([this, cronexpr, task]{
-        cr::CronExpression cron{cronexpr};
-        while (this->running.load()) {
-            std::chrono::seconds secs = cron.next();
-            std::this_thread::sleep_for(secs);
-            task();
-        }
-    }) {
-        worker.detach();
+    running(true) {
+        // check that expr is valid
+        auto tmp = cr::CronExpression(cronexpr);
+        (void) tmp;
+        this->worker = std::thread([this, cronexpr, task] {
+            auto cron = cr::CronExpression(cronexpr);
+            while (this->running.load()) {
+                std::chrono::seconds secs = cron.next();
+                        std::this_thread::sleep_for(secs);
+                        task();
+            }
+        });
+        this->worker.detach();
     }
         
     void stop(CronTask&) {
