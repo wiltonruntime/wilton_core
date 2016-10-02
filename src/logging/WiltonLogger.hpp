@@ -38,6 +38,8 @@ public:
     
     static bool is_enabled_for_level(const std::string& logger_name, const std::string& level_name);
     
+    static void shutdown();
+    
 };
 
 } // namespace

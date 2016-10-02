@@ -104,3 +104,12 @@ char* wilton_logger_is_level_enabled(
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
+
+char* wilton_logger_shutdown() {
+    try {
+        wl::WiltonLogger::shutdown();
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}

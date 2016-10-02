@@ -219,6 +219,8 @@ WILTON_EXPORT char* wilton_logger_is_level_enabled(
         int* res_out
 );
 
+WILTON_EXPORT char* wilton_logger_shutdown();
+
 // mustache
 
 WILTON_EXPORT char* wilton_render_mustache(

@@ -31,6 +31,7 @@ namespace { // anonymous
 namespace su = staticlib::utils;
 
 std::atomic_bool INITIALIZED{false};
+std::atomic_bool SHUTDOWN{false};
 bool THE_FALSE{false};
 
 log4cplus::LogLevel to_level(const std::string& level_name) {
@@ -87,6 +88,12 @@ public:
         log4cplus::LogLevel level = to_level(level_name);
         return logger.isEnabledFor(level);
     }
+    
+    static void shutdown() {
+        if (SHUTDOWN.compare_exchange_strong(THE_FALSE, true)) {
+            log4cplus::Logger::shutdown();
+        }
+    }
 
 private:
     // todo: check invalid file behaviour
@@ -119,6 +126,7 @@ private:
 PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, log, (const std::string&)(const std::string&)(const std::string&), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, apply_config, (const LoggingConfig&), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, bool, is_enabled_for_level, (const std::string&)(const std::string&), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD_STATIC(WiltonLogger, void, shutdown, (), (), common::WiltonInternalException)
 
 } // namespace
 }
