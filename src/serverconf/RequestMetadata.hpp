@@ -28,6 +28,7 @@ class RequestMetadata {
     std::string method;
     std::string pathname;
     std::string query;
+    std::vector<std::pair<std::string, std::string>> queries;
     std::vector<serverconf::Header> headers;
 
 public:
@@ -41,6 +42,7 @@ public:
     method(std::move(other.method)),
     pathname(std::move(other.pathname)),
     query(std::move(other.query)),
+    queries(std::move(other.queries)),
     headers(std::move(other.headers)) { }
     
     RequestMetadata& operator=(RequestMetadata&& other) {
@@ -49,18 +51,22 @@ public:
         method = std::move(other.method);
         pathname = std::move(other.pathname);
         query = std::move(other.query);
+        queries = std::move(other.queries);
         headers = std::move(other.headers);
         return *this;
     }
     
     RequestMetadata(const std::string& httpVersion, const std::string& protocol, 
             const std::string& method, const std::string& pathname,
-            const std::string& query, std::vector<serverconf::Header> headers) :
+            const std::string& query, 
+            std::vector<std::pair<std::string, std::string>> queries,
+            std::vector<serverconf::Header> headers) :
     httpVersion(httpVersion.data(), httpVersion.length()),
     protocol(protocol.data(), protocol.length()),
     method(method.data(), method.length()),
     pathname(pathname.data(), pathname.length()),
     query(query.data(), query.length()),
+    queries(std::move(queries)),
     headers(std::move(headers)) { }
         
     staticlib::serialization::JsonValue to_json() const {
@@ -70,13 +76,18 @@ public:
             return el.to_json();
         });
         std::vector<ss::JsonField> hfields = sr::emplace_to_vector(std::move(ha));
+        auto qu = sr::transform(sr::refwrap(queries), [](const std::pair<std::string, std::string>& pa) {
+            return ss::JsonField(pa.first, pa.second);
+        });
+        std::vector<ss::JsonField> qfields = sr::emplace_to_vector(std::move(qu));
         return {
             {"httpVersion", httpVersion},
             {"protocol", protocol},
             {"method", method},
+            {"url", reconstructUrl()},
             {"pathname", pathname},
             {"query", query},
-            {"url", reconstructUrl()},
+            {"queries", std::move(qfields)},
             {"headers", std::move(hfields)}
         };
     }

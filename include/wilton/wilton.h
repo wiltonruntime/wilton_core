@@ -115,9 +115,14 @@ WILTON_EXPORT char* wilton_Server_stop(
     "httpVersion": "1.1",
     "protocol": "http|https",
     "method": "GET|POST|PUT|DELETE",
+    "url": "/path/to/hanldler?param1=val1...",
     "pathname": "/path/to/hanldler",
     "query": "param1=val1...",
-    "url": "/path/to/hanldler?param1=val1...",
+    "queries": {
+        "param1": "val1",
+        "param2": "val21,val22"
+        ...
+    },
     "headers": {
         "Header-Name": "header_value",
         ...

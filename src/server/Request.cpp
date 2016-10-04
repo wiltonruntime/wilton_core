@@ -76,9 +76,10 @@ public:
         std::string http_ver = sc::to_string(req->get_version_major()) +
                 "." + sc::to_string(req->get_version_minor());
         auto headers = get_request_headers(*req);
+        auto queries = get_queries(*req);
         std::string protocol = resp->get_connection()->get_ssl_flag() ? "https" : "http";
         return serverconf::RequestMetadata(http_ver, protocol, req->get_method(), req->get_resource(),
-                req->get_query_string(), std::move(headers));
+                req->get_query_string(), std::move(queries), std::move(headers));
     }
 
     const std::string& get_request_data(Request&) {
@@ -145,7 +146,7 @@ private:
     std::vector<serverconf::Header> get_request_headers(sh::http_request& req) {
         std::unordered_map<std::string, serverconf::Header> map{};
         for (const auto& en : req.get_headers()) {
-            auto ha = serverconf::Header{en.first, en.second};
+            auto ha = serverconf::Header(en.first, en.second);
             std::string key = en.first;
             std::transform(key.begin(), key.end(), key.begin(), ::tolower);
             auto inserted = map.emplace(key, std::move(ha));
@@ -160,6 +161,21 @@ private:
         std::sort(res.begin(), res.end(), [](const serverconf::Header& el1, const serverconf::Header & el2) {
             return el1.name < el2.name;
         });
+        return res;
+    }
+    
+    std::vector<std::pair<std::string, std::string>> get_queries(sh::http_request& req) {
+        std::unordered_map<std::string, std::string> map{};
+        for (const auto& en : req.get_queries()) {
+            auto inserted = map.emplace(en.first, en.second);
+            if (!inserted.second) {
+                append_with_comma(inserted.first->second, en.second);
+            }
+        }
+        std::vector<std::pair<std::string, std::string>> res{};
+        for (auto& en : map) {
+            res.emplace_back(en.first, en.second);
+        }
         return res;
     }
 
