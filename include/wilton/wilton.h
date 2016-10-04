@@ -35,6 +35,8 @@ extern "C" {
 WILTON_EXPORT void wilton_free(
         char* errmsg);
 
+WILTON_EXPORT char* wilton_sleep_millis(
+        int millis);
 
 // server
 
