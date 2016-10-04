@@ -477,6 +477,23 @@ WILTON_EXPORT char* wilton_CronTask_start(
 WILTON_EXPORT char* wilton_CronTask_stop(
         wilton_CronTask* cron);
 
+// Mutex
+
+struct wilton_Mutex;
+typedef struct wilton_Mutex wilton_Mutex;
+
+WILTON_EXPORT char* wilton_Mutex_create(
+        wilton_Mutex** mutex_out);
+
+WILTON_EXPORT char* wilton_Mutex_lock(
+        wilton_Mutex* mutex);
+
+WILTON_EXPORT char* wilton_Mutex_unlock(
+        wilton_Mutex* mutex);
+
+WILTON_EXPORT char* wilton_Mutex_destroy(
+        wilton_Mutex* mutex);
+
 // TODO: NAT proxy
 
 struct wilton_NatProxy;
