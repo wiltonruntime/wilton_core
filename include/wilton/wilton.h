@@ -238,6 +238,13 @@ WILTON_EXPORT char* wilton_render_mustache(
         char** output_text_out,
         int* output_text_len_out);
 
+WILTON_EXPORT char* wilton_render_mustache_file(
+        const char* template_file_path,
+        int template_file_path_len,
+        const char* values_json,
+        int values_json_len,
+        char** output_text_out,
+        int* output_text_len_out);
 
 // DB
 

@@ -41,7 +41,7 @@ public:
     
     static std::string render_string(const std::string& template_text, 
             const staticlib::serialization::JsonValue& json);
-   
+
 };
 
 } // namespace
