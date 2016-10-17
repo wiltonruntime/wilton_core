@@ -51,6 +51,8 @@ public:
                 }
             } else if ("method" == name) {
                 options.method = common::get_json_string(fi, "method");
+            } else if ("abortOnConnectError" == name) {
+                options.abort_on_connect_error = common::get_json_bool(fi, "abortOnConnectError");
             } else if ("abortOnResponseError" == name) {
                 options.abort_on_response_error = common::get_json_bool(fi, "abortOnResponseError");
             } else if ("readTimeoutMillis" == name) {
@@ -131,6 +133,7 @@ public:
         return {
             {"headers", std::move(hfields)},
             {"method", options.method},
+            {"abortOnConnectError", options.abort_on_connect_error},
             {"abortOnResponseError", options.abort_on_response_error},
             {"readTimeoutMillis", options.read_timeout_millis},
             {"fdsetTimeoutMillis", options.fdset_timeout_millis},

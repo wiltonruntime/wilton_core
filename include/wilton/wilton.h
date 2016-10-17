@@ -320,6 +320,7 @@ WILTON_EXPORT char* wilton_HttpClient_close(
         ...
     },
     "method": "GET|POST|PUT|DELETE",
+    "abortOnConnectError": true,
     "abortOnResponseError": true,
     "readTimeoutMillis": uint32_t,
     "fdsetTimeoutMillis": uint32_t,
@@ -398,7 +399,10 @@ WILTON_EXPORT char* wilton_HttpClient_close(
     // https://curl.haxx.se/libcurl/c/CURLOPT_SSL_CIPHER_LIST.html
     "sslCipherList": ""
  }
- {
+ {    
+    // true if connection was successful
+    "connectionSuccess": bool,
+    "data": "response_data",
     "headers": {
         "Header-Name": "header_value",
         ...

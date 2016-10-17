@@ -31,8 +31,9 @@ public:
         });
         std::vector<ss::JsonField> hfields = sr::emplace_to_vector(std::move(ha));
         return {
-            {"headers", std::move(hfields)},
+            {"connectionSuccess", info.connection_success()},
             {"data", std::move(data)},
+            {"headers", std::move(hfields)},
             {"effectiveUrl", info.effective_url},
             {"responseCode", static_cast<int64_t> (info.response_code)},
             {"totalTimeSecs", info.total_time_secs},
