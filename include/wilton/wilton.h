@@ -30,14 +30,6 @@
 extern "C" {
 #endif
     
-// common
-
-WILTON_EXPORT void wilton_free(
-        char* errmsg);
-
-WILTON_EXPORT char* wilton_sleep_millis(
-        int millis);
-
 // server
 
 struct wilton_Server;
@@ -510,19 +502,20 @@ WILTON_EXPORT char* wilton_Mutex_unlock(
 WILTON_EXPORT char* wilton_Mutex_destroy(
         wilton_Mutex* mutex);
 
-// TODO: NAT proxy
 
-struct wilton_NatProxy;
-typedef struct wilton_NatProxy wilton_NatProxy;
+// misc
 
-WILTON_EXPORT char* wilton_NatProxy_create(
-        wilton_NatProxy** proxy_out,
-        const char* conf_json,
-        int conf_json_len);
+WILTON_EXPORT void wilton_free(
+        char* errmsg);
 
-WILTON_EXPORT char* wilton_NatProxy_stop(
-        wilton_NatProxy* proxy);
+WILTON_EXPORT char* wilton_thread_sleep_millis(
+        int millis);
 
+WILTON_EXPORT char* wilton_tcp_wait_for_connection(
+        const char* ip_addr,
+        int ip_addr_len,
+        int tcp_port,
+        int timeout_millis);
 
 #ifdef	__cplusplus
 }
