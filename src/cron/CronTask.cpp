@@ -26,7 +26,7 @@ using task_fun_type = std::function<void()>;
 } //namespace
 
 class CronTask::Impl : public staticlib::pimpl::PimplObject::Impl {
-    std::atomic_bool running;
+    std::atomic<bool> running;
     std::thread worker;
     
 public:
