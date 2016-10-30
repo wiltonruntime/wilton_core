@@ -12,18 +12,17 @@
 
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
+#include "staticlib/mustache.hpp"
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
-
-#include "mustache/MustacheProcessor.hpp"
 
 namespace { // anonymous
 
 namespace sc = staticlib::config;
 namespace si = staticlib::io;
+namespace sm = staticlib::mustache;
 namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
-namespace wm = wilton::mustache;
 
 } // namespace
 
@@ -49,7 +48,7 @@ char* wilton_render_mustache /* noexcept */ (
         uint32_t values_json_len_u32 = static_cast<uint32_t> (values_json_len);
         std::string values_json_str{values_json, values_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(values_json_str);
-        const std::string res = wm::MustacheProcessor::render_string(template_text_str, json);
+        const std::string res = sm::render_string(template_text_str, json);
         *output_text_out = su::alloc_copy(res);
         *output_text_len_out = res.length();
         return nullptr;
@@ -80,7 +79,7 @@ WILTON_EXPORT char* wilton_render_mustache_file /* noexcept */ (
         uint32_t values_json_len_u32 = static_cast<uint32_t> (values_json_len);
         std::string values_json_str{values_json, values_json_len_u32};
         ss::JsonValue json = ss::load_json_from_string(values_json_str);
-        auto mp = wm::MustacheProcessor(template_file_path_str, std::move(json));
+        auto mp = sm::MustacheSource(template_file_path_str, std::move(json));
         auto sink = si::string_sink();
         std::array<char, 4096> buf;
         si::copy_all(mp, sink, buf.data(), buf.size());

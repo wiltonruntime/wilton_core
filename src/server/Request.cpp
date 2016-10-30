@@ -17,12 +17,12 @@
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
 #include "staticlib/httpserver.hpp"
+#include "staticlib/mustache.hpp"
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
 #include "common/WiltonInternalException.hpp"
-#include "mustache/MustacheProcessor.hpp"
 #include "server/ResponseStreamSender.hpp"
 #include "server/RequestPayloadHandler.hpp"
 #include "server/Server.hpp"
@@ -39,6 +39,7 @@ namespace { // anonymous
 namespace sc = staticlib::config;
 namespace si = staticlib::io;
 namespace sh = staticlib::httpserver;
+namespace sm = staticlib::mustache;
 namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
 
@@ -117,7 +118,7 @@ public:
     void send_mustache(Request&, std::string mustache_file_path, ss::JsonValue json) {
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
-        auto mp = mustache::MustacheProcessor(mustache_file_path, std::move(json), mustache_partials);
+        auto mp = sm::MustacheSource(mustache_file_path, std::move(json), mustache_partials);
         auto mp_ptr = si::make_source_istream_ptr(std::move(mp));
         auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(mp_ptr));
         sender->send();

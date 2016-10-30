@@ -66,7 +66,6 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
             wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_icu )
         endif ( )
     endif ( )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_mstch )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_soci )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
@@ -84,6 +83,7 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_httpclient )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_mustache )
 endif ( )
 
 # dependencies
@@ -96,11 +96,11 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_httpclient
         staticlib_utils
         staticlib_cron
+        staticlib_mustache
         staticlib_tinydir
         staticlib_pimpl
         jansson
         log4cplus
-        mstch
         sqlite3
         soci
         libcurl
