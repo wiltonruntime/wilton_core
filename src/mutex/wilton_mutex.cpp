@@ -64,6 +64,30 @@ char* wilton_Mutex_unlock(wilton_Mutex* mutex) /* noexcept */ {
     }
 }
 
+char* wilton_Mutex_wait(wilton_Mutex* mutex, void* cond_ctx,
+        int (*cond_cb)(void* cond_ctx)) /* noexcept */ {
+    if (nullptr == mutex) return su::alloc_copy(TRACEMSG("Null 'mutex' parameter specified"));
+    if (nullptr == cond_cb) return su::alloc_copy(TRACEMSG("Null 'cond_cb' parameter specified"));
+    try {
+        mutex->impl().wait([cond_ctx, cond_cb]() {
+            return 0 != cond_cb(cond_ctx);
+        });
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}
+
+char* wilton_Mutex_notify_all(wilton_Mutex* mutex) /* noexcept */ {
+    if (nullptr == mutex) return su::alloc_copy(TRACEMSG("Null 'mutex' parameter specified"));
+    try {
+        mutex->impl().notify_all();
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}
+
 // todo: think about destroy sync
 char* wilton_Mutex_destroy(wilton_Mutex* mutex) /* noexcept */ {
     if (nullptr == mutex) return su::alloc_copy(TRACEMSG("Null 'mutex' parameter specified"));

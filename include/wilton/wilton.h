@@ -499,6 +499,15 @@ WILTON_EXPORT char* wilton_Mutex_lock(
 WILTON_EXPORT char* wilton_Mutex_unlock(
         wilton_Mutex* mutex);
 
+WILTON_EXPORT char* wilton_Mutex_wait(
+        wilton_Mutex* mutex,
+        void* cond_ctx,
+        int (*cond_cb)(
+                void* cond_ctx));
+
+WILTON_EXPORT char* wilton_Mutex_notify_all(
+        wilton_Mutex* mutex);
+
 WILTON_EXPORT char* wilton_Mutex_destroy(
         wilton_Mutex* mutex);
 

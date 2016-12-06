@@ -10,6 +10,8 @@
 
 #include "staticlib/pimpl.hpp"
 
+#include <functional>
+
 #include "common/WiltonInternalException.hpp"
 
 namespace wilton {
@@ -34,6 +36,10 @@ public:
     void lock();
 
     void unlock();
+    
+    void wait(std::function<bool()> cond);
+    
+    void notify_all();
 
 };
 
