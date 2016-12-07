@@ -13,6 +13,7 @@
 
 namespace { // anonymous
 
+namespace sc = staticlib::config;
 namespace su = staticlib::utils;
 namespace wm = wilton::mutex;
 
@@ -64,12 +65,15 @@ char* wilton_Mutex_unlock(wilton_Mutex* mutex) /* noexcept */ {
     }
 }
 
-char* wilton_Mutex_wait(wilton_Mutex* mutex, void* cond_ctx,
+char* wilton_Mutex_wait(wilton_Mutex* mutex, int timeout_millis, void* cond_ctx,
         int (*cond_cb)(void* cond_ctx)) /* noexcept */ {
     if (nullptr == mutex) return su::alloc_copy(TRACEMSG("Null 'mutex' parameter specified"));
+    if (!su::is_positive_uint32(timeout_millis)) return su::alloc_copy(TRACEMSG(
+            "Invalid 'timeout_millis' parameter specified: [" + sc::to_string(timeout_millis) + "]"));
     if (nullptr == cond_cb) return su::alloc_copy(TRACEMSG("Null 'cond_cb' parameter specified"));
     try {
-        mutex->impl().wait([cond_ctx, cond_cb]() {
+        uint32_t timeout_millis_u32 = static_cast<uint32_t> (timeout_millis);
+        mutex->impl().wait(timeout_millis_u32, [cond_ctx, cond_cb]() {
             return 0 != cond_cb(cond_ctx);
         });
         return nullptr;

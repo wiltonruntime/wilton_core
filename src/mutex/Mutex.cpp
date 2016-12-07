@@ -7,6 +7,7 @@
 
 #include "mutex/Mutex.hpp"
 
+#include <chrono>
 #include <mutex>
 #include <condition_variable>
 
@@ -17,6 +18,8 @@ namespace wilton {
 namespace mutex {
 
 namespace { // anonymous
+
+namespace sc = staticlib::config;
 
 using cond_fun = std::function<bool()>;
 
@@ -38,9 +41,13 @@ public:
         std::unique_lock<std::mutex> guard{mutex, std::adopt_lock};
     }
 
-    void wait(Mutex&, std::function<bool()> cond) {
+    void wait(Mutex&, uint32_t timeout_millis, std::function<bool()> cond) {
         std::unique_lock<std::mutex> guard{mutex, std::adopt_lock};
-        cv.wait(guard, cond);        
+        cv.wait_for(guard, std::chrono::milliseconds(timeout_millis), cond);
+        if (!cond()) {
+            throw common::WiltonInternalException(TRACEMSG(
+                    "Mutex wait timed out, timeout_millis: [" + sc::to_string(timeout_millis) + "]"));
+        }
     }
 
     void notify_all(Mutex&) {
@@ -52,7 +59,7 @@ public:
 PIMPL_FORWARD_CONSTRUCTOR(Mutex, (), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Mutex, void, lock, (), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Mutex, void, unlock, (), (), common::WiltonInternalException)
-PIMPL_FORWARD_METHOD(Mutex, void, wait, (cond_fun), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Mutex, void, wait, (uint32_t)(cond_fun), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Mutex, void, notify_all, (), (), common::WiltonInternalException)
 
 } // namespace

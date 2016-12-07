@@ -501,6 +501,7 @@ WILTON_EXPORT char* wilton_Mutex_unlock(
 
 WILTON_EXPORT char* wilton_Mutex_wait(
         wilton_Mutex* mutex,
+        int timeout_millis,
         void* cond_ctx,
         int (*cond_cb)(
                 void* cond_ctx));

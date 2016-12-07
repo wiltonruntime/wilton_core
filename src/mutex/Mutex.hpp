@@ -37,7 +37,7 @@ public:
 
     void unlock();
     
-    void wait(std::function<bool()> cond);
+    void wait(uint32_t timeout_millis, std::function<bool()> cond);
     
     void notify_all();
 
