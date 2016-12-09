@@ -7,9 +7,8 @@
 
 #include "wilton/wilton.h"
 
-#include <cstdlib>
-#include <thread>
-#include <chrono>
+#include <cstdint>
+#include <string>
 
 #include "staticlib/config.hpp"
 #include "staticlib/utils.hpp"
@@ -21,22 +20,10 @@ namespace sc = staticlib::config;
 namespace su = staticlib::utils;
 namespace wm = wilton::misc;
 
-}
+} // namespace
 
 void wilton_free(char* errmsg) /* noexcept */ {
     std::free(errmsg);
-}
-
-char* wilton_thread_sleep_millis(int millis) /* noexcept */ {
-    if (!su::is_positive_uint32(millis)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'millis' parameter specified: [" + sc::to_string(millis) + "]"));
-    try {
-        uint32_t millis_u32 = static_cast<uint32_t> (millis);
-        std::this_thread::sleep_for(std::chrono::milliseconds{millis_u32});
-        return nullptr;
-    } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
-    }
 }
 
 char* wilton_tcp_wait_for_connection(const char* ip_addr, int ip_addr_len, 

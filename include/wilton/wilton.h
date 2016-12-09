@@ -513,13 +513,49 @@ WILTON_EXPORT char* wilton_Mutex_destroy(
         wilton_Mutex* mutex);
 
 
+// shared
+
+WILTON_EXPORT char* wilton_shared_put(
+        const char* key,
+        int key_len,
+        const char* value,
+        int value_len);
+
+WILTON_EXPORT char* wilton_shared_get(
+        const char* key,
+        int key_len,
+        char** value_out,
+        int* value_out_len);
+
+WILTON_EXPORT char* wilton_shared_wait_change(
+        int timeout_millis,
+        const char* key,
+        int key_len,
+        const char* current_value,
+        int current_value_len,
+        char** changed_value_out,
+        int* changed_value_out_len);
+
+WILTON_EXPORT char* wilton_shared_remove(
+        const char* key,
+        int key_len);
+
+
+// thread
+
+WILTON_EXPORT char* wilton_thread_run(
+        void* cb_ctx,
+        void (*cb)(
+                void* cb_ctx));
+
+WILTON_EXPORT char* wilton_thread_sleep_millis(
+        int millis);
+
+
 // misc
 
 WILTON_EXPORT void wilton_free(
         char* errmsg);
-
-WILTON_EXPORT char* wilton_thread_sleep_millis(
-        int millis);
 
 WILTON_EXPORT char* wilton_tcp_wait_for_connection(
         const char* ip_addr,
