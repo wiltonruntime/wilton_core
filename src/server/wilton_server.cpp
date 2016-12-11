@@ -7,10 +7,14 @@
 
 #include "wilton/wilton.h"
 
+#include <functional>
+#include <vector>
+
 #include "staticlib/config.hpp"
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
+#include "server/HttpPath.hpp"
 #include "server/Request.hpp"
 #include "server/ResponseWriter.hpp"
 #include "server/Server.hpp"
@@ -25,7 +29,7 @@ namespace su = staticlib::utils;
 namespace ws = wilton::server;
 namespace wj = wilton::serverconf;
 
-}
+} // namespace
 
 struct wilton_Server {
 private:
@@ -43,13 +47,13 @@ public:
 struct wilton_Request {
 private:
     // note: NON-owning
-    ws::Request& delegate;
-
+    wilton::server::Request& delegate;
 public:
-    wilton_Request(ws::Request& delegate) :
+
+    wilton_Request(wilton::server::Request& delegate) :
     delegate(delegate) { }
 
-    ws::Request& impl() {
+    wilton::server::Request& impl() {
         return delegate;
     }
 };
@@ -59,7 +63,6 @@ private:
     ws::ResponseWriter delegate;
 
 public:
-
     wilton_ResponseWriter(ws::ResponseWriter&& delegate) :
     delegate(std::move(delegate)) { }
 
@@ -68,33 +71,87 @@ public:
     }
 };
 
+struct wilton_HttpPath {
+private:
+    ws::HttpPath delegate;
+
+public:
+
+    wilton_HttpPath(ws::HttpPath&& delegate) :
+    delegate(std::move(delegate)) { }
+
+    ws::HttpPath& impl() {
+        return delegate;
+    }
+};
+
+namespace { // anonymous
+
+std::vector<std::reference_wrapper<ws::HttpPath>> wrap_paths(wilton_HttpPath** paths, uint16_t paths_len) {
+    std::vector<std::reference_wrapper < ws::HttpPath>> res;
+    for (int i = 0; i < paths_len; i++) {
+        wilton_HttpPath* ptr = paths[i];
+        std::reference_wrapper<ws::HttpPath> ref = std::ref(ptr->impl());
+        res.push_back(ref);
+    }
+    return res;
+}
+
+} // namespace
+
+char* wilton_HttpPath_create(wilton_HttpPath** http_path_out, const char* method, int method_len,
+        const char* path, int path_len, void* handler_ctx, 
+        void (*handler_cb)(void* handler_ctx, wilton_Request* request)) {
+    if (nullptr == http_path_out) return su::alloc_copy(TRACEMSG("Null 'http_path_out' parameter specified"));
+    if (nullptr == method) return su::alloc_copy(TRACEMSG("Null 'method' parameter specified"));
+    if (!su::is_positive_uint16(method_len)) return su::alloc_copy(TRACEMSG(
+            "Invalid 'method_len' parameter specified: [" + sc::to_string(method_len) + "]"));
+    if (nullptr == path) return su::alloc_copy(TRACEMSG("Null 'path' parameter specified"));
+    if (!su::is_positive_uint16(path_len)) return su::alloc_copy(TRACEMSG(
+            "Invalid 'path_len' parameter specified: [" + sc::to_string(path_len) + "]"));
+    if (nullptr == handler_cb) return su::alloc_copy(TRACEMSG("Null 'handler_cb' parameter specified"));
+    try {
+        uint16_t method_len_u16 = static_cast<uint16_t> (method_len);
+        std::string method_str = std::string(method, method_len_u16);
+        uint16_t path_len_u16 = static_cast<uint16_t> (path_len);
+        std::string path_str = std::string(path, path_len_u16);
+        auto ha_ctx = handler_ctx;
+        auto ha_cb = handler_cb;
+        auto handler = [ha_ctx, ha_cb](ws::Request& req) {
+            wilton_Request req_pass{req};
+            ha_cb(ha_ctx, std::addressof(req_pass));
+        };
+        ws::HttpPath http_path{std::move(method_str), std::move(path_str), handler};
+        wilton_HttpPath* http_path_ptr = new wilton_HttpPath(std::move(http_path));
+        *http_path_out = http_path_ptr;
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}
+
+char* wilton_HttpPath_destroy(wilton_HttpPath* path) {
+    delete path;
+    return nullptr;
+}
+
 // TODO: fixme json copy
-char* wilton_Server_create(
-        wilton_Server** server_out,
-        void* gateway_ctx,
-        void (*gateway_cb)(
-                void* gateway_ctx,
-                wilton_Request* request),
-        const char* conf_json,
-        int conf_json_len) /* noexcept */ {
-    if (nullptr == server_out) return su::alloc_copy(TRACEMSG("Null 'server_out' parameter specified"));
-    if (nullptr == gateway_cb) return su::alloc_copy(TRACEMSG("Null 'gateway_cb' parameter specified"));
+char* wilton_Server_create /* noexcept */ (wilton_Server** server_out, const char* conf_json,
+        int conf_json_len, wilton_HttpPath** paths, int paths_len) /* noexcept */ {
+    if (nullptr == server_out) return su::alloc_copy(TRACEMSG("Null 'server_out' parameter specified"));    
     if (nullptr == conf_json) return su::alloc_copy(TRACEMSG("Null 'conf_json' parameter specified"));
     if (!su::is_positive_uint32(conf_json_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'conf_json_len' parameter specified: [" + sc::to_string(conf_json_len) + "]"));
+    if (nullptr == paths) return su::alloc_copy(TRACEMSG("Null 'paths' parameter specified"));
+    if (!su::is_positive_uint16(paths_len)) return su::alloc_copy(TRACEMSG(
+            "Invalid 'paths_len' parameter specified: [" + sc::to_string(paths_len) + "]"));
     try {
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
-        std::string metadata{conf_json, conf_json_len_u32};
-        ss::JsonValue json = ss::load_json_from_string(metadata);
-        ws::Server server{
-            [gateway_ctx, gateway_cb](ws::Request & req) {
-                wilton_Request* req_ptr = new wilton_Request(req);
-                gateway_cb(gateway_ctx, req_ptr);
-                // todo: special handling for chunked send
-                delete req_ptr;
-            },
-            std::move(json)
-        };
+        std::string conf_str{conf_json, conf_json_len_u32};                
+        ss::JsonValue json = ss::load_json_from_string(conf_str);
+        uint16_t paths_len_u16 = static_cast<uint16_t>(paths_len);
+        auto pathsvec = wrap_paths(paths, paths_len_u16);
+        ws::Server server{std::move(json), std::move(pathsvec)};
         wilton_Server* server_ptr = new wilton_Server(std::move(server));
         *server_out = server_ptr;
         return nullptr;

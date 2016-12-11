@@ -9,9 +9,11 @@
 #define	WILTON_SERVER_SERVER_HPP
 
 #include <functional>
+#include <vector>
 
 #include "staticlib/pimpl.hpp"
 
+#include "server/HttpPath.hpp"
 #include "server/Request.hpp"
 #include "serverconf/ServerConfig.hpp"
 
@@ -32,7 +34,7 @@ public:
      */
     PIMPL_CONSTRUCTOR(Server)
             
-    Server(std::function<void(Request& req)> gateway, serverconf::ServerConfig conf);
+    Server(serverconf::ServerConfig conf, std::vector<std::reference_wrapper<HttpPath>> paths);
     
     void stop();
     

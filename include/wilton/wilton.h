@@ -41,6 +41,23 @@ typedef struct wilton_Request wilton_Request;
 struct wilton_ResponseWriter;
 typedef struct wilton_ResponseWriter wilton_ResponseWriter;
 
+struct wilton_HttpPath;
+typedef struct wilton_HttpPath wilton_HttpPath;
+
+WILTON_EXPORT char* wilton_HttpPath_create(
+        wilton_HttpPath** http_path_out,
+        const char* method,
+        int method_len,
+        const char* path,
+        int path_len,
+        void* handler_ctx,
+        void (*handler_cb)(
+                void* handler_ctx,
+                wilton_Request* request));
+
+WILTON_EXPORT char* wilton_HttpPath_destroy(
+        wilton_HttpPath* path);
+
 /*
     {
         "numberOfThreads": uint32_t, 
@@ -87,12 +104,10 @@ typedef struct wilton_ResponseWriter wilton_ResponseWriter;
  */
 WILTON_EXPORT char* wilton_Server_create(
         wilton_Server** server_out,
-        void* gateway_ctx,
-        void (*gateway_cb)(
-                void* gateway_ctx,
-                wilton_Request* request),
         const char* conf_json,
-        int conf_json_len);
+        int conf_json_len,
+        wilton_HttpPath** paths,
+        int paths_len);
 
 WILTON_EXPORT char* wilton_Server_stop(
         wilton_Server* server);

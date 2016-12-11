@@ -44,7 +44,6 @@ namespace ss = staticlib::serialization;
 namespace st = staticlib::tinydir;
 namespace su = staticlib::utils;
 
-using gateway_fun_type = std::function<void(Request& req)>;
 using partmap_type = const std::map<std::string, std::string>&;
 
 } // namespace
@@ -54,7 +53,7 @@ class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
     std::unique_ptr<sh::http_server> server;
 
 public:
-    Impl(gateway_fun_type gateway, serverconf::ServerConfig conf) :
+    Impl(serverconf::ServerConfig conf, std::vector<std::reference_wrapper<HttpPath>> paths) :
     mustache_partials(load_partials(conf.mustache)),
     server(sc::make_unique<sh::http_server>(
             conf.numberOfThreads, 
@@ -65,21 +64,20 @@ public:
             conf.ssl.verifyFile,
             create_verifier_cb(conf.ssl.verifySubjectSubstr))) {
         logging::WiltonLogger::apply_config(conf.logging);
-        std::vector<std::string> methods = {"GET", "POST", "PUT", "DELETE", "OPTIONS"};
-        std::string path = "/";
-        for (const std::string& me : methods) {
-            auto conf_ptr = std::make_shared<serverconf::RequestPayloadConfig>(conf.requestPayload.clone());
-            server->add_payload_handler(me, path, [conf_ptr](staticlib::httpserver::http_request_ptr& /* request */) {
+        auto conf_ptr = std::make_shared<serverconf::RequestPayloadConfig>(conf.requestPayload.clone());
+        for (const HttpPath& pa : paths) {
+            auto ha = pa.handler; // copy
+            server->add_handler(pa.method, pa.path,
+                    [ha, this](sh::http_request_ptr& req, sh::tcp_connection_ptr & conn) {
+                        auto writer = sh::http_response_writer::create(conn, req);
+                        Request req_wrap{static_cast<void*> (std::addressof(req)),
+                                static_cast<void*> (std::addressof(writer)), this->mustache_partials};
+                        ha(req_wrap);
+                        req_wrap.finish();
+                    });
+            server->add_payload_handler(pa.method, pa.path, [conf_ptr](staticlib::httpserver::http_request_ptr& /* request */) {
                 return RequestPayloadHandler{*conf_ptr};
             });
-            server->add_handler(me, path,
-                    [gateway, this](sh::http_request_ptr& req, sh::tcp_connection_ptr & conn) {
-                        auto writer = sh::http_response_writer::create(conn, req);
-                        Request req_pass{static_cast<void*> (std::addressof(req)),
-                                static_cast<void*> (std::addressof(writer)), this->mustache_partials};
-                        gateway(req_pass);
-                        req_pass.finish();
-                    });
         }
         for (const auto& dr : conf.documentRoots) {
             if (dr.dirPath.length() > 0) {
@@ -156,7 +154,7 @@ private:
     }
     
 };
-PIMPL_FORWARD_CONSTRUCTOR(Server, (gateway_fun_type)(serverconf::ServerConfig), (), common::WiltonInternalException)
+PIMPL_FORWARD_CONSTRUCTOR(Server, (serverconf::ServerConfig)(std::vector<std::reference_wrapper<HttpPath>>), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Server, void, stop, (), (), common::WiltonInternalException)
 
 } // namespace
