@@ -8,6 +8,7 @@
 #ifndef WILTON_H
 #define	WILTON_H
 
+#ifndef WILTON_EXPORT
 #ifdef WILTON_SHARED
 #ifdef _WIN32
 #ifdef WILTON_SHARED_IMPORT
@@ -25,6 +26,7 @@
 #else
 #define WILTON_EXPORT
 #endif // WILTON_SHARED
+#endif // WILTON_EXPORT
 
 #ifdef	__cplusplus
 extern "C" {
