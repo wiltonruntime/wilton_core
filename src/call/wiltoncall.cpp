@@ -30,7 +30,11 @@ wilton::call::WiltoncallRegistry& static_registry() {
 char* wiltoncall_init() {
     try {
         auto& reg = static_registry();
-        
+        //client
+        reg.put("httpclient_create", wilton::client::httpclient_create);
+        reg.put("httpclient_close", wilton::client::httpclient_close);
+        reg.put("httpclient_execute", wilton::client::httpclient_execute);
+        reg.put("httpclient_send_temp_file", wilton::client::httpclient_send_temp_file);
         // shared
         reg.put("shared_put", wilton::shared::shared_put);
         reg.put("shared_get", wilton::shared::shared_get);

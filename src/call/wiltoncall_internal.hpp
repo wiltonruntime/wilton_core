@@ -75,15 +75,18 @@ namespace wilton {
 //std::string db_transaction_rollback(const std::string& data);
 //
 //// HttpClient
-//
-//std::string httpclient_create(const std::string& data);
-//
-//std::string httpclient_close(const std::string& data);
-//
-//std::string httpclient_execute(const std::string& data);
-//
-//std::string httpclient_send_temp_file(const std::string& data);
-//
+namespace client {
+
+std::string httpclient_create(const std::string& data);
+
+std::string httpclient_close(const std::string& data);
+
+std::string httpclient_execute(const std::string& data);
+
+std::string httpclient_send_temp_file(const std::string& data);
+
+} // namespace
+
 //// Cron
 //
 //std::string cron_start(const std::string& data);
