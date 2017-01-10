@@ -152,6 +152,5 @@ std::string httpclient_send_temp_file(const std::string& data) {
     return common::wrap_wilton_output(out, out_len);
 }
 
-
 } // namespace
 }

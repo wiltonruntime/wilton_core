@@ -52,12 +52,15 @@ namespace wilton {
 //
 //std::string logger_shutdown(const std::string& data);
 //
-//// Mustache
-//
-//std::string mustache_render(const std::string& data);
-//
-//std::string mustache_render_file(const std::string& data);
-//
+// Mustache
+namespace mustache {
+
+std::string mustache_render(const std::string& data);
+
+std::string mustache_render_file(const std::string& data);
+
+} // namespace
+
 //// DB
 //
 //std::string db_connection_open(const std::string& data);

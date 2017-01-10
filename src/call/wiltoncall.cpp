@@ -30,6 +30,9 @@ wilton::call::WiltoncallRegistry& static_registry() {
 char* wiltoncall_init() {
     try {
         auto& reg = static_registry();
+        // mustache
+        reg.put("mustache_render", wilton::mustache::mustache_render);
+        reg.put("mustache_render_file", wilton::mustache::mustache_render_file);
         //client
         reg.put("httpclient_create", wilton::client::httpclient_create);
         reg.put("httpclient_close", wilton::client::httpclient_close);
