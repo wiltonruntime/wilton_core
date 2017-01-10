@@ -12,22 +12,35 @@
 
 #include "common/WiltonInternalException.hpp"
 #include "call/WiltoncallRegistry.hpp"
+#include "call/wiltoncall_internal.hpp"
 
 namespace { // anonymous
 
 namespace sc = staticlib::config;
 namespace su = staticlib::utils;
-namespace wc = wilton::call;
-namespace wm = wilton::common;
+namespace wc = wilton::common;
 
-wc::WiltoncallRegistry& static_registry() {
-    static wc::WiltoncallRegistry registry;
+wilton::call::WiltoncallRegistry& static_registry() {
+    static wilton::call::WiltoncallRegistry registry;
     return registry;
 }
 
 } // namespace
 
-WILTON_EXPORT char* wiltoncall(char* call_name, int call_name_len, char* json_in, int json_in_len,
+char* wiltoncall_init() {
+    try {
+        auto& reg = static_registry();
+        
+        reg.put("tcp_wait_for_connection", wilton::misc::tcp_wait_for_connection);
+        
+        return nullptr;
+    } catch (const std::exception& e) {
+        return su::alloc_copy(TRACEMSG(e.what() +
+                "\n'wiltoncall' initialization error"));
+    }
+}
+
+char* wiltoncall(char* call_name, int call_name_len, char* json_in, int json_in_len,
         char** json_out, int* json_out_len) /* noexcept */ {
     if (nullptr == call_name) return su::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
     if (!su::is_positive_uint16(call_name_len)) return su::alloc_copy(TRACEMSG(
@@ -54,7 +67,7 @@ WILTON_EXPORT char* wiltoncall(char* call_name, int call_name_len, char* json_in
     }
 }
 
-WILTON_EXPORT char* wiltoncall_register(char* call_name, int call_name_len, void* call_ctx,
+char* wiltoncall_register(char* call_name, int call_name_len, void* call_ctx,
         char* (*call_cb)
         (void* call_ctx, const char* json_in, int json_in_len, char** json_out, int* json_out_len)) /* noexcept */ {
     if (nullptr == call_name) return su::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
@@ -73,13 +86,13 @@ WILTON_EXPORT char* wiltoncall_register(char* call_name, int call_name_len, void
             if (nullptr != err) {
                 std::string msg = TRACEMSG(std::string(err));
                 wilton_free(err);
-                throw wm::WiltonInternalException(msg);
+                throw wc::WiltonInternalException(msg);
             }
             if (nullptr == out) {
-                throw wm::WiltonInternalException(TRACEMSG("Invalid 'null' result returned"));
+                throw wc::WiltonInternalException(TRACEMSG("Invalid 'null' result returned"));
             }
             if (!su::is_uint32(out_len)){
-                throw wm::WiltonInternalException(TRACEMSG(
+                throw wc::WiltonInternalException(TRACEMSG(
                     "Invalid result length value returned: [" + sc::to_string(out_len) + "]"));
             }
             return std::string(out, static_cast<uint32_t>(out_len));
@@ -91,7 +104,7 @@ WILTON_EXPORT char* wiltoncall_register(char* call_name, int call_name_len, void
     }
 }
 
-WILTON_EXPORT char* wiltoncall_remove(char* call_name, int call_name_len) {
+char* wiltoncall_remove(char* call_name, int call_name_len) {
     if (nullptr == call_name) return su::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
     if (!su::is_positive_uint16(call_name_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'call_name_len' parameter specified: [" + sc::to_string(call_name_len) + "]"));

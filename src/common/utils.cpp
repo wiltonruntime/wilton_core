@@ -9,6 +9,10 @@
 
 #include "staticlib/utils.hpp"
 
+#include "wilton/wilton.h"
+
+#include "common/WiltonInternalException.hpp"
+
 namespace wilton {
 namespace common {
 
@@ -19,6 +23,16 @@ namespace su = staticlib::utils;
 
 } //namespace
 
+const std::string& empty_string() {
+    static std::string empty{""};
+    return empty;
+}
+
+void throw_wilton_error(char* err, const std::string& msg) {
+    wilton_free(err);
+    throw WiltonInternalException(msg);
+}
+
 const std::string& get_json_string(const ss::JsonField& field) {
     if (ss::JsonType::STRING != field.type() || field.as_string().empty()) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
@@ -26,6 +40,15 @@ const std::string& get_json_string(const ss::JsonField& field) {
             " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
     return field.as_string();
+}
+
+int64_t get_json_int64(const ss::JsonField& field) {
+    if (ss::JsonType::INTEGER != field.type()) {
+        throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+                " type: [" + ss::stringify_json_type(field.type()) + "]," +
+                " value: [" + ss::dump_json_to_string(field.value()) + "]"));
+    }
+    return field.as_int64();
 }
 
 uint32_t get_json_uint32(const staticlib::serialization::JsonField& field) {

@@ -14,6 +14,8 @@
 extern "C" {
 #endif
 
+WILTON_EXPORT char* wiltoncall_init();    
+    
 WILTON_EXPORT char* wiltoncall(
         char* call_name,
         int call_name_len,

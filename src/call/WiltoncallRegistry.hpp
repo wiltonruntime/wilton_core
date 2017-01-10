@@ -5,8 +5,8 @@
  * Created on January 8, 2017, 4:48 PM
  */
 
-#ifndef WILTONCALLREGISTRY_HPP
-#define	WILTONCALLREGISTRY_HPP
+#ifndef WILTON_CALL_WILTONCALLREGISTRY_HPP
+#define	WILTON_CALL_WILTONCALLREGISTRY_HPP
 
 #include <mutex>
 #include <string>
@@ -88,5 +88,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTONCALLREGISTRY_HPP */
+#endif	/* WILTON_CALL_WILTONCALLREGISTRY_HPP */
 
