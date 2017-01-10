@@ -42,16 +42,19 @@ namespace wilton {
 //
 //std::string request_send_with_response_writer(const std::string& data);
 //
-//// Logger
-//
-//std::string logger_initialize(const std::string& data);
-//
-//std::string logger_log(const std::string& data);
-//
-//std::string logger_is_level_enabled(const std::string& data);
-//
-//std::string logger_shutdown(const std::string& data);
-//
+// Logger
+namespace logging {
+
+std::string logging_initialize(const std::string& data);
+
+std::string logging_log(const std::string& data);
+
+std::string logging_is_level_enabled(const std::string& data);
+
+std::string logging_shutdown(const std::string& data);
+
+} // namespace
+
 // Mustache
 namespace mustache {
 

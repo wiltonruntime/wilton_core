@@ -78,6 +78,5 @@ std::string mustache_render_file(const std::string& data) {
     return common::wrap_wilton_output(out, out_len);
 }
 
-
 } // namespace
 }

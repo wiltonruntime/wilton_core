@@ -30,6 +30,11 @@ wilton::call::WiltoncallRegistry& static_registry() {
 char* wiltoncall_init() {
     try {
         auto& reg = static_registry();
+        // logging
+        reg.put("logging_initialize", wilton::logging::logging_initialize);
+        reg.put("logging_log", wilton::logging::logging_log);
+        reg.put("logging_is_level_enabled", wilton::logging::logging_is_level_enabled);
+        reg.put("logging_shutdown", wilton::logging::logging_shutdown);
         // mustache
         reg.put("mustache_render", wilton::mustache::mustache_render);
         reg.put("mustache_render_file", wilton::mustache::mustache_render_file);
