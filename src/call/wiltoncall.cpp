@@ -30,11 +30,20 @@ wilton::call::WiltoncallRegistry& static_registry() {
 char* wiltoncall_init() {
     try {
         auto& reg = static_registry();
+        
         // logging
         reg.put("logging_initialize", wilton::logging::logging_initialize);
         reg.put("logging_log", wilton::logging::logging_log);
         reg.put("logging_is_level_enabled", wilton::logging::logging_is_level_enabled);
         reg.put("logging_shutdown", wilton::logging::logging_shutdown);
+        // db
+        reg.put("db_connection_open", wilton::db::db_connection_open);
+        reg.put("db_connection_query", wilton::db::db_connection_query);
+        reg.put("db_connection_execute", wilton::db::db_connection_execute);
+        reg.put("db_connection_close", wilton::db::db_connection_close);
+        reg.put("db_transaction_start", wilton::db::db_transaction_start);
+        reg.put("db_transaction_commit", wilton::db::db_transaction_commit);
+        reg.put("db_transaction_rollback", wilton::db::db_transaction_rollback);
         // mustache
         reg.put("mustache_render", wilton::mustache::mustache_render);
         reg.put("mustache_render_file", wilton::mustache::mustache_render_file);

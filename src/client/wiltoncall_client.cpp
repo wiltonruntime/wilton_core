@@ -26,7 +26,7 @@ common::handle_registry<wilton_HttpClient>& static_registry() {
 std::string httpclient_create(const std::string& data) {
     wilton_HttpClient* http;
     char* err = wilton_HttpClient_create(std::addressof(http), data.c_str(), data.length());
-    if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
+    if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_registry().put(http);
     return ss::dump_json_to_string({
         { "httpclientHandle", handle}
@@ -55,7 +55,7 @@ std::string httpclient_close(const std::string& data) {
     char* err = wilton_HttpClient_close(http);
     if (nullptr != err) {
         static_registry().put(http);
-        common::throw_wilton_error(err, TRACEMSG(std::string(err)));
+        common::throw_wilton_error(err, TRACEMSG(err));
     }
     return "{}";
 }
@@ -98,7 +98,7 @@ std::string httpclient_execute(const std::string& data) {
             request_data.c_str(), request_data.length(), metadata.c_str(), metadata.length(),
             std::addressof(out), std::addressof(out_len));
     static_registry().put(http);
-    if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
+    if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return common::wrap_wilton_output(out, out_len);
 }
 
@@ -148,7 +148,7 @@ std::string httpclient_send_temp_file(const std::string& data) {
                         delete filePath_passed;
             });
     static_registry().put(http);
-    if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
+    if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return common::wrap_wilton_output(out, out_len);
 }
 

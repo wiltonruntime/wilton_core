@@ -95,6 +95,5 @@ std::string logging_shutdown(const std::string&) {
     return "{}";
 }
 
-
 } // namespace
 }
