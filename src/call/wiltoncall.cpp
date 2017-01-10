@@ -31,6 +31,12 @@ char* wiltoncall_init() {
     try {
         auto& reg = static_registry();
         
+        // shared
+        reg.put("shared_put", wilton::shared::shared_put);
+        reg.put("shared_get", wilton::shared::shared_get);
+        reg.put("shared_wait_change", wilton::shared::shared_wait_change);
+        reg.put("shared_remove", wilton::shared::shared_remove);
+        // misc
         reg.put("tcp_wait_for_connection", wilton::misc::tcp_wait_for_connection);
         
         return nullptr;

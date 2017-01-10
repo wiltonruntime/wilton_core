@@ -47,7 +47,7 @@ std::string tcp_wait_for_connection(const std::string& data) {
     char* err = wilton_tcp_wait_for_connection(ip.c_str(), ip.size(),
             static_cast<int> (port), static_cast<int> (timeout));
     if (nullptr != err) {
-        common::throw_wilton_error(err, TRACEMSG(std::string(err)));
+        common::throw_wilton_error(err, TRACEMSG(err));
     }
     return "{}";
 }

@@ -33,6 +33,12 @@ void throw_wilton_error(char* err, const std::string& msg) {
     throw WiltonInternalException(msg);
 }
 
+std::string wrap_wilton_output(char* out, int out_len) {
+    std::string res{out, static_cast<std::string::size_type> (out_len)};
+    wilton_free(out);
+    return res;
+}
+
 const std::string& get_json_string(const ss::JsonField& field) {
     if (ss::JsonType::STRING != field.type() || field.as_string().empty()) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"

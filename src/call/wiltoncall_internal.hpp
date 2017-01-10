@@ -104,23 +104,25 @@ namespace wilton {
 //
 //std::string mutex_destroy(const std::string& data);
 //
-//// shared
-//
-//std::string shared_put(const std::string& data);
-//
-//std::string shared_get(const std::string& data);
-//
-//std::string shared_wait_change(const std::string& data);
-//
-//std::string shared_remove(const std::string& data);
-//
+// shared
+namespace shared {
+
+std::string shared_put(const std::string& data);
+
+std::string shared_get(const std::string& data);
+
+std::string shared_wait_change(const std::string& data);
+
+std::string shared_remove(const std::string& data);
+
+}
+
 //// thread
 //
 //std::string thread_run(const std::string& data);
 //
 //std::string thread_sleep_millis(const std::string& data);
 //
-
 
 // misc
 namespace misc {

@@ -25,6 +25,8 @@ const std::string& empty_string();
 
 void throw_wilton_error(char* err, const std::string& msg);
 
+std::string wrap_wilton_output(char* out, int out_len);
+
 const std::string& get_json_string(const staticlib::serialization::JsonField& field);
 
 int64_t get_json_int64(const staticlib::serialization::JsonField& field);
