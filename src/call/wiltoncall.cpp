@@ -67,7 +67,7 @@ char* wiltoncall_init() {
     }
 }
 
-char* wiltoncall(char* call_name, int call_name_len, char* json_in, int json_in_len,
+char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, int json_in_len,
         char** json_out, int* json_out_len) /* noexcept */ {
     if (nullptr == call_name) return su::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
     if (!su::is_positive_uint16(call_name_len)) return su::alloc_copy(TRACEMSG(
@@ -94,7 +94,7 @@ char* wiltoncall(char* call_name, int call_name_len, char* json_in, int json_in_
     }
 }
 
-char* wiltoncall_register(char* call_name, int call_name_len, void* call_ctx,
+char* wiltoncall_register(const char* call_name, int call_name_len, void* call_ctx,
         char* (*call_cb)
         (void* call_ctx, const char* json_in, int json_in_len, char** json_out, int* json_out_len)) /* noexcept */ {
     if (nullptr == call_name) return su::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
@@ -131,7 +131,7 @@ char* wiltoncall_register(char* call_name, int call_name_len, void* call_ctx,
     }
 }
 
-char* wiltoncall_remove(char* call_name, int call_name_len) {
+char* wiltoncall_remove(const char* call_name, int call_name_len) {
     if (nullptr == call_name) return su::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
     if (!su::is_positive_uint16(call_name_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'call_name_len' parameter specified: [" + sc::to_string(call_name_len) + "]"));

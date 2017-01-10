@@ -17,21 +17,23 @@ extern "C" {
 WILTON_EXPORT char* wiltoncall_init();    
     
 WILTON_EXPORT char* wiltoncall(
-        char* call_name,
+        const char* call_name,
         int call_name_len,
-        char* json_in,
+        const char* json_in,
         int json_in_len,
-        char* json_out,
-        int json_out_len);
+        char** json_out,
+        int* json_out_len);
 
+// must be implemented by scripting runtime,
+// see wilton_jni for example
 WILTON_EXPORT char* wiltoncall_runscript(
-        char* json_in,
+        const char* json_in,
         int json_in_len,
-        char* json_out,
-        int json_out_len);
+        char** json_out,
+        int* json_out_len);
 
 WILTON_EXPORT char* wiltoncall_register(
-        char* call_name,
+        const char* call_name,
         int call_name_len,
         void* call_ctx,
         char* (*call_cb)(
@@ -42,7 +44,7 @@ WILTON_EXPORT char* wiltoncall_register(
                 int* json_out_len));
 
 WILTON_EXPORT char* wiltoncall_remove(
-        char* call_name,
+        const char* call_name,
         int call_name_len);
 
 #ifdef	__cplusplus

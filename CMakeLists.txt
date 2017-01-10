@@ -68,6 +68,7 @@ if ( NOT DEFINED STATICLIB_TOOLCHAIN )
     endif ( )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_soci )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_jni )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_endian )
@@ -89,6 +90,7 @@ endif ( )
 # dependencies
 set ( ${PROJECT_NAME}_DEPS
         staticlib_config
+        staticlib_jni
         staticlib_httpserver
         staticlib_serialization
         staticlib_unzip
