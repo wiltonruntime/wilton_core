@@ -41,7 +41,7 @@ public:
         for (const ss::JsonField& fi : json.as_object()) {
             auto& name = fi.name();
             if ("partialsDirs" == name) {
-                for (const ss::JsonValue& va : common::get_json_array(fi, "mustache.partialsDirs")) {
+                for (const ss::JsonValue& va : common::get_json_array(fi)) {
                     if (ss::JsonType::STRING != va.type() || va.as_string().empty()) {
                         throw common::WiltonInternalException(TRACEMSG(
                                 "Invalid 'mustache.partialsDirs.el' value,"

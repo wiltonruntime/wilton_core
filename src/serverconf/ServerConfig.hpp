@@ -69,15 +69,15 @@ public:
         for (const ss::JsonField& fi : json.as_object()) {
             auto& name = fi.name();
             if ("numberOfThreads" == name) {
-                this->numberOfThreads = common::get_json_uint16(fi, "numberOfThreads");
+                this->numberOfThreads = common::get_json_uint16(fi);
             } else if ("tcpPort" == name) {
-                this->tcpPort = common::get_json_uint16(fi, "tcpPort");
+                this->tcpPort = common::get_json_uint16(fi);
             } else if ("ipAddress" == name) {
-                this->ipAddress = common::get_json_string(fi, "ipAddress");
+                this->ipAddress = common::get_json_string(fi);
             } else if ("ssl" == name) {
                 this->ssl = SslConfig(fi.value());
             } else if ("documentRoots" == name) {
-                for (const ss::JsonValue& lo : common::get_json_array(fi, "documentRoots")) {
+                for (const ss::JsonValue& lo : common::get_json_array(fi)) {
                     auto jd = serverconf::DocumentRoot(lo);
                     this->documentRoots.emplace_back(std::move(jd));
                 }

@@ -52,11 +52,11 @@ public:
         for (const ss::JsonField& fi : json.as_object()) {
             auto& name = fi.name();
             if ("tmpDirPath" == name) {
-                this->tmpDirPath = common::get_json_string(fi, "requestPayload.tmpDirPath");
+                this->tmpDirPath = common::get_json_string(fi);
             } else if ("tmpFilenameLength" == name) {
-                this->tmpFilenameLength = common::get_json_uint16(fi, "requestPayload.tmpFilenameLength");                
+                this->tmpFilenameLength = common::get_json_uint16(fi);
             } else if ("memoryLimitBytes" == name) {
-                this->memoryLimitBytes = common::get_json_uint32(fi, "requestPayload.memoryLimitBytes");
+                this->memoryLimitBytes = common::get_json_uint32(fi);
             } else {
                 throw common::WiltonInternalException(TRACEMSG("Unknown 'requestPayload' field: [" + name + "]"));
             }

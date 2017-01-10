@@ -19,19 +19,19 @@
 namespace wilton {
 namespace common {
 
-const std::string& get_json_string(const staticlib::serialization::JsonField& field, const std::string& name);
+const std::string& get_json_string(const staticlib::serialization::JsonField& field);
 
-uint32_t get_json_uint32(const staticlib::serialization::JsonField& field, const std::string& name);
+uint32_t get_json_uint32(const staticlib::serialization::JsonField& field);
 
-uint16_t get_json_uint16(const staticlib::serialization::JsonField& field, const std::string& name);
+uint16_t get_json_uint16(const staticlib::serialization::JsonField& field);
 
-bool get_json_bool(const staticlib::serialization::JsonField& field, const std::string& name);
+bool get_json_bool(const staticlib::serialization::JsonField& field);
 
 const std::vector<staticlib::serialization::JsonValue>& get_json_array(
-        const staticlib::serialization::JsonField& field, const std::string& name);
+        const staticlib::serialization::JsonField& field);
 
 const std::vector<staticlib::serialization::JsonField>& get_json_object(
-        const staticlib::serialization::JsonField& field, const std::string& name);
+        const staticlib::serialization::JsonField& field);
 
 } //namespace
 }        

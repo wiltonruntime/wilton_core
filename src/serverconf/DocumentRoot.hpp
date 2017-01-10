@@ -71,17 +71,17 @@ public:
         for (const ss::JsonField& fi : json.as_object()) {
             auto& name = fi.name();
             if ("resource" == name) {
-                this->resource = common::get_json_string(fi, "documentRoot.resource");
+                this->resource = common::get_json_string(fi);
             } else if ("dirPath" == name) {
-                this->dirPath = common::get_json_string(fi, "documentRoot.dirPath");
+                this->dirPath = common::get_json_string(fi);
             } else if ("zipPath" == name) {
-                this->zipPath = common::get_json_string(fi, "documentRoot.zipPath");
+                this->zipPath = common::get_json_string(fi);
             } else if ("zipInnerPrefix" == name) {
-                this->zipInnerPrefix = common::get_json_string(fi, "documentRoot.zipInnerPrefix");
+                this->zipInnerPrefix = common::get_json_string(fi);
             } else if ("cacheMaxAgeSeconds" == name) {
-                this->cacheMaxAgeSeconds = common::get_json_uint32(fi, "documentRoot.cacheMaxAgeSeconds");
+                this->cacheMaxAgeSeconds = common::get_json_uint32(fi);
             } else if ("mimeTypes" == name) {
-                for (const ss::JsonValue& ap : common::get_json_array(fi, "documentRoot.mimeTypes")) {
+                for (const ss::JsonValue& ap : common::get_json_array(fi)) {
                     auto ja = serverconf::MimeType(ap);
                     mimeTypes.emplace_back(std::move(ja));
                 }

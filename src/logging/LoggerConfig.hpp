@@ -45,9 +45,9 @@ public:
         for (const ss::JsonField& fi : json.as_object()) {
             auto& fname = fi.name();
             if ("name" == fname) {
-                this->name = common::get_json_string(fi, "logging.loggers.name");
+                this->name = common::get_json_string(fi);
             } else if ("level" == fname) {
-                this->level = common::get_json_string(fi, "logging.loggers.level");
+                this->level = common::get_json_string(fi);
             } else {
                 throw common::WiltonInternalException(TRACEMSG("Unknown 'logging.loggers' field: [" + fname + "]"));
             }

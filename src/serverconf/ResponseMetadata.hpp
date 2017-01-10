@@ -49,12 +49,12 @@ public:
         for (const ss::JsonField& fi : json.as_object()) {
             auto& name = fi.name();
             if ("statusCode" == name) {
-                this->statusCode = common::get_json_uint16(fi, "statusCode");
+                this->statusCode = common::get_json_uint16(fi);
             } else if ("statusMessage" == name) {
-                this->statusMessage = common::get_json_string(fi, "statusMessage");
+                this->statusMessage = common::get_json_string(fi);
             } else if ("headers" == name) {
-                for (const ss::JsonField& hf : common::get_json_object(fi, "headers")) {
-                    std::string val = common::get_json_string(hf, std::string("headers.") + hf.name());
+                for (const ss::JsonField& hf : common::get_json_object(fi)) {
+                    std::string val = common::get_json_string(hf);
                     this->headers.emplace_back(hf.name(), std::move(val));
                 }
             } else {
