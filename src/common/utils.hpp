@@ -23,6 +23,8 @@ namespace common {
 
 const std::string& empty_string();
 
+const staticlib::serialization::JsonValue& empty_json();
+
 void throw_wilton_error(char* err, const std::string& msg);
 
 std::string wrap_wilton_output(char* out, int out_len);

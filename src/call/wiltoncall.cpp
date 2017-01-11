@@ -57,6 +57,9 @@ char* wiltoncall_init() {
         reg.put("shared_get", wilton::shared::shared_get);
         reg.put("shared_wait_change", wilton::shared::shared_wait_change);
         reg.put("shared_remove", wilton::shared::shared_remove);
+        // thread
+        reg.put("thread_run", wilton::thread::thread_run);
+        reg.put("thread_sleep_millis", wilton::thread::thread_sleep_millis);
         // misc
         reg.put("tcp_wait_for_connection", wilton::misc::tcp_wait_for_connection);
         

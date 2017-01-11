@@ -83,7 +83,7 @@ std::string db_transaction_rollback(const std::string& data);
 
 } // namespace
 
-//// HttpClient
+// HttpClient
 namespace client {
 
 std::string httpclient_create(const std::string& data);
@@ -127,14 +127,16 @@ std::string shared_wait_change(const std::string& data);
 
 std::string shared_remove(const std::string& data);
 
-}
+} // namespace
 
-//// thread
-//
-//std::string thread_run(const std::string& data);
-//
-//std::string thread_sleep_millis(const std::string& data);
-//
+// thread
+namespace thread {
+
+std::string thread_run(const std::string& data);
+
+std::string thread_sleep_millis(const std::string& data);
+
+} // namespace
 
 // misc
 namespace misc {

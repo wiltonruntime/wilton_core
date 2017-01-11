@@ -28,6 +28,11 @@ const std::string& empty_string() {
     return empty;
 }
 
+const ss::JsonValue& empty_json() {
+    static ss::JsonValue empty;
+    return empty;
+}
+
 void throw_wilton_error(char* err, const std::string& msg) {
     wilton_free(err);
     throw WiltonInternalException(msg);
