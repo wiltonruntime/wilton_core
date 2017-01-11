@@ -111,7 +111,7 @@ std::string mutex_wait(const std::string& data) {
     int64_t timeout_millis = -1;
     for (const ss::JsonField& fi : json.as_object()) {
         auto& name = fi.name();
-        if ("conditionCallback" == name) {
+        if ("conditionCallbackScript" == name) {
             rcallback = fi.value();
         } else if ("mutexHandle" == name) {
             handle = common::get_json_int64(fi);
@@ -122,7 +122,7 @@ std::string mutex_wait(const std::string& data) {
         }
     }
     if (ss::JsonType::NULL_T == rcallback.get().type()) throw common::WiltonInternalException(TRACEMSG(
-            "Required parameter 'conditionCallback' not specified"));
+            "Required parameter 'conditionCallbackScript' not specified"));
     if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
             "Required parameter 'mutexHandle' not specified"));
     if (-1 == timeout_millis) throw common::WiltonInternalException(TRACEMSG(

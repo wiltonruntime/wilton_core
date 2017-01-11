@@ -40,7 +40,7 @@ std::string cron_start(const std::string& data) {
     auto rexpr = std::ref(common::empty_string());
     for (const ss::JsonField& fi : json.as_object()) {
         auto& name = fi.name();
-        if ("callback" == name) {
+        if ("callbackScript" == name) {
             rcallback = fi.value();
         } else if ("expression" == name) {
             rexpr = common::get_json_string(fi);
@@ -49,7 +49,7 @@ std::string cron_start(const std::string& data) {
         }
     }
     if (ss::JsonType::NULL_T == rcallback.get().type()) throw common::WiltonInternalException(TRACEMSG(
-            "Required parameter 'callback' not specified"));
+            "Required parameter 'callbackScript' not specified"));
     if (rexpr.get().empty()) throw common::WiltonInternalException(TRACEMSG(
             "Required parameter 'url' not specified"));
     const ss::JsonValue& callback = rcallback.get();

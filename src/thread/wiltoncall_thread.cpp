@@ -34,14 +34,14 @@ std::string thread_run(const std::string& data) {
     auto rcallback = std::ref(common::empty_json());
     for (const ss::JsonField& fi : json.as_object()) {
         auto& name = fi.name();
-        if ("callback" == name) {
+        if ("callbackScript" == name) {
             rcallback = fi.value();
         } else {
             throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
     if (ss::JsonType::NULL_T == rcallback.get().type()) throw common::WiltonInternalException(TRACEMSG(
-            "Required parameter 'callback' not specified"));
+            "Required parameter 'callbackScript' not specified"));
     const ss::JsonValue& callback = rcallback.get();
     std::string* callback_str_ptr = new std::string();
     *callback_str_ptr = ss::dump_json_to_string(callback);
