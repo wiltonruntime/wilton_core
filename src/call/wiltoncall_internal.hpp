@@ -96,12 +96,15 @@ std::string httpclient_send_temp_file(const std::string& data);
 
 } // namespace
 
-//// Cron
-//
-//std::string cron_start(const std::string& data);
-//
-//std::string cron_stop(const std::string& data);
-//
+// Cron
+namespace cron {
+
+std::string cron_start(const std::string& data);
+
+std::string cron_stop(const std::string& data);
+
+} // namespace
+
 //// Mutex
 //
 //std::string mutex_create(const std::string& data);

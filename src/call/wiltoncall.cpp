@@ -52,6 +52,9 @@ char* wiltoncall_init() {
         reg.put("httpclient_close", wilton::client::httpclient_close);
         reg.put("httpclient_execute", wilton::client::httpclient_execute);
         reg.put("httpclient_send_temp_file", wilton::client::httpclient_send_temp_file);
+        // cron
+        reg.put("cron_start", wilton::cron::cron_start);
+        reg.put("cron_stop", wilton::cron::cron_stop);
         // shared
         reg.put("shared_put", wilton::shared::shared_put);
         reg.put("shared_get", wilton::shared::shared_get);
