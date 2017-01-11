@@ -18,7 +18,6 @@ namespace { //anonymous
 namespace ss = staticlib::serialization;
 
 // shouldn't be called before logging is initialized by app
-
 void log_error(const std::string& message) {
     static std::string level = "ERROR";
     static std::string logger = "wilton.thread";

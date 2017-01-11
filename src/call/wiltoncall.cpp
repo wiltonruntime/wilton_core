@@ -55,6 +55,13 @@ char* wiltoncall_init() {
         // cron
         reg.put("cron_start", wilton::cron::cron_start);
         reg.put("cron_stop", wilton::cron::cron_stop);
+        // mutex
+        reg.put("mutex_create", wilton::mutex::mutex_create);
+        reg.put("mutex_lock", wilton::mutex::mutex_lock);
+        reg.put("mutex_unlock", wilton::mutex::mutex_unlock);
+        reg.put("mutex_wait", wilton::mutex::mutex_wait);
+        reg.put("mutex_notify_all", wilton::mutex::mutex_notify_all);
+        reg.put("mutex_destroy", wilton::mutex::mutex_destroy);
         // shared
         reg.put("shared_put", wilton::shared::shared_put);
         reg.put("shared_get", wilton::shared::shared_get);

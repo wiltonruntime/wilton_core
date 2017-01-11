@@ -64,13 +64,13 @@ std::string cron_start(const std::string& data) {
                 std::string* sptr = static_cast<std::string*> (passed);
                 // output will be ignored
                 char* out;
-                        int out_len;
-                        auto err = wiltoncall_runscript(sptr->c_str(), static_cast<int> (sptr->length()),
+                int out_len;
+                auto err = wiltoncall_runscript(sptr->c_str(), static_cast<int> (sptr->length()),
                         std::addressof(out), std::addressof(out_len));
-                        delete sptr;
+                delete sptr;
                 if (nullptr != err) {
                     log_error(TRACEMSG(err));
-                            wilton_free(err);
+                    wilton_free(err);
                 }
             });
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
