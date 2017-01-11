@@ -19,29 +19,32 @@
 namespace wilton {
 
 //// Server
-//
-//std::string server_create(const std::string& data);
-//
-//std::string server_stop(const std::string& data);
-//
-//std::string request_get_metadata(const std::string& data);
-//
-//std::string request_get_data(const std::string& data);
-//
-//std::string request_get_data_filename(const std::string& data);
-//
-//std::string request_set_response_metadata(const std::string& data);
-//
-//std::string request_send_response(const std::string& data);
-//
-//std::string request_send_temp_file(const std::string& data);
-//
-//std::string request_send_mustache(const std::string& data);
-//
-//std::string request_send_later(const std::string& data);
-//
-//std::string request_send_with_response_writer(const std::string& data);
-//
+namespace server {
+
+std::string server_create(const std::string& data);
+
+std::string server_stop(const std::string& data);
+
+std::string request_get_metadata(const std::string& data);
+
+std::string request_get_data(const std::string& data);
+
+std::string request_get_data_filename(const std::string& data);
+
+std::string request_set_response_metadata(const std::string& data);
+
+std::string request_send_response(const std::string& data);
+
+std::string request_send_temp_file(const std::string& data);
+
+std::string request_send_mustache(const std::string& data);
+
+std::string request_send_later(const std::string& data);
+
+std::string request_send_with_response_writer(const std::string& data);
+
+} // namespace
+
 // Logger
 namespace logging {
 

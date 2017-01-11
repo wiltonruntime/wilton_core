@@ -31,6 +31,18 @@ char* wiltoncall_init() {
     try {
         auto& reg = static_registry();
         
+        // server
+        reg.put("server_create", wilton::server::server_create);
+        reg.put("server_stop", wilton::server::server_stop);
+        reg.put("request_get_metadata", wilton::server::request_get_metadata);
+        reg.put("request_get_data", wilton::server::request_get_data);
+        reg.put("request_get_data_filename", wilton::server::request_get_data_filename);
+        reg.put("request_set_response_metadata", wilton::server::request_set_response_metadata);
+        reg.put("request_send_response", wilton::server::request_send_response);
+        reg.put("request_send_temp_file", wilton::server::request_send_temp_file);
+        reg.put("request_send_mustache", wilton::server::request_send_mustache);
+        reg.put("request_send_later", wilton::server::request_send_later);
+        reg.put("request_send_with_response_writer", wilton::server::request_send_with_response_writer);
         // logging
         reg.put("logging_initialize", wilton::logging::logging_initialize);
         reg.put("logging_log", wilton::logging::logging_log);
