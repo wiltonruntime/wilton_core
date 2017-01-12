@@ -7,6 +7,7 @@
 
 #include "common/utils.hpp"
 
+#include "staticlib/io.hpp"
 #include "staticlib/utils.hpp"
 
 #include "wilton/wilton.h"
@@ -18,6 +19,7 @@ namespace common {
 
 namespace { // anonymous
 
+namespace si = staticlib::io;
 namespace ss = staticlib::serialization;
 namespace su = staticlib::utils;
 
@@ -107,6 +109,18 @@ const std::vector<staticlib::serialization::JsonField>& get_json_object(
                 " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
     return field.as_object();    
+}
+
+void dump_error(const std::string& directory, const std::string& msg) {
+    try {
+        // random postfix
+        std::string id = su::RandomStringGenerator().generate(12);
+        auto errfile = directory + "wilton_ERROR_" + id + ".txt";
+        auto fd = su::FileDescriptor(errfile, 'w');
+        si::write_all(fd, msg);
+    } catch (...) {
+        // give up
+    }
 }
 
 } //namespace

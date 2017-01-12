@@ -15,6 +15,8 @@
 #include "wilton/wilton.h"
 #include "wilton/wiltoncall.h"
 
+#include "logging/logging_internal.hpp"
+
 namespace wilton {
 namespace server {
 
@@ -22,15 +24,6 @@ namespace { //anonymous
 
 namespace sc = staticlib::config;
 namespace ss = staticlib::serialization;
-
-// shouldn't be called before logging is initialized by app
-void log_error(const std::string& message) {
-    static std::string level = "ERROR";
-    static std::string logger = "wilton.server";
-    // call wilton
-    wilton_logger_log(level.c_str(), level.length(), logger.c_str(), logger.length(),
-            message.c_str(), message.length());
-}
 
 class HttpView {
 public:
@@ -201,7 +194,7 @@ std::vector<std::unique_ptr<wilton_HttpPath, HttpPathDeleter>> create_paths(
                     if (nullptr != err) {
                         std::string msg = TRACEMSG(err);
                         wilton_free(err);
-                        log_error(msg);
+                        log_error("wilton.server", msg);
                         send_system_error(requestHandle, msg);
                     }
                     static_request_registry().remove(requestHandle);

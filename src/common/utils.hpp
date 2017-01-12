@@ -45,6 +45,9 @@ const std::vector<staticlib::serialization::JsonValue>& get_json_array(
 const std::vector<staticlib::serialization::JsonField>& get_json_object(
         const staticlib::serialization::JsonField& field);
 
+void dump_error(const std::string& directory, const std::string& msg);
+
+
 template<typename T>
 class handle_registry {
     std::unordered_set<T*> registry;

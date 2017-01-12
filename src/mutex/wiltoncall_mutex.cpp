@@ -14,6 +14,8 @@
 #include "wilton/wilton.h"
 #include "wilton/wiltoncall.h"
 
+#include "logging/logging_internal.hpp"
+
 namespace wilton {
 namespace mutex {
 
@@ -27,15 +29,6 @@ namespace su = staticlib::utils;
 common::handle_registry<wilton_Mutex>& static_registry() {
     static common::handle_registry<wilton_Mutex> registry;
     return registry;
-}
-
-// shouldn't be called before logging is initialized by app
-void log_error(const std::string& message) {
-    static std::string level = "ERROR";
-    static std::string logger = "wilton.mutex";
-    // call wilton
-    wilton_logger_log(level.c_str(), level.length(), logger.c_str(), logger.length(),
-            message.c_str(), message.length());
 }
 
 } // namespace
@@ -144,16 +137,16 @@ std::string mutex_wait(const std::string& data) {
                         std::addressof(out), std::addressof(out_len));
                 delete sptr;
                 if (nullptr != err) {
-                    log_error(TRACEMSG(err));
+                    log_error("wilton.mutex", TRACEMSG(err));
                     wilton_free(err);
                     return 1;
                 }
                 if (nullptr == out) {
-                    log_error(TRACEMSG("Null condition result returned"));
+                    log_error("wilton.mutex", TRACEMSG("Null condition result returned"));
                     return 1;
                 }
                 if (!su::is_positive_uint16(out_len)) {
-                    log_error(TRACEMSG(
+                    log_error("wilton.mutex", TRACEMSG(
                         "Invalid output length returned from condition: [" + sc::to_string(out_len) + "]"));
                     return 1;
                 }
@@ -166,13 +159,13 @@ std::string mutex_wait(const std::string& data) {
                     if ("condition" == name && ss::JsonType::BOOLEAN == fi.type()) {
                         tribool = fi.as_bool() ? 1 : 0;
                     } else {
-                        log_error(TRACEMSG("Unknown condition result data field: [" + name + "]"));
+                        log_error("wilton.mutex", TRACEMSG("Unknown condition result data field: [" + name + "]"));
                         return 1;
                     }
                 }
                 if (-1 == tribool) {
                     std::string res_str{out, static_cast<uint16_t> (out_len)};
-                    log_error(TRACEMSG("Required parameter 'condition' not specified" +
+                    log_error("wilton.mutex", TRACEMSG("Required parameter 'condition' not specified" +
                             " in condition result: [" + res_str + "]"));
                 }
                 bool cond_res = 1 == tribool;

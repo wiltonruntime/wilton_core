@@ -10,21 +10,14 @@
 #include "wilton/wilton.h"
 #include "wilton/wiltoncall.h"
 
+#include "logging/logging_internal.hpp"
+
 namespace wilton {
 namespace thread {
 
 namespace { //anonymous
 
 namespace ss = staticlib::serialization;
-
-// shouldn't be called before logging is initialized by app
-void log_error(const std::string& message) {
-    static std::string level = "ERROR";
-    static std::string logger = "wilton.thread";
-    // call wilton
-    wilton_logger_log(level.c_str(), level.length(), logger.c_str(), logger.length(),
-            message.c_str(), message.length());
-}
 
 } // namespace
 
@@ -56,7 +49,7 @@ std::string thread_run(const std::string& data) {
                         std::addressof(out), std::addressof(out_len));
                 delete sptr;
                 if (nullptr != err) {
-                    log_error(TRACEMSG(err));
+                    log_error("wilton.thread", TRACEMSG(err));
                     wilton_free(err);
                 }
             });
