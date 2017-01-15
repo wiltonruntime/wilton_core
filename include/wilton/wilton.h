@@ -87,18 +87,6 @@ WILTON_EXPORT char* wilton_HttpPath_destroy(
             "tmpFilenameLength": uint16_t,
             "memoryLimitBytes": uint32_t
         },
-        "logging": {
-            "appenders": [{
-                "appenderType": "NULL | CONSOLE | FILE | DAILY_ROLLING_FILE",
-                "filePath": "path/to/log/file",
-                "layout": "%d{%Y-%m-%d %H:%M:%S,%q} [%-5p %-5.5t %-20.20c] %m%n",
-                "thresholdLevel": "TRACE | DEBUG | INFO | WARN | ERROR | FATAL"
-            }, ... ],
-            "loggers": [{
-                "name": "my.logger.name",
-                "level": "TRACE | DEBUG | INFO | WARN | ERROR | FATAL"
-            }, ...]
-        },
         "mustache": {
             "partialsDirs": ["path/to/dir1", "path/to/dir2" ...]
         }

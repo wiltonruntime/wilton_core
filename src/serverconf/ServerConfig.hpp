@@ -17,8 +17,6 @@
 
 #include "common/WiltonInternalException.hpp"
 #include "common/utils.hpp"
-#include "logging/AppenderConfig.hpp"
-#include "logging/LoggingConfig.hpp"
 #include "serverconf/DocumentRoot.hpp"
 #include "serverconf/MustacheConfig.hpp"
 #include "serverconf/RequestPayloadConfig.hpp"
@@ -35,7 +33,6 @@ public:
     SslConfig ssl;
     std::vector<DocumentRoot> documentRoots;
     RequestPayloadConfig requestPayload;
-    logging::LoggingConfig logging;
     MustacheConfig mustache;
 
     ServerConfig(const ServerConfig&) = delete;
@@ -49,7 +46,6 @@ public:
     ssl(std::move(other.ssl)),
     documentRoots(std::move(other.documentRoots)),
     requestPayload(std::move(other.requestPayload)),
-    logging(std::move(other.logging)),
     mustache(std::move(other.mustache)) { }
 
     ServerConfig& operator=(ServerConfig&& other) {
@@ -59,7 +55,6 @@ public:
         this->ssl = std::move(other.ssl);
         this->documentRoots = std::move(other.documentRoots);
         this->requestPayload = std::move(other.requestPayload);
-        this->logging = std::move(other.logging);
         this->mustache = std::move(other.mustache);
         return *this;
     }
@@ -83,16 +78,11 @@ public:
                 }
             } else if ("requestPayload" == name) {
                 this->requestPayload = serverconf::RequestPayloadConfig(fi.value());
-            } else if ("logging" == name) {
-                this->logging = logging::LoggingConfig(fi.value());
             } else if ("mustache" == name) {
                 this->mustache = MustacheConfig(fi.value());
             } else {
                 throw common::WiltonInternalException(TRACEMSG("Unknown field: [" + name + "]"));
             }
-        }
-        if (0 == logging.appenders.size()) {
-            logging.appenders.emplace_back(logging::AppenderConfig());
         }
     }
     
@@ -107,8 +97,7 @@ public:
             {"ipAddress", ipAddress},
             {"ssl", ssl.to_json()},
             {"documentRoots", drs},
-            {"requestPayload", logging.to_json()},
-            {"logging", logging.to_json()},
+            {"requestPayload", requestPayload.to_json()},
             {"mustache", mustache.to_json()}
         };
     }

@@ -63,7 +63,6 @@ public:
             create_pwd_cb(conf.ssl.keyPassword),
             conf.ssl.verifyFile,
             create_verifier_cb(conf.ssl.verifySubjectSubstr))) {
-        logging::WiltonLogger::apply_config(conf.logging);
         auto conf_ptr = std::make_shared<serverconf::RequestPayloadConfig>(conf.requestPayload.clone());
         for (const HttpPath& pa : paths) {
             auto ha = pa.handler; // copy
