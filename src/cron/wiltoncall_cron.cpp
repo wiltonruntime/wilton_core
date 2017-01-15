@@ -34,6 +34,7 @@ std::string cron_start(const std::string& data) {
     for (const ss::JsonField& fi : json.as_object()) {
         auto& name = fi.name();
         if ("callbackScript" == name) {
+            common::check_json_callback_script(fi);
             rcallback = fi.value();
         } else if ("expression" == name) {
             rexpr = common::get_json_string(fi);

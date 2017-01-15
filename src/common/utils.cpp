@@ -111,6 +111,57 @@ const std::vector<staticlib::serialization::JsonField>& get_json_object(
     return field.as_object();    
 }
 
+void check_json_callback_script(const staticlib::serialization::JsonField& field) {
+    if (ss::JsonType::OBJECT != field.type()) {
+        throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+                " type: [" + ss::stringify_json_type(field.type()) + "]," +
+                " value: [" + ss::dump_json_to_string(field.value()) + "]"));
+    }
+    bool module = false;
+    bool func = false;
+    bool args = false;
+    for (const ss::JsonField& fi : field.as_object()) {
+        auto& name = fi.name();
+        if ("module" == name) {
+            if (ss::JsonType::STRING != field.type()) {
+                throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+                        " type: [" + ss::stringify_json_type(field.type()) + "]," +
+                        " value: [" + ss::dump_json_to_string(field.value()) + "]"));
+            }
+            module = true;
+        } else if ("func" == name) {
+            if (ss::JsonType::STRING != field.type()) {
+                throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+                        " type: [" + ss::stringify_json_type(field.type()) + "]," +
+                        " value: [" + ss::dump_json_to_string(field.value()) + "]"));
+            }
+            func = true;
+        } else if ("args" == name) {
+            if (ss::JsonType::ARRAY != field.type()) {
+                throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+                        " type: [" + ss::stringify_json_type(field.type()) + "]," +
+                        " value: [" + ss::dump_json_to_string(field.value()) + "]"));
+            }
+            args = true;
+        } else {
+            throw common::WiltonInternalException(TRACEMSG(
+                    "Unknown data field: [" + name + "] in object: [" + field.name() + "]"));
+        }
+    }
+    if (!module) {
+        throw common::WiltonInternalException(TRACEMSG(
+                "Required field: 'module' is not supplied in object: [" + field.name() + "]"));
+    }
+    if (!func) {
+        throw common::WiltonInternalException(TRACEMSG(
+                "Required field: 'func' is not supplied in object: [" + field.name() + "]"));
+    }
+    if (!args) {
+        throw common::WiltonInternalException(TRACEMSG(
+                "Required field: 'func' is not supplied in object: [" + field.name() + "]"));
+    }
+}
+
 void dump_error(const std::string& directory, const std::string& msg) {
     try {
         // random postfix

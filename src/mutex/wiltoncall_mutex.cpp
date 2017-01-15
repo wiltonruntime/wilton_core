@@ -105,6 +105,7 @@ std::string mutex_wait(const std::string& data) {
     for (const ss::JsonField& fi : json.as_object()) {
         auto& name = fi.name();
         if ("conditionCallbackScript" == name) {
+            common::check_json_callback_script(fi);
             rcallback = fi.value();
         } else if ("mutexHandle" == name) {
             handle = common::get_json_int64(fi);

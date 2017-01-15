@@ -29,7 +29,7 @@ class HttpView {
 public:
     std::string method;
     std::string path;
-    std::string callbackScript;
+    ss::JsonValue callbackScript;
 
     HttpView(const HttpView&) = delete;
 
@@ -52,8 +52,9 @@ public:
                 method = common::get_json_string(fi);
             } else if ("path" == name) {
                 path = common::get_json_string(fi);
-            } else if ("module" == name) {
-                callbackScript = ss::dump_json_to_string(fi.value());
+            } else if ("callbackScript" == name) {
+                common::check_json_callback_script(fi);
+                callbackScript = fi.value().clone();
             } else {
                 throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
             }
@@ -70,7 +71,7 @@ public:
 
 class ServerCtx {
     // iterators must be permanent
-    std::list<std::string> callbackScripts;
+    std::list<ss::JsonValue> callbackScripts;
 
 public:
     ServerCtx(const ServerCtx&) = delete;
@@ -84,8 +85,8 @@ public:
 
     ServerCtx() { }
 
-    std::string& add_callback(const std::string& callback) {
-        callbackScripts.push_back(callback);
+    ss::JsonValue& add_callback(const ss::JsonValue& callback) {
+        callbackScripts.emplace_back(callback.clone());
         return callbackScripts.back();
     }
 };
@@ -179,17 +180,22 @@ std::vector<std::unique_ptr<wilton_HttpPath, HttpPathDeleter>> create_paths(
     // assert(views.size() == ctx.get_modules_names().size())
     std::vector<std::unique_ptr<wilton_HttpPath, HttpPathDeleter>> res;
     for (auto& vi : views) {
-        std::string& cbs_to_pass = ctx.add_callback(vi.callbackScript);
+        ss::JsonValue& cbs_to_pass = ctx.add_callback(vi.callbackScript);
         wilton_HttpPath* ptr = nullptr;
         auto err = wilton_HttpPath_create(std::addressof(ptr), vi.method.c_str(), vi.method.length(),
                 vi.path.c_str(), vi.path.length(), static_cast<void*> (std::addressof(cbs_to_pass)),
                 [](void* passed, wilton_Request* request) {
-                    std::string* sptr = static_cast<std::string*> (passed);
                     int64_t requestHandle = static_request_registry().put(request);
+                    ss::JsonValue* cb_ptr = static_cast<ss::JsonValue*> (passed);
+                    ss::JsonValue params = cb_ptr->clone();
+                    // params structure is pre-checked
+                    std::vector<ss::JsonValue>& args = *params.getattr_mutable("args").as_array_mutable().first;
+                    args.emplace_back(requestHandle);
+                    std::string params_str = ss::dump_json_to_string(params);
                     // output will be ignored
                     char* out;
                     int out_len;
-                    auto err = wiltoncall_runscript(sptr->c_str(), static_cast<int> (sptr->length()),
+                    auto err = wiltoncall_runscript(params_str.c_str(), static_cast<int> (params_str.length()),
                             std::addressof(out), std::addressof(out_len));
                     if (nullptr != err) {
                         std::string msg = TRACEMSG(err);

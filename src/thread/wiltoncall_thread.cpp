@@ -28,6 +28,7 @@ std::string thread_run(const std::string& data) {
     for (const ss::JsonField& fi : json.as_object()) {
         auto& name = fi.name();
         if ("callbackScript" == name) {
+            common::check_json_callback_script(fi);
             rcallback = fi.value();
         } else {
             throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
