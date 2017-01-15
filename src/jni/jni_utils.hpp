@@ -23,6 +23,8 @@ jclass find_java_class(JNIEnv* env, const std::string& name);
 
 jmethodID find_java_method(JNIEnv* env, jclass clazz, const std::string& name, const std::string& signature);
 
+jmethodID find_java_method_static(JNIEnv* env, jclass clazz, const std::string& name, const std::string& signature);
+
 } // namespace
 }
 

@@ -38,6 +38,15 @@ jclass find_java_class(JNIEnv* env, const std::string& name) {
 jmethodID find_java_method(JNIEnv* env, jclass clazz, const std::string& name, const std::string& signature) {
     jmethodID res = env->GetMethodID(clazz, name.c_str(), signature.c_str());
     if (nullptr == res) {
+        throw common::WiltonInternalException(TRACEMSG("Cannot find method, name: [" + name + "]," +
+                " signature: [" + signature + "]"));
+    }
+    return res;
+}
+
+jmethodID find_java_method_static(JNIEnv* env, jclass clazz, const std::string& name, const std::string& signature) {
+    jmethodID res = env->GetStaticMethodID(clazz, name.c_str(), signature.c_str());
+    if (nullptr == res) {
         throw common::WiltonInternalException(TRACEMSG("Cannot find static method, name: [" + name + "]," +
                 " signature: [" + signature + "]"));
     }

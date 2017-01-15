@@ -123,24 +123,24 @@ void check_json_callback_script(const staticlib::serialization::JsonField& field
     for (const ss::JsonField& fi : field.as_object()) {
         auto& name = fi.name();
         if ("module" == name) {
-            if (ss::JsonType::STRING != field.type()) {
-                throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
-                        " type: [" + ss::stringify_json_type(field.type()) + "]," +
-                        " value: [" + ss::dump_json_to_string(field.value()) + "]"));
+            if (ss::JsonType::STRING != fi.type()) {
+                throw common::WiltonInternalException(TRACEMSG("Invalid '" + fi.name() + "' field,"
+                        " type: [" + ss::stringify_json_type(fi.type()) + "]," +
+                        " value: [" + ss::dump_json_to_string(fi.value()) + "]"));
             }
             module = true;
         } else if ("func" == name) {
-            if (ss::JsonType::STRING != field.type()) {
-                throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
-                        " type: [" + ss::stringify_json_type(field.type()) + "]," +
-                        " value: [" + ss::dump_json_to_string(field.value()) + "]"));
+            if (ss::JsonType::STRING != fi.type()) {
+                throw common::WiltonInternalException(TRACEMSG("Invalid '" + fi.name() + "' field,"
+                        " type: [" + ss::stringify_json_type(fi.type()) + "]," +
+                        " value: [" + ss::dump_json_to_string(fi.value()) + "]"));
             }
             func = true;
         } else if ("args" == name) {
-            if (ss::JsonType::ARRAY != field.type()) {
-                throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
-                        " type: [" + ss::stringify_json_type(field.type()) + "]," +
-                        " value: [" + ss::dump_json_to_string(field.value()) + "]"));
+            if (ss::JsonType::ARRAY != fi.type()) {
+                throw common::WiltonInternalException(TRACEMSG("Invalid '" + fi.name() + "' field,"
+                        " type: [" + ss::stringify_json_type(fi.type()) + "]," +
+                        " value: [" + ss::dump_json_to_string(fi.value()) + "]"));
             }
             args = true;
         } else {

@@ -7,6 +7,8 @@
 
 #include "wilton/wiltoncall.h"
 
+#include <atomic>
+
 #include "staticlib/config.hpp"
 #include "staticlib/utils.hpp"
 
@@ -29,6 +31,14 @@ wilton::call::WiltoncallRegistry& static_registry() {
 
 char* wiltoncall_init() {
     try {
+        // check called once
+        static bool the_false = false;
+        static std::atomic<bool> initilized{false};
+        if (!initilized.compare_exchange_strong(the_false, true)) {
+            throw wc::WiltonInternalException(TRACEMSG("'wiltoncall' registry is already initialized"));
+        }
+        
+        // registry
         auto& reg = static_registry();
         
         // server

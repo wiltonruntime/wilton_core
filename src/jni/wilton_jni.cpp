@@ -93,7 +93,7 @@ public:
         this->wiltonJniClass = std::unique_ptr<_jclass, GlobalRefDeleter>(
                 wj::find_java_class(env, WILTON_JNI_CLASS_SIGNATURE_STR), GlobalRefDeleter());
         // describe
-        this->describeThrowableMethod = wj::find_java_method(env, this->wiltonJniClass.get(),
+        this->describeThrowableMethod = wj::find_java_method_static(env, this->wiltonJniClass.get(),
                 WILTON_JNI_CLASS_DESCRIBETHROWABLE_METHOD_STR, WILTON_JNI_CLASS_DESCRIBETHROWABLE_METHOD_SIGNATURE_STR);
         // gateway
         this->wiltonGatewayInterface = std::unique_ptr<_jclass, GlobalRefDeleter>(
@@ -177,20 +177,34 @@ JNIEXPORT void JNI_OnUnload(JavaVM*, void*) {
 
 JNIEXPORT void JNICALL WILTON_JNI_FUNCTION(wiltoninit)
 (JNIEnv* env, jclass, jobject gateway, jstring logging_conf) {
+    // check called once
+    static bool the_false = false;
+    static std::atomic<bool> initilized{false};
+    if (!initilized.compare_exchange_strong(the_false, true)) {
+        env->ThrowNew(static_jni_ctx().wiltonExceptionClass.get(),
+                TRACEMSG("'wiltoninit' was already called").c_str());
+        return;
+    }
+    
+    std::string lconf = "";
     try {
-    // set gateway
+        // set gateway
         static_jni_ctx().set_gateway_object(env, gateway);
         // wiltoncalls
-        wiltoncall_init();
+        auto err_init = wiltoncall_init();
+        if (nullptr != err_init) {
+            wc::throw_wilton_error(err_init, TRACEMSG(err_init));
+        }
         // init_logging
-        std::string lconf = wj::jstring_to_str(env, logging_conf);
-        auto err = wilton_logger_initialize(lconf.c_str(), static_cast<int>(lconf.length()));
-        if (nullptr != err) {
-            wc::throw_wilton_error(err, TRACEMSG(err));
+        lconf = wj::jstring_to_str(env, logging_conf);
+        auto err_logging = wilton_logger_initialize(lconf.c_str(), static_cast<int>(lconf.length()));
+        if (nullptr != err_logging) {
+            wc::throw_wilton_error(err_logging, TRACEMSG(err_logging));
         }
     } catch (const std::exception& e) {
         env->ThrowNew(static_jni_ctx().wiltonExceptionClass.get(),
-                TRACEMSG(e.what() + "\nWilton initialization error").c_str());
+                TRACEMSG(e.what() + "\nWilton initialization error," +
+                " logging_conf: [" + lconf + "]").c_str());
     }
 }
 
@@ -217,8 +231,7 @@ JNIEXPORT jstring JNICALL WILTON_JNI_FUNCTION(wiltoncall)
         return env->NewStringUTF(out);
     } else {
         env->ThrowNew(static_jni_ctx().wiltonExceptionClass.get(), TRACEMSG(err + 
-                "\n'wiltoncall' error for name: [" + name_string + "]," +
-                " data: [" + data_string + "]").c_str());
+                "\n'wiltoncall' error for name: [" + name_string + "]").c_str());
         wilton_free(err);
         return nullptr;
     }
