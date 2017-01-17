@@ -250,7 +250,8 @@ char* wiltoncall_runscript(const char* json_in, int json_in_len, char** json_out
         JniCtx& ctx = static_jni_ctx();
         JNIEnv* env = get_jni_env();
         jstring json_ustr = env->NewStringUTF(json_in);
-        jobject res = env->CallObjectMethod(ctx.wiltonGatewayObject.get(), ctx.runScriptMethod);
+        jobject res = env->CallObjectMethod(ctx.wiltonGatewayObject.get(),
+                ctx.runScriptMethod, json_ustr);
         env->DeleteLocalRef(json_ustr);
         jthrowable exc = env->ExceptionOccurred();
         if (nullptr == exc) {
