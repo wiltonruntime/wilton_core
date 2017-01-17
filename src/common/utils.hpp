@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -74,6 +75,32 @@ public:
         T* ptr = reinterpret_cast<T*> (handle);
         auto exists = registry.count(ptr);
         return 1 == exists ? ptr : nullptr;
+    }
+};
+
+template<typename T, typename P>
+class payload_handle_registry {
+    std::unordered_map<T*, P> registry;
+    std::mutex mutex;
+
+public:
+    int64_t put(T* ptr, P&& ctx) {
+        std::lock_guard<std::mutex> lock(mutex);
+        auto pair = registry.emplace(ptr, std::move(ctx));
+        return pair.second ? reinterpret_cast<int64_t> (ptr) : 0;
+    }
+
+    std::pair<T*, P> remove(int64_t handle) {
+        std::lock_guard<std::mutex> lock(mutex);
+        T* ptr = reinterpret_cast<T*> (handle);
+        auto it = registry.find(ptr);
+        if (registry.end() != it) {
+            auto ctx = std::move(it->second);
+            registry.erase(ptr);
+            return std::make_pair(ptr, std::move(ctx));
+        } else {
+            return std::make_pair(nullptr, P());
+        }
     }
 };
 

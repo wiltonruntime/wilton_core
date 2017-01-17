@@ -8,7 +8,6 @@
 #include "call/wiltoncall_internal.hpp"
 
 #include <list>
-#include <unordered_map>
 
 #include "staticlib/config.hpp"
 
@@ -91,33 +90,8 @@ public:
     }
 };
 
-class server_handle_registry {
-    std::unordered_map<wilton_Server*, ServerCtx> registry;
-    std::mutex mutex;
-
-public:
-    int64_t put(wilton_Server* ptr, ServerCtx&& ctx) {
-        std::lock_guard<std::mutex> lock(mutex);
-        auto pair = registry.emplace(ptr, std::move(ctx));
-        return pair.second ? reinterpret_cast<int64_t> (ptr) : 0;
-    }
-
-    std::pair<wilton_Server*, ServerCtx> remove(int64_t handle) {
-        std::lock_guard<std::mutex> lock(mutex);
-        wilton_Server* ptr = reinterpret_cast<wilton_Server*> (handle);
-        auto it = registry.find(ptr);
-        if (registry.end() != it) {
-            auto ctx = std::move(it->second);
-            registry.erase(ptr);
-            return std::make_pair(ptr, std::move(ctx));
-        } else {
-            return std::make_pair(nullptr, ServerCtx());
-        }
-    }
-};
-
-server_handle_registry& static_server_registry() {
-    static server_handle_registry registry;
+common::payload_handle_registry<wilton_Server, ServerCtx>& static_server_registry() {
+    static common::payload_handle_registry<wilton_Server, ServerCtx> registry;
     return registry;
 }
 

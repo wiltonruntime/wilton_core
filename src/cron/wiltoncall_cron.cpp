@@ -7,6 +7,9 @@
 
 #include "call/wiltoncall_internal.hpp"
 
+#include <atomic>
+#include <memory>
+
 #include "wilton/wilton.h"
 #include "wilton/wiltoncall.h"
 
@@ -19,8 +22,8 @@ namespace { //anonymous
 
 namespace ss = staticlib::serialization;
 
-common::handle_registry<wilton_CronTask>& static_registry() {
-    static common::handle_registry<wilton_CronTask> registry;
+common::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>>& static_registry() {
+    static common::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>> registry;
     return registry;
 }
 
@@ -47,28 +50,26 @@ std::string cron_start(const std::string& data) {
     if (rexpr.get().empty()) throw common::WiltonInternalException(TRACEMSG(
             "Required parameter 'url' not specified"));
     const ss::JsonValue& callback = rcallback.get();
-    std::string* callback_str_ptr = new std::string();
-    *callback_str_ptr = ss::dump_json_to_string(callback);
     const std::string& expr = rexpr.get();
+    std::string* str_to_pass = new std::string(ss::dump_json_to_string(callback));
     // call wilton
     wilton_CronTask* cron;
     char* err = wilton_CronTask_start(std::addressof(cron), expr.c_str(), expr.length(),
-            callback_str_ptr,
+            static_cast<void*> (str_to_pass),
             [](void* passed) {
-                std::string* sptr = static_cast<std::string*> (passed);
+                std::string* str = static_cast<std::string*> (passed);
                 // output will be ignored
                 char* out;
                 int out_len;
-                auto err = wiltoncall_runscript(sptr->c_str(), static_cast<int> (sptr->length()),
-                        std::addressof(out), std::addressof(out_len));
-                delete sptr;
+                auto err = wiltoncall_runscript(str->c_str(), static_cast<int> (str->length()),
+                std::addressof(out), std::addressof(out_len));
                 if (nullptr != err) {
                     log_error("wilton.cron", TRACEMSG(err));
                     wilton_free(err);
                 }
             });
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    int64_t handle = static_registry().put(cron);
+    int64_t handle = static_registry().put(cron, std::unique_ptr<std::string>(str_to_pass));
     return ss::dump_json_to_string({
         { "cronHandle", handle}
     });
@@ -89,13 +90,13 @@ std::string cron_stop(const std::string& data) {
     if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
             "Required parameter 'httpclientHandle' not specified"));
     // get handle
-    wilton_CronTask* cron = static_registry().remove(handle);
-    if (nullptr == cron) throw common::WiltonInternalException(TRACEMSG(
+    auto pa = static_registry().remove(handle);
+    if (nullptr == pa.first) throw common::WiltonInternalException(TRACEMSG(
             "Invalid 'cronHandle' parameter specified"));
     // call wilton
-    char* err = wilton_CronTask_stop(cron);
+    char* err = wilton_CronTask_stop(pa.first);
     if (nullptr != err) {
-        static_registry().put(cron);
+        static_registry().put(pa.first, std::move(pa.second));
         common::throw_wilton_error(err, TRACEMSG(err));
     }
     return "{}";
