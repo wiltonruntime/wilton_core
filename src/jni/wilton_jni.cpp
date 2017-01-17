@@ -142,7 +142,7 @@ JNIEnv* get_jni_env() {
 std::string describe_java_exception(JNIEnv* env, jthrowable exc) {
     jobject umsg = env->CallStaticObjectMethod(static_jni_ctx().wiltonJniClass.get(),
             static_jni_ctx().describeThrowableMethod, exc);
-    if (!env->ExceptionOccurred()) {
+    if (!env->ExceptionCheck()) {
         std::string res = wj::jstring_to_str(env, static_cast<jstring>(umsg));
         env->DeleteLocalRef(umsg);
         return res;

@@ -122,21 +122,19 @@ std::string mutex_wait(const std::string& data) {
     if (-1 == timeout_millis) throw common::WiltonInternalException(TRACEMSG(
             "Required parameter 'timeoutMillis' not specified"));
     const ss::JsonValue& callback = rcallback.get();
-    std::string* callback_str_ptr = new std::string();
-    *callback_str_ptr = ss::dump_json_to_string(callback);
+    std::string cbjson = ss::dump_json_to_string(callback);
     // get handle
     wilton_Mutex* mutex = static_registry().peek(handle);
     if (nullptr == mutex) throw common::WiltonInternalException(TRACEMSG(
             "Invalid 'mutexHandle' parameter specified"));
     // call wilton
-    char* err = wilton_Mutex_wait(mutex, static_cast<int> (timeout_millis), callback_str_ptr,
+    char* err = wilton_Mutex_wait(mutex, static_cast<int> (timeout_millis), static_cast<void*> (std::addressof(cbjson)),
             [](void* passed) {
                 std::string* sptr = static_cast<std::string*> (passed);
                 char* out;
                 int out_len;
                 auto err = wiltoncall_runscript(sptr->c_str(), static_cast<int> (sptr->length()),
-                        std::addressof(out), std::addressof(out_len));
-                delete sptr;
+                        std::addressof(out), std::addressof(out_len));                
                 if (nullptr != err) {
                     log_error("wilton.mutex", TRACEMSG(err));
                     wilton_free(err);
