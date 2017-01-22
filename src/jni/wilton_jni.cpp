@@ -169,6 +169,8 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void*) {
     }
 }
 
+// generally won't be called on most JVMs
+// as ctx holds a bunch of global refs
 JNIEXPORT void JNI_OnUnload(JavaVM*, void*) {
     delete std::addressof(static_jni_ctx());
     // flip init flag
@@ -228,7 +230,9 @@ JNIEXPORT jstring JNICALL WILTON_JNI_FUNCTION(wiltoncall)
             data_string.c_str(), static_cast<int>(data_string.length()),
             std::addressof(out), std::addressof(out_len));
     if (nullptr == err) {
-        return env->NewStringUTF(out);
+        jstring res = env->NewStringUTF(out);
+        wilton_free(out);
+        return res;
     } else {
         env->ThrowNew(static_jni_ctx().wiltonExceptionClass.get(), TRACEMSG(err + 
                 "\n'wiltoncall' error for name: [" + name_string + "]").c_str());
