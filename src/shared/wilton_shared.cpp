@@ -68,10 +68,10 @@ std::unordered_map<std::string, Value>& static_map() {
 
 char* wilton_shared_put(const char* key, int key_len, const char* value, int value_len) /* noexcept */ {
     if (nullptr == key) return su::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!su::is_positive_uint16(key_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(key_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'key_len' parameter specified: [" + sc::to_string(key_len) + "]"));
     if (nullptr == value) return su::alloc_copy(TRACEMSG("Null 'value' parameter specified"));
-    if (!su::is_uint32(value_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32(value_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'value_len' parameter specified: [" + sc::to_string(value_len) + "]"));
     try {
         // prepare tuple
@@ -95,7 +95,7 @@ char* wilton_shared_put(const char* key, int key_len, const char* value, int val
 
 char* wilton_shared_get(const char* key, int key_len, char** value_out, int* value_out_len) /* noexcept */ {
     if (nullptr == key) return su::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!su::is_positive_uint16(key_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(key_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'key_len' parameter specified: [" + sc::to_string(key_len) + "]"));
     if (nullptr == value_out) return su::alloc_copy(TRACEMSG("Null 'value_out' parameter specified"));
     if (nullptr == value_out_len) return su::alloc_copy(TRACEMSG("Null 'value_out_len' parameter specified"));
@@ -123,13 +123,13 @@ char* wilton_shared_get(const char* key, int key_len, char** value_out, int* val
 char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len,
         const char* current_value, int current_value_len, char** changed_value_out,
         int* changed_value_out_len) /* noexcept */ {
-    if (!su::is_positive_uint32(timeout_millis)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32_positive(timeout_millis)) return su::alloc_copy(TRACEMSG(
             "Invalid 'timeout_millis' parameter specified: [" + sc::to_string(timeout_millis) + "]"));
     if (nullptr == key) return su::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!su::is_positive_uint16(key_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(key_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'key_len' parameter specified: [" + sc::to_string(key_len) + "]"));
     if (nullptr == current_value) return su::alloc_copy(TRACEMSG("Null 'current_value' parameter specified"));
-    if (!su::is_uint32(current_value_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32(current_value_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'current_value_len' parameter specified: [" + sc::to_string(current_value_len) + "]"));
     if (nullptr == changed_value_out) return su::alloc_copy(TRACEMSG("Null 'changed_value_out' parameter specified"));
     if (nullptr == changed_value_out_len) return su::alloc_copy(TRACEMSG("Null 'changed_value_out_len' parameter specified"));
@@ -181,7 +181,7 @@ char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len
 
 char* wilton_shared_remove(const char* key, int key_len) /* noexcept */ {
     if (nullptr == key) return su::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!su::is_positive_uint16(key_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(key_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'key_len' parameter specified: [" + sc::to_string(key_len) + "]"));
     try {
         // prepare key

@@ -57,8 +57,15 @@ public:
     }
 
     staticlib::serialization::JsonValue to_json() const {
+        namespace sr = staticlib::ranges;
+        namespace ss = staticlib::serialization;
         return {
-            { "partialsDirs", partialsDirs }
+            { "partialsDirs", [this]{
+                auto ra = sr::transform(sr::refwrap(partialsDirs), [this](const std::string& el) {
+                    return ss::JsonValue(el);
+                });
+                return ra.to_vector();
+            }() }
         };
     }
 };

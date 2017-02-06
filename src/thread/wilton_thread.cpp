@@ -39,7 +39,7 @@ char* wilton_thread_run(void* cb_ctx, void (*cb)(void* cb_ctx)) /* noexcept */ {
 }
 
 char* wilton_thread_sleep_millis(int millis) /* noexcept */ {
-    if (!su::is_positive_uint32(millis)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32_positive(millis)) return su::alloc_copy(TRACEMSG(
             "Invalid 'millis' parameter specified: [" + sc::to_string(millis) + "]"));
     try {
         uint32_t millis_u32 = static_cast<uint32_t> (millis);

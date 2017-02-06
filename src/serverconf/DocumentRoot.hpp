@@ -97,16 +97,18 @@ public:
        
     staticlib::serialization::JsonValue to_json() const {
         namespace sr = staticlib::ranges;
-        auto mimes = sr::transform(sr::refwrap(mimeTypes), [](const MimeType& el) {
-            return el.to_json();
-        });
         return {
             {"resource", resource},
             {"dirPath", dirPath},
             {"zipPath", zipPath},
             {"zipInnerPrefix", zipInnerPrefix},
             {"cacheMaxAgeSeconds", cacheMaxAgeSeconds},
-            {"mimeTypes", mimes}
+            {"mimeTypes", [this] {
+                auto ra = sr::transform(sr::refwrap(mimeTypes), [](const MimeType& el) {
+                    return el.to_json();
+                });
+                return ra.to_vector();
+            }()}
         };
     }
     

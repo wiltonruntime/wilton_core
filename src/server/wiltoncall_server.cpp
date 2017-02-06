@@ -106,11 +106,9 @@ common::handle_registry<wilton_ResponseWriter>& static_response_writer_registry(
 }
 
 std::vector<HttpView> extract_and_delete_views(ss::JsonValue& conf) {
-    auto pair = conf.as_object_mutable();
-    if (!pair.second) throw common::WiltonInternalException(TRACEMSG(
+    std::vector<ss::JsonField>& fields = conf.as_object_or_throw(TRACEMSG(
             "Invalid configuration object specified: invalid type," +
             " conf: [" + ss::dump_json_to_string(conf) + "]"));
-    std::vector<ss::JsonField>& fields = *pair.first;
     std::vector<HttpView> views;
     uint32_t i = 0;
     for (auto it = fields.begin(); it != fields.end(); ++it) {
@@ -163,7 +161,7 @@ std::vector<std::unique_ptr<wilton_HttpPath, HttpPathDeleter>> create_paths(
                     ss::JsonValue* cb_ptr = static_cast<ss::JsonValue*> (passed);
                     ss::JsonValue params = cb_ptr->clone();
                     // params structure is pre-checked
-                    std::vector<ss::JsonValue>& args = *params.getattr_mutable("args").as_array_mutable().first;
+                    std::vector<ss::JsonValue>& args = params.getattr_or_throw("args").as_array_or_throw();
                     args.emplace_back(requestHandle);
                     std::string params_str = ss::dump_json_to_string(params);
                     // output will be ignored

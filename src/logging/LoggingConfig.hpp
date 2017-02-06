@@ -65,15 +65,21 @@ public:
 
     staticlib::serialization::JsonValue to_json() const {
         namespace sr = staticlib::ranges;
-        auto japps = sr::transform(sr::refwrap(appenders), [](const AppenderConfig& el) {
-            return el.to_json();
-        });
-        auto jlogs = sr::transform(sr::refwrap(loggers), [](const LoggerConfig& el) {
-            return el.to_json();
-        });
+        
+        
         return {
-            {"appenders", japps},
-            {"loggers", jlogs}
+            {"appenders", [this](){
+                auto ra = sr::transform(appenders, [](const AppenderConfig & el) {
+                    return el.to_json();
+                });
+                return ra.to_vector();
+            }()},
+            {"loggers", [this](){
+                auto ra = sr::transform(loggers, [](const LoggerConfig & el) {
+                    return el.to_json();
+                });
+                return ra.to_vector();
+            }()}
         };
     }
 };

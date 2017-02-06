@@ -246,7 +246,7 @@ JNIEXPORT jstring JNICALL WILTON_JNI_FUNCTION(wiltoncall)
 char* wiltoncall_runscript(const char* json_in, int json_in_len, char** json_out, 
         int* json_out_len) /* noexcept */ {
     if (nullptr == json_in) return su::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
-    if (!su::is_uint32(json_in_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32(json_in_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'json_in_len' parameter specified: [" + sc::to_string(json_in_len) + "]"));
     if (nullptr == json_out) return su::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
     if (nullptr == json_out_len) return su::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));

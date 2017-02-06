@@ -45,7 +45,7 @@ char* wilton_CronTask_start(
                 void* task_ctx)) /* noexcept */ {
     if (nullptr == cron_out) return su::alloc_copy(TRACEMSG("Null 'cron_out' parameter specified"));
     if (nullptr == cronexpr) return su::alloc_copy(TRACEMSG("Null 'cronexpr' parameter specified"));
-    if (!su::is_positive_uint16(cronexpr_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(cronexpr_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'cronexpr_len' parameter specified: [" + sc::to_string(cronexpr_len) + "]"));
     if (nullptr == task_cb) return su::alloc_copy(TRACEMSG("Null 'task_cb' parameter specified"));
     try {

@@ -105,10 +105,10 @@ char* wiltoncall_init() {
 char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, int json_in_len,
         char** json_out, int* json_out_len) /* noexcept */ {
     if (nullptr == call_name) return su::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
-    if (!su::is_positive_uint16(call_name_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(call_name_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'call_name_len' parameter specified: [" + sc::to_string(call_name_len) + "]"));
     if (nullptr == json_in) return su::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
-    if (!su::is_positive_uint32(json_in_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32_positive(json_in_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'json_in_len' parameter specified: [" + sc::to_string(json_in_len) + "]"));
     if (nullptr == json_out) return su::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
     if (nullptr == json_out_len) return su::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
@@ -133,7 +133,7 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
         char* (*call_cb)
         (void* call_ctx, const char* json_in, int json_in_len, char** json_out, int* json_out_len)) /* noexcept */ {
     if (nullptr == call_name) return su::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
-    if (!su::is_positive_uint16(call_name_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(call_name_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'call_name_len' parameter specified: [" + sc::to_string(call_name_len) + "]"));
     if (nullptr == call_cb) return su::alloc_copy(TRACEMSG("Null 'call_cb' parameter specified"));
     try {
@@ -153,7 +153,7 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
             if (nullptr == out) {
                 throw wc::WiltonInternalException(TRACEMSG("Invalid 'null' result returned"));
             }
-            if (!su::is_uint32(out_len)){
+            if (!sc::is_uint32(out_len)){
                 throw wc::WiltonInternalException(TRACEMSG(
                     "Invalid result length value returned: [" + sc::to_string(out_len) + "]"));
             }
@@ -168,7 +168,7 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
 
 char* wiltoncall_remove(const char* call_name, int call_name_len) {
     if (nullptr == call_name) return su::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
-    if (!su::is_positive_uint16(call_name_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(call_name_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'call_name_len' parameter specified: [" + sc::to_string(call_name_len) + "]"));
     try {
         uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);

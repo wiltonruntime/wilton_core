@@ -88,7 +88,7 @@ std::string cron_stop(const std::string& data) {
         }
     }
     if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
-            "Required parameter 'httpclientHandle' not specified"));
+            "Required parameter 'cronHandle' not specified"));
     // get handle
     auto pa = static_registry().remove(handle);
     if (nullptr == pa.first) throw common::WiltonInternalException(TRACEMSG(

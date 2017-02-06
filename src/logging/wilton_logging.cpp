@@ -29,7 +29,7 @@ char* wilton_logger_initialize(
         const char* conf_json,
         int conf_json_len) {
     if (nullptr == conf_json) return su::alloc_copy(TRACEMSG("Null 'conf_json' parameter specified"));
-    if (!su::is_positive_uint32(conf_json_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32_positive(conf_json_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'conf_json_len' parameter specified: [" + sc::to_string(conf_json_len) + "]"));
     try {
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
@@ -52,13 +52,13 @@ char* wilton_logger_log(
         const char* message,
         int message_len) {
     if (nullptr == level_name) return su::alloc_copy(TRACEMSG("Null 'level_name' parameter specified"));
-    if (!su::is_positive_uint16(level_name_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(level_name_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'level_name_len' parameter specified: [" + sc::to_string(level_name_len) + "]"));
     if (nullptr == logger_name) return su::alloc_copy(TRACEMSG("Null 'logger_name' parameter specified"));
-    if (!su::is_positive_uint16(logger_name_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(logger_name_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'logger_name_len' parameter specified: [" + sc::to_string(logger_name_len) + "]"));
     if (nullptr == message) return su::alloc_copy(TRACEMSG("Null 'message' parameter specified"));
-    if (!su::is_uint32(message_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32(message_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'message_len' parameter specified: [" + sc::to_string(message_len) + "]"));
     try {
         uint32_t level_name_len_u32 = static_cast<uint32_t> (level_name_len);
@@ -82,10 +82,10 @@ char* wilton_logger_is_level_enabled(
         int* res_out
         ) {
     if (nullptr == logger_name) return su::alloc_copy(TRACEMSG("Null 'logger_name' parameter specified"));
-    if (!su::is_positive_uint16(logger_name_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(logger_name_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'logger_name_len' parameter specified: [" + sc::to_string(logger_name_len) + "]"));
     if (nullptr == level_name) return su::alloc_copy(TRACEMSG("Null 'level_name' parameter specified"));
-    if (!su::is_positive_uint16(level_name_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(level_name_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'level_name_len' parameter specified: [" + sc::to_string(level_name_len) + "]"));
     if (nullptr == res_out) return su::alloc_copy(TRACEMSG("Null 'res_out' parameter specified"));
     try {

@@ -25,6 +25,7 @@
 #define	WILTON_SERVER_RESPONSESTREAMSENDER_HPP
 
 #include <memory>
+#include <streambuf>
 
 #include "asio.hpp"
 
@@ -40,14 +41,14 @@ namespace server {
 
 class ResponseStreamSender : public std::enable_shared_from_this<ResponseStreamSender> {
     staticlib::httpserver::http_response_writer_ptr writer;
-    std::unique_ptr<std::istream> stream;
+    std::unique_ptr<std::streambuf> stream;
     std::function<void(bool)> finalizer;
 
     std::array<char, 4096> buf;
 
 public:
     ResponseStreamSender(staticlib::httpserver::http_response_writer_ptr writer, 
-            std::unique_ptr<std::istream>&& stream, 
+            std::unique_ptr<std::streambuf>&& stream, 
             std::function<void(bool)> finalizer = [](bool){}) :
     writer(std::move(writer)),
     stream(std::move(stream)),
@@ -59,9 +60,10 @@ public:
     }
 
     void handle_write(const asio::error_code& ec, size_t /* bytes_written */) {
+        namespace si = staticlib::io;
         if (!ec) {
-            staticlib::io::streambuf_source src{stream->rdbuf()};
-            size_t len = staticlib::io::read_all(src, buf.data(), buf.size());
+            auto src = si::streambuf_source(stream.get());
+            size_t len = si::read_all(src, buf);
             writer->clear();
             if (len > 0) {
                 if (buf.size() == len) {

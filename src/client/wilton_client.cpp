@@ -15,6 +15,7 @@
 #include "staticlib/io.hpp"
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
+#include "staticlib/tinydir.hpp"
 
 #include "client/ClientResponse.hpp"
 #include "client/ClientRequestConfig.hpp"
@@ -26,6 +27,7 @@ namespace sc = staticlib::config;
 namespace sh = staticlib::httpclient;
 namespace si = staticlib::io;
 namespace ss = staticlib::serialization;
+namespace st = staticlib::tinydir;
 namespace su = staticlib::utils;
 namespace wc = wilton::client;
     
@@ -50,7 +52,7 @@ char* wilton_HttpClient_create(
         int conf_json_len) {
     if (nullptr == http_out) return su::alloc_copy(TRACEMSG("Null 'http_out' parameter specified"));
     if (nullptr == conf_json) return su::alloc_copy(TRACEMSG("Null 'conf_json' parameter specified"));
-    if (!su::is_positive_uint32(conf_json_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32_positive(conf_json_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'conf_json_len' parameter specified: [" + sc::to_string(conf_json_len) + "]"));
     try {
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
@@ -91,11 +93,11 @@ char* wilton_HttpClient_execute(
         int* response_data_len_out) {
     if (nullptr == http) return su::alloc_copy(TRACEMSG("Null 'http' parameter specified"));    
     if (nullptr == url) return su::alloc_copy(TRACEMSG("Null 'url' parameter specified"));
-    if (!su::is_positive_uint32(url_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32_positive(url_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'url_len' parameter specified: [" + sc::to_string(url_len) + "]"));
-    if (!su::is_uint32(request_data_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32(request_data_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'request_data_len' parameter specified: [" + sc::to_string(request_data_len) + "]"));
-    if (!su::is_uint32(request_metadata_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32(request_metadata_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'request_metadata_len' parameter specified: [" + sc::to_string(request_metadata_len) + "]"));
     try {
         std::string url_str{url, static_cast<uint32_t> (url_len)};
@@ -113,12 +115,12 @@ char* wilton_HttpClient_execute(
             si::string_source data_src{std::move(data_str)};
             // POST will be used by default for this API call
             sh::HttpResource resp = http->impl().open_url(url_str, std::move(data_src), opts.options);            
-            si::copy_all(resp, sink, buf.data(), buf.size());
+            si::copy_all(resp, sink, buf);
             resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
         } else {
             // GET will be used by default for this API call
             sh::HttpResource resp = http->impl().open_url(url_str, opts.options);
-            si::copy_all(resp, sink, buf.data(), buf.size());
+            si::copy_all(resp, sink, buf);
             resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
         }
         std::string resp_complete = ss::dump_json_to_string(resp_json);
@@ -146,12 +148,12 @@ char* wilton_HttpClient_send_file(
                 int sent_successfully)) {
     if (nullptr == http) return su::alloc_copy(TRACEMSG("Null 'http' parameter specified"));
     if (nullptr == url) return su::alloc_copy(TRACEMSG("Null 'url' parameter specified"));
-    if (!su::is_positive_uint32(url_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32_positive(url_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'url_len' parameter specified: [" + sc::to_string(url_len) + "]"));
     if (nullptr == file_path) return su::alloc_copy(TRACEMSG("Null 'file_path' parameter specified"));
-    if (!su::is_positive_uint16(file_path_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(file_path_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'file_path_len' parameter specified: [" + sc::to_string(file_path_len) + "]"));
-    if (!su::is_uint32(request_metadata_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32(request_metadata_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'request_metadata_len' parameter specified: [" + sc::to_string(request_metadata_len) + "]"));
     try {
         std::string url_str{url, static_cast<uint32_t> (url_len)};
@@ -163,10 +165,10 @@ char* wilton_HttpClient_send_file(
         wc::ClientRequestConfig opts{std::move(opts_json)};
         std::array<char, 4096> buf;
         std::string file_path_str{file_path, static_cast<uint32_t> (file_path_len)};
-        su::FileDescriptor fd{file_path_str, 'r'};
+        auto fd = st::TinydirFileSource(file_path_str);
         sh::HttpResource resp = http->impl().open_url(url_str, std::move(fd), opts.options);
         si::string_sink sink{};
-        si::copy_all(resp, sink, buf.data(), buf.size());
+        si::copy_all(resp, sink, buf);
         ss::JsonValue resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
         std::string resp_complete = ss::dump_json_to_string(resp_json);
         if (nullptr != finalizer_cb) {

@@ -144,7 +144,7 @@ std::string mutex_wait(const std::string& data) {
                     log_error("wilton.mutex", TRACEMSG("Null condition result returned"));
                     return 1;
                 }
-                if (!su::is_positive_uint16(out_len)) {
+                if (!sc::is_uint16_positive(out_len)) {
                     log_error("wilton.mutex", TRACEMSG(
                         "Invalid output length returned from condition: [" + sc::to_string(out_len) + "]"));
                     return 1;

@@ -35,6 +35,7 @@
 #include "staticlib/httpserver/http_request.hpp"
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
+#include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
 #include "common/WiltonInternalException.hpp"
@@ -47,6 +48,7 @@ namespace { // anonymous
 
 namespace sc = staticlib::config;
 namespace si = staticlib::io;
+namespace st = staticlib::tinydir;
 namespace su = staticlib::utils;
 
 } // namespace
@@ -62,7 +64,7 @@ class RequestPayloadHandler {
         uint64_t counter = 0;
         std::string buffer = "";
         std::string filename;
-        std::unique_ptr<su::FileDescriptor> file;
+        std::unique_ptr<st::TinydirFileSink> file;
         State state = State::MEMORY;
         su::RandomStringGenerator rng;
 
@@ -131,7 +133,7 @@ public:
             } else {
                 data->state = State::FILE;
                 data->filename = gen_filename();
-                data->file = sc::make_unique<su::FileDescriptor>(data->filename, 'w');
+                data->file = std::unique_ptr<st::TinydirFileSink>(new st::TinydirFileSink(data->filename));
                 if (!data->buffer.empty()) {
                     si::write_all(*data->file, data->buffer);
                     data->buffer = "";
@@ -140,7 +142,7 @@ public:
             // fall through
         case State::FILE:
             if (nullptr != data->file.get()) {
-                si::write_all(*data->file, s, n);
+                si::write_all(*data->file, {s, n});
             } else throw common::WiltonInternalException(TRACEMSG("Invalid payload handler data state"));
             return;
         default:
@@ -167,10 +169,10 @@ private:
         switch (data->state) {
         case State::FILE: {
             data->state = State::MEMORY;
-            su::FileDescriptor fd{data->filename, 'r'};
+            auto fd = st::TinydirFileSource(data->filename);
             si::string_sink sink;
             std::array<char, 4096> buf;
-            si::copy_all(fd, sink, buf.data(), buf.size());
+            si::copy_all(fd, sink, buf);
             data->buffer = std::move(sink.get_string());            
         } // fall through     
         case State::MEMORY:
@@ -187,7 +189,7 @@ private:
             data->state = State::FILE;
             if (data->filename.empty()) {
                 data->filename = gen_filename();
-                su::FileDescriptor fd{data->filename, 'w'};
+                auto fd = st::TinydirFileSink(data->filename);
                 si::write_all(fd, data->buffer);
             }
             // fall through

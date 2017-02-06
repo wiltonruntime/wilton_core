@@ -68,7 +68,7 @@ char* wilton_Mutex_unlock(wilton_Mutex* mutex) /* noexcept */ {
 char* wilton_Mutex_wait(wilton_Mutex* mutex, int timeout_millis, void* cond_ctx,
         int (*cond_cb)(void* cond_ctx)) /* noexcept */ {
     if (nullptr == mutex) return su::alloc_copy(TRACEMSG("Null 'mutex' parameter specified"));
-    if (!su::is_positive_uint32(timeout_millis)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32_positive(timeout_millis)) return su::alloc_copy(TRACEMSG(
             "Invalid 'timeout_millis' parameter specified: [" + sc::to_string(timeout_millis) + "]"));
     if (nullptr == cond_cb) return su::alloc_copy(TRACEMSG("Null 'cond_cb' parameter specified"));
     try {

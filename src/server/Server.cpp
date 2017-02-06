@@ -55,14 +55,14 @@ class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
 public:
     Impl(serverconf::ServerConfig conf, std::vector<std::reference_wrapper<HttpPath>> paths) :
     mustache_partials(load_partials(conf.mustache)),
-    server(sc::make_unique<sh::http_server>(
+    server(std::unique_ptr<sh::http_server>(new sh::http_server(
             conf.numberOfThreads, 
             conf.tcpPort,
             asio::ip::address_v4::from_string(conf.ipAddress),
             conf.ssl.keyFile,
             create_pwd_cb(conf.ssl.keyPassword),
             conf.ssl.verifyFile,
-            create_verifier_cb(conf.ssl.verifySubjectSubstr))) {
+            create_verifier_cb(conf.ssl.verifySubjectSubstr)))) {
         auto conf_ptr = std::make_shared<serverconf::RequestPayloadConfig>(conf.requestPayload.clone());
         for (const HttpPath& pa : paths) {
             auto ha = pa.handler; // copy
@@ -132,13 +132,13 @@ private:
         std::map<std::string, std::string> res;
         for (const std::string& dirpath : cf.partialsDirs) {
             for (const st::TinydirFile& tf : st::list_directory(dirpath)) {
-                if (!su::ends_with(tf.get_name(), MUSTACHE_EXT)) continue;
-                std::string name = std::string(tf.get_name().data(), tf.get_name().length() - MUSTACHE_EXT.length());
+                if (!su::ends_with(tf.name(), MUSTACHE_EXT)) continue;
+                std::string name = std::string(tf.name().data(), tf.name().length() - MUSTACHE_EXT.length());
                 std::string val = read_file(tf);
                 auto pa = res.insert(std::make_pair(std::move(name), std::move(val)));
                 if (!pa.second) throw common::WiltonInternalException(TRACEMSG(
                         "Invalid duplicate 'mustache.partialsDirs' element," +
-                        " dirpath: [" + dirpath + "], path: [" + tf.get_path() + "]"));
+                        " dirpath: [" + dirpath + "], path: [" + tf.path() + "]"));
             }
         }
         return res;
@@ -148,7 +148,7 @@ private:
         auto fd = tf.open_read();
         std::array<char, 4096> buf;
         si::string_sink sink{};
-        si::copy_all(fd, sink, buf.data(), buf.size());
+        si::copy_all(fd, sink, buf);
         return std::move(sink.get_string());
     }
     

@@ -20,6 +20,7 @@
 #include "staticlib/mustache.hpp"
 #include "staticlib/pimpl/pimpl_forward_macros.hpp"
 #include "staticlib/serialization.hpp"
+#include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
 #include "common/WiltonInternalException.hpp"
@@ -41,6 +42,7 @@ namespace si = staticlib::io;
 namespace sh = staticlib::httpserver;
 namespace sm = staticlib::mustache;
 namespace ss = staticlib::serialization;
+namespace st = staticlib::tinydir;
 namespace su = staticlib::utils;
 
 using partmap_type = const std::map<std::string, std::string>&;
@@ -107,10 +109,10 @@ public:
     }
 
     void send_file(Request&, std::string file_path, std::function<void(bool)> finalizer) {
-        su::FileDescriptor fd{file_path, 'r'};
+        auto fd = st::TinydirFileSource(file_path);
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
-        auto fd_ptr = si::make_source_istream_ptr(std::move(fd));
+        auto fd_ptr = std::unique_ptr<std::streambuf>(si::make_unbuffered_istreambuf_ptr(std::move(fd)));
         auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(fd_ptr), std::move(finalizer));
         sender->send();
     }
@@ -119,7 +121,7 @@ public:
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         auto mp = sm::MustacheSource(mustache_file_path, std::move(json), mustache_partials);
-        auto mp_ptr = si::make_source_istream_ptr(std::move(mp));
+        auto mp_ptr = std::unique_ptr<std::streambuf>(si::make_unbuffered_istreambuf_ptr(std::move(mp)));
         auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(mp_ptr));
         sender->send();
     }

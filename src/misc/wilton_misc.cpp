@@ -29,11 +29,11 @@ void wilton_free(char* errmsg) /* noexcept */ {
 char* wilton_tcp_wait_for_connection(const char* ip_addr, int ip_addr_len, 
         int tcp_port, int timeout_millis) /* noexcept */ {
     if (nullptr == ip_addr) return su::alloc_copy(TRACEMSG("Null 'ip_addr' parameter specified"));
-    if (!su::is_uint32(ip_addr_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32(ip_addr_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'ip_addr_len' parameter specified: [" + sc::to_string(ip_addr_len) + "]"));
-    if (!su::is_positive_uint16(tcp_port)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(tcp_port)) return su::alloc_copy(TRACEMSG(
             "Invalid 'tcp_port' parameter specified: [" + sc::to_string(tcp_port) + "]"));
-    if (!su::is_positive_uint32(timeout_millis)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32_positive(timeout_millis)) return su::alloc_copy(TRACEMSG(
             "Invalid 'timeout_millis' parameter specified: [" + sc::to_string(timeout_millis) + "]"));
     try {
         uint32_t ip_addr_len_u32 = static_cast<uint32_t> (ip_addr_len);

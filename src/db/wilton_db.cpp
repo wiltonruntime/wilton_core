@@ -58,7 +58,7 @@ char* wilton_DBConnection_open(
         int conn_url_len) /* noexcept */ {
     if (nullptr == conn_out) return su::alloc_copy(TRACEMSG("Null 'conn_out' parameter specified"));
     if (nullptr == conn_url) return su::alloc_copy(TRACEMSG("Null 'conn_url' parameter specified"));
-    if (!su::is_positive_uint16(conn_url_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint16_positive(conn_url_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'conn_url_len' parameter specified: [" + sc::to_string(conn_url_len) + "]"));
     try {
         uint16_t conn_url_len_u16 = static_cast<uint16_t> (conn_url_len);
@@ -83,10 +83,10 @@ char* wilton_DBConnection_query(
         int* result_set_len_out) {
     if (nullptr == conn) return su::alloc_copy(TRACEMSG("Null 'conn' parameter specified"));
     if (nullptr == sql_text) return su::alloc_copy(TRACEMSG("Null 'sql_text' parameter specified"));
-    if (!su::is_positive_uint32(sql_text_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32_positive(sql_text_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'sql_text_len' parameter specified: [" + sc::to_string(sql_text_len) + "]"));
     if (nullptr == params_json) return su::alloc_copy(TRACEMSG("Null 'params_json' parameter specified"));
-    if (!su::is_uint32(params_json_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32(params_json_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'params_json_len' parameter specified: [" + sc::to_string(params_json_len) + "]"));
     if (nullptr == result_set_out) return su::alloc_copy(TRACEMSG("Null 'result_set_out' parameter specified"));
     if (nullptr == result_set_len_out) return su::alloc_copy(TRACEMSG("Null 'result_set_len_out' parameter specified"));
@@ -118,10 +118,10 @@ char* wilton_DBConnection_execute(
         int params_json_len) {
     if (nullptr == conn) return su::alloc_copy(TRACEMSG("Null 'conn' parameter specified"));
     if (nullptr == sql_text) return su::alloc_copy(TRACEMSG("Null 'sql_text' parameter specified"));
-    if (!su::is_positive_uint32(sql_text_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32_positive(sql_text_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'sql_text_len' parameter specified: [" + sc::to_string(sql_text_len) + "]"));
     if (nullptr == params_json) return su::alloc_copy(TRACEMSG("Null 'params_json' parameter specified"));
-    if (!su::is_uint32(params_json_len)) return su::alloc_copy(TRACEMSG(
+    if (!sc::is_uint32(params_json_len)) return su::alloc_copy(TRACEMSG(
             "Invalid 'params_json_len' parameter specified: [" + sc::to_string(params_json_len) + "]"));
     try {
         uint32_t sql_text_len_u32 = static_cast<uint32_t> (sql_text_len);

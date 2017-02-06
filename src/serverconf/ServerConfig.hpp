@@ -88,15 +88,17 @@ public:
     
     staticlib::serialization::JsonValue to_json() const {
         namespace sr = staticlib::ranges;
-        auto drs = sr::transform(sr::refwrap(documentRoots), [](const serverconf::DocumentRoot& el) {
-            return el.to_json();
-        });
         return {
             {"numberOfThreads", numberOfThreads},
             {"tcpPort", tcpPort},
             {"ipAddress", ipAddress},
             {"ssl", ssl.to_json()},
-            {"documentRoots", drs},
+            {"documentRoots", [this]() {
+                auto drs = sr::transform(sr::refwrap(documentRoots), [](const serverconf::DocumentRoot& el) {
+                    return el.to_json();
+                });
+                return drs.to_vector();
+            }()},
             {"requestPayload", requestPayload.to_json()},
             {"mustache", mustache.to_json()}
         };

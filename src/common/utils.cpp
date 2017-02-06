@@ -8,6 +8,7 @@
 #include "common/utils.hpp"
 
 #include "staticlib/io.hpp"
+#include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
 #include "wilton/wilton.h"
@@ -19,8 +20,10 @@ namespace common {
 
 namespace { // anonymous
 
+namespace sc = staticlib::config;
 namespace si = staticlib::io;
 namespace ss = staticlib::serialization;
+namespace st = staticlib::tinydir;
 namespace su = staticlib::utils;
 
 } //namespace
@@ -65,7 +68,7 @@ int64_t get_json_int64(const ss::JsonField& field) {
 }
 
 uint32_t get_json_uint32(const staticlib::serialization::JsonField& field) {
-    if (ss::JsonType::INTEGER != field.type() || !su::is_uint32(field.as_int64())) {
+    if (ss::JsonType::INTEGER != field.type() || !sc::is_uint32(field.as_int64())) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
                 " type: [" + ss::stringify_json_type(field.type()) + "]," +
                 " value: [" + ss::dump_json_to_string(field.value()) + "]"));
@@ -74,7 +77,7 @@ uint32_t get_json_uint32(const staticlib::serialization::JsonField& field) {
 }
 
 uint16_t get_json_uint16(const staticlib::serialization::JsonField& field) {
-    if (ss::JsonType::INTEGER != field.type() || !su::is_uint16(field.as_int64())) {
+    if (ss::JsonType::INTEGER != field.type() || !sc::is_uint16(field.as_int64())) {
         throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
                 " type: [" + ss::stringify_json_type(field.type()) + "]," +
                 " value: [" + ss::dump_json_to_string(field.value()) + "]"));
@@ -167,7 +170,7 @@ void dump_error(const std::string& directory, const std::string& msg) {
         // random postfix
         std::string id = su::RandomStringGenerator().generate(12);
         auto errfile = directory + "wilton_ERROR_" + id + ".txt";
-        auto fd = su::FileDescriptor(errfile, 'w');
+        auto fd = st::TinydirFileSink(errfile);
         si::write_all(fd, msg);
     } catch (...) {
         // give up
