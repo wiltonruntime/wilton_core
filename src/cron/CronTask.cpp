@@ -9,7 +9,8 @@
 
 #include <atomic>
 #include <chrono>
-#include <memory>
+#include <condition_variable>
+#include <mutex>
 #include <thread>
 
 #include "staticlib/cron.hpp"
@@ -27,30 +28,41 @@ using task_fun_type = std::function<void()>;
 } //namespace
 
 class CronTask::Impl : public staticlib::pimpl::PimplObject::Impl {
-    std::shared_ptr<std::atomic<bool>> running;
+    std::mutex mutex;
+    std::condition_variable cv;
+    
+    cr::CronExpression cron;
+    std::function<void()> task;
+    std::thread worker;
+    std::atomic<bool> running;
     
 public:
-    Impl(const std::string& cronexpr, std::function<void()> task) :
-    running(new std::atomic<bool>(true)) {
-        // check that expr is valid
-        auto tmp = cr::CronExpression(cronexpr);
-        (void) tmp;
-        auto shared_running = this->running;
-        auto worker = std::thread([shared_running, cronexpr, task] {
-            auto cron = cr::CronExpression(cronexpr);
-            while (shared_running->load()) {
+    ~Impl() STATICLIB_NOEXCEPT {};
+    
+    Impl(const std::string& cronexpr, std::function<void()> crontask) :
+    cron(cronexpr),
+    task(std::move(crontask)),
+    running(true) {
+        worker = std::thread([this] {
+            while (running.load()) {
                 std::chrono::seconds secs = cron.next();
-                std::this_thread::sleep_for(secs);
-                if (shared_running->load()) {
+                {
+                    std::unique_lock<std::mutex> guard{mutex};
+                    cv.wait_for(guard, secs, [this]{
+                        return !running.load();
+                    });
+                }
+                if (running.load()) {
                     task();
                 }
             }
         });
-        worker.detach();
     }
         
     void stop(CronTask&) {
-        this->running->store(false);
+        running.store(false);
+        cv.notify_all();
+        this->worker.join();
     }
 };
 PIMPL_FORWARD_CONSTRUCTOR(CronTask, (const std::string&)(task_fun_type), (), common::WiltonInternalException)
