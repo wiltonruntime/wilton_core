@@ -42,7 +42,7 @@ public:
     HttpView& operator=(HttpView&&) = delete;
 
     HttpView(const ss::json_value& json) {
-        if (ss::json_type::object != json.type()) throw common::WiltonInternalException(TRACEMSG(
+        if (ss::json_type::object != json.type()) throw common::wilton_internal_exception(TRACEMSG(
                 "Invalid 'views' entry: must be an 'object'," +
                 " entry: [" + ss::dump_json_to_string(json) + "]"));
         for (const ss::json_field& fi : json.as_object()) {
@@ -55,7 +55,7 @@ public:
                 common::check_json_callback_script(fi);
                 callbackScript = fi.value().clone();
             } else {
-                throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+                throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
             }
         }
     }
@@ -114,14 +114,14 @@ std::vector<HttpView> extract_and_delete_views(ss::json_value& conf) {
     for (auto it = fields.begin(); it != fields.end(); ++it) {
         ss::json_field& fi = *it;
         if ("views" == fi.name()) {
-            if (ss::json_type::array != fi.type()) throw common::WiltonInternalException(TRACEMSG(
+            if (ss::json_type::array != fi.type()) throw common::wilton_internal_exception(TRACEMSG(
                     "Invalid configuration object specified: 'views' attr is not a list," +
                     " conf: [" + ss::dump_json_to_string(conf) + "]"));
-            if (0 == fi.as_array().size()) throw common::WiltonInternalException(TRACEMSG(
+            if (0 == fi.as_array().size()) throw common::wilton_internal_exception(TRACEMSG(
                     "Invalid configuration object specified: 'views' attr is am empty list," +
                     " conf: [" + ss::dump_json_to_string(conf) + "]"));
             for (auto& va : fi.as_array()) {
-                if (ss::json_type::object != va.type()) throw common::WiltonInternalException(TRACEMSG(
+                if (ss::json_type::object != va.type()) throw common::wilton_internal_exception(TRACEMSG(
                         "Invalid configuration object specified: 'views' is not a 'object'," +
                         "index: [" + sc::to_string(i) + "], conf: [" + ss::dump_json_to_string(conf) + "]"));
                 views.emplace_back(HttpView(va));
@@ -132,7 +132,7 @@ std::vector<HttpView> extract_and_delete_views(ss::json_value& conf) {
         }
         i++;
     }
-    throw common::WiltonInternalException(TRACEMSG(
+    throw common::wilton_internal_exception(TRACEMSG(
             "Invalid configuration object specified: 'views' list not specified," +
             " conf: [" + ss::dump_json_to_string(conf) + "]"));
 }
@@ -140,7 +140,7 @@ std::vector<HttpView> extract_and_delete_views(ss::json_value& conf) {
 void send_system_error(int64_t requestHandle, std::string errmsg) {
     wilton_Request* request = static_request_registry().remove(requestHandle);
     if (nullptr != request) {
-        std::string conf{R"({"statusCode": 500, "statusMessage": "Server Error"})"};
+        std::string conf{R"({"statusCode": 500, "statusMessage": "server Error"})"};
         wilton_Request_set_response_metadata(request, conf.c_str(), conf.length());
         wilton_Request_send_response(request, errmsg.c_str(), errmsg.length());
         static_request_registry().put(request);
@@ -179,7 +179,7 @@ std::vector<std::unique_ptr<wilton_HttpPath, HttpPathDeleter>> create_paths(
                     }
                     static_request_registry().remove(requestHandle);
                 });
-        if (nullptr != err) throw common::WiltonInternalException(TRACEMSG(err));
+        if (nullptr != err) throw common::wilton_internal_exception(TRACEMSG(err));
         res.emplace_back(ptr, HttpPathDeleter());
     }
     return res;
@@ -222,14 +222,14 @@ std::string server_stop(const std::string& data) {
         if ("serverHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'serverHandle' not specified"));
     // get handle
     auto pa = static_server_registry().remove(handle);
-    if (nullptr == pa.first) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == pa.first) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'serverHandle' parameter specified"));
     // call wilton
     char* err = wilton_Server_stop(pa.first);
@@ -249,14 +249,14 @@ std::string request_get_metadata(const std::string& data) {
         if ("requestHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'requestHandle' not specified"));
     // get handle
     wilton_Request* request = static_request_registry().remove(handle);
-    if (nullptr == request) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
     char* out;
@@ -279,14 +279,14 @@ std::string request_get_data(const std::string& data) {
         if ("requestHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'requestHandle' not specified"));
     // get handle
     wilton_Request* request = static_request_registry().remove(handle);
-    if (nullptr == request) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
     char* out;
@@ -307,14 +307,14 @@ std::string request_get_data_filename(const std::string& data) {
         if ("requestHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'requestHandle' not specified"));
     // get handle
     wilton_Request* request = static_request_registry().remove(handle);
-    if (nullptr == request) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
     char* out;
@@ -338,16 +338,16 @@ std::string request_set_response_metadata(const std::string& data) {
         } else if ("metadata" == name) {
             metadata = ss::dump_json_to_string(fi.value());
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'requestHandle' not specified"));
-    if (metadata.empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (metadata.empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'metadata' not specified"));
     // get handle
     wilton_Request* request = static_request_registry().remove(handle);
-    if (nullptr == request) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
     char* err = wilton_Request_set_response_metadata(request, metadata.c_str(), metadata.length());
@@ -368,15 +368,15 @@ std::string request_send_response(const std::string& data) {
         } else if ("data" == name) {
             rdata = fi.as_string();
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'requestHandle' not specified"));
     const std::string& request_data = rdata.get().empty() ? "{}" : rdata.get();
     // get handle
     wilton_Request* request = static_request_registry().remove(handle);
-    if (nullptr == request) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
     char* err = wilton_Request_send_response(request, request_data.c_str(), request_data.length());
@@ -397,16 +397,16 @@ std::string request_send_temp_file(const std::string& data) {
         } else if ("filePath" == name) {
             file = common::get_json_string(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'requestHandle' not specified"));
-    if (file.empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (file.empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'filePath' not specified"));
     // get handle
     wilton_Request* request = static_request_registry().remove(handle);
-    if (nullptr == request) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
     char* err = wilton_Request_send_file(request, file.c_str(), file.length(),
@@ -436,12 +436,12 @@ std::string request_send_mustache(const std::string& data) {
         } else if ("values" == name) {
             values = ss::dump_json_to_string(fi.value());
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'requestHandle' not specified"));
-    if (rfile.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rfile.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'mustacheFilePath' not specified"));
     if (values.empty()) {
         values = "{}";
@@ -449,7 +449,7 @@ std::string request_send_mustache(const std::string& data) {
     const std::string& file = rfile.get();
     // get handle
     wilton_Request* request = static_request_registry().remove(handle);
-    if (nullptr == request) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
     char* err = wilton_Request_send_mustache(request, file.c_str(), file.length(),
@@ -468,14 +468,14 @@ std::string request_send_later(const std::string& data) {
         if ("requestHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'requestHandle' not specified"));
     // get handle
     wilton_Request* request = static_request_registry().remove(handle);
-    if (nullptr == request) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
     wilton_ResponseWriter* writer;
@@ -500,15 +500,15 @@ std::string request_send_with_response_writer(const std::string& data) {
         } else if ("data" == name) {
             rdata = fi.as_string();
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'responseWriterHandle' not specified"));
     const std::string& request_data = rdata.get().empty() ? "{}" : rdata.get();
     // get handle, note: won't be put back - one-off operation   
     wilton_ResponseWriter* writer = static_response_writer_registry().remove(handle);
-    if (nullptr == writer) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == writer) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'responseWriterHandle' parameter specified"));
     // call wilton
     char* err = wilton_ResponseWriter_send(writer, request_data.c_str(), request_data.length());

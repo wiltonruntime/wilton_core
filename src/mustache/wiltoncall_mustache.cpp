@@ -30,10 +30,10 @@ std::string mustache_render(const std::string& data) {
         } else if ("values" == name) {
             values = ss::dump_json_to_string(fi.value());
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (rtemplate.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rtemplate.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'template' not specified"));
     const std::string& templade = rtemplate.get();
     if (values.empty()) {
@@ -60,10 +60,10 @@ std::string mustache_render_file(const std::string& data) {
         } else if ("values" == name) {
             values = ss::dump_json_to_string(fi.value());
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (rfile.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rfile.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'file' not specified"));
     const std::string& file = rfile.get();
     if (values.empty()) {

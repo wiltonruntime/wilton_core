@@ -13,12 +13,12 @@
 
 #include "staticlib/serialization.hpp"
 
-#include "common/WiltonInternalException.hpp"
+#include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
 
 namespace wilton {
 
-//// Server
+// Server
 namespace server {
 
 std::string server_create(const std::string& data);

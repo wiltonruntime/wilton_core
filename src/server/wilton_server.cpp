@@ -14,12 +14,12 @@
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
-#include "server/HttpPath.hpp"
-#include "server/Request.hpp"
-#include "server/ResponseWriter.hpp"
-#include "server/Server.hpp"
+#include "server/http_path.hpp"
+#include "server/request.hpp"
+#include "server/response_writer.hpp"
+#include "server/server.hpp"
 
-#include "serverconf/ResponseMetadata.hpp"
+#include "serverconf/response_metadata.hpp"
 
 namespace { // anonymous
 
@@ -33,13 +33,13 @@ namespace wj = wilton::serverconf;
 
 struct wilton_Server {
 private:
-    ws::Server delegate;
+    ws::server delegate;
 
 public:
-    wilton_Server(ws::Server&& delegate) :
+    wilton_Server(ws::server&& delegate) :
     delegate(std::move(delegate)) { }
 
-    ws::Server& impl() {
+    ws::server& impl() {
         return delegate;
     }
 };
@@ -47,51 +47,51 @@ public:
 struct wilton_Request {
 private:
     // note: NON-owning
-    wilton::server::Request& delegate;
+    wilton::server::request& delegate;
 public:
 
-    wilton_Request(wilton::server::Request& delegate) :
+    wilton_Request(wilton::server::request& delegate) :
     delegate(delegate) { }
 
-    wilton::server::Request& impl() {
+    wilton::server::request& impl() {
         return delegate;
     }
 };
 
 struct wilton_ResponseWriter {
 private:
-    ws::ResponseWriter delegate;
+    ws::response_writer delegate;
 
 public:
-    wilton_ResponseWriter(ws::ResponseWriter&& delegate) :
+    wilton_ResponseWriter(ws::response_writer&& delegate) :
     delegate(std::move(delegate)) { }
 
-    ws::ResponseWriter& impl() {
+    ws::response_writer& impl() {
         return delegate;
     }
 };
 
 struct wilton_HttpPath {
 private:
-    ws::HttpPath delegate;
+    ws::http_path delegate;
 
 public:
 
-    wilton_HttpPath(ws::HttpPath&& delegate) :
+    wilton_HttpPath(ws::http_path&& delegate) :
     delegate(std::move(delegate)) { }
 
-    ws::HttpPath& impl() {
+    ws::http_path& impl() {
         return delegate;
     }
 };
 
 namespace { // anonymous
 
-std::vector<std::reference_wrapper<ws::HttpPath>> wrap_paths(wilton_HttpPath** paths, uint16_t paths_len) {
-    std::vector<std::reference_wrapper < ws::HttpPath>> res;
+std::vector<std::reference_wrapper<ws::http_path>> wrap_paths(wilton_HttpPath** paths, uint16_t paths_len) {
+    std::vector<std::reference_wrapper < ws::http_path>> res;
     for (int i = 0; i < paths_len; i++) {
         wilton_HttpPath* ptr = paths[i];
-        std::reference_wrapper<ws::HttpPath> ref = std::ref(ptr->impl());
+        std::reference_wrapper<ws::http_path> ref = std::ref(ptr->impl());
         res.push_back(ref);
     }
     return res;
@@ -117,11 +117,11 @@ char* wilton_HttpPath_create(wilton_HttpPath** http_path_out, const char* method
         std::string path_str = std::string(path, path_len_u16);
         auto ha_ctx = handler_ctx;
         auto ha_cb = handler_cb;
-        auto handler = [ha_ctx, ha_cb](ws::Request& req) {
+        auto handler = [ha_ctx, ha_cb](ws::request& req) {
             wilton_Request req_pass{req};
             ha_cb(ha_ctx, std::addressof(req_pass));
         };
-        ws::HttpPath http_path{std::move(method_str), std::move(path_str), handler};
+        ws::http_path http_path{std::move(method_str), std::move(path_str), handler};
         wilton_HttpPath* http_path_ptr = new wilton_HttpPath(std::move(http_path));
         *http_path_out = http_path_ptr;
         return nullptr;
@@ -151,7 +151,7 @@ char* wilton_Server_create /* noexcept */ (wilton_Server** server_out, const cha
         ss::json_value json = ss::load_json_from_string(conf_str);
         uint16_t paths_len_u16 = static_cast<uint16_t>(paths_len);
         auto pathsvec = wrap_paths(paths, paths_len_u16);
-        ws::Server server{std::move(json), std::move(pathsvec)};
+        ws::server server{std::move(json), std::move(pathsvec)};
         wilton_Server* server_ptr = new wilton_Server(std::move(server));
         *server_out = server_ptr;
         return nullptr;
@@ -231,7 +231,7 @@ char* wilton_Request_set_response_metadata(wilton_Request* request,
         uint32_t metadata_json_len_u32 = static_cast<uint32_t> (metadata_json_len);
         std::string metadata{metadata_json, metadata_json_len_u32};
         ss::json_value json = ss::load_json_from_string(metadata);
-        wj::ResponseMetadata rm{json};
+        wj::response_metadata rm{json};
         request->impl().set_response_metadata(std::move(rm));
         return nullptr;
     } catch (const std::exception& e) {
@@ -313,7 +313,7 @@ char* wilton_Request_send_later(
     if (nullptr == request) return su::alloc_copy(TRACEMSG("Null 'request' parameter specified"));    
     if (nullptr == writer_out) return su::alloc_copy(TRACEMSG("Null 'writer_out' parameter specified"));
     try {
-        ws::ResponseWriter writer = request->impl().send_later();
+        ws::response_writer writer = request->impl().send_later();
         wilton_ResponseWriter* writer_ptr = new wilton_ResponseWriter(std::move(writer));
         *writer_out = writer_ptr;
         return nullptr;

@@ -33,14 +33,14 @@ std::string tcp_wait_for_connection(const std::string& data) {
         } else if ("timeoutMillis" == name) {
             timeout = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == timeout) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == timeout) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'timeoutMillis' not specified"));
-    if (rip.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rip.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'ipAddress' not specified"));
-    if (-1 == port) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == port) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'tcpPort' not specified"));
     const std::string& ip = rip.get();
     // call wilton

@@ -39,12 +39,12 @@ std::string logging_log(const std::string& data) {
         } else if ("message" == name) {
             rmessage = fi.as_string();
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (rlevel.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rlevel.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'level' not specified"));
-    if (rlogger.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rlogger.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'logger' not specified"));
     const std::string& level = rlevel.get();
     const std::string& logger = rlogger.get();
@@ -68,12 +68,12 @@ std::string logging_is_level_enabled(const std::string& data) {
         } else if ("logger" == name) {
             rlogger = common::get_json_string(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (rlevel.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rlevel.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'level' not specified"));
-    if (rlogger.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rlogger.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'logger' not specified"));
     const std::string& level = rlevel.get();
     const std::string& logger = rlogger.get();

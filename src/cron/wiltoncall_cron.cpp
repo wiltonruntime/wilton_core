@@ -42,12 +42,12 @@ std::string cron_start(const std::string& data) {
         } else if ("expression" == name) {
             rexpr = common::get_json_string(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (ss::json_type::nullt == rcallback.get().type()) throw common::WiltonInternalException(TRACEMSG(
+    if (ss::json_type::nullt == rcallback.get().type()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'callbackScript' not specified"));
-    if (rexpr.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rexpr.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'url' not specified"));
     const ss::json_value& callback = rcallback.get();
     const std::string& expr = rexpr.get();
@@ -84,14 +84,14 @@ std::string cron_stop(const std::string& data) {
         if ("cronHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'cronHandle' not specified"));
     // get handle
     auto pa = static_registry().remove(handle);
-    if (nullptr == pa.first) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == pa.first) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'cronHandle' parameter specified"));
     // call wilton
     char* err = wilton_CronTask_stop(pa.first);

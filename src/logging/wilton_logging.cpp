@@ -13,8 +13,8 @@
 #include "staticlib/serialization.hpp"
 #include "staticlib/utils.hpp"
 
-#include "logging/WiltonLogger.hpp"
-#include "logging/LoggingConfig.hpp"
+#include "logging/wilton_logger.hpp"
+#include "logging/logging_config.hpp"
 
 namespace { // anonymous
 
@@ -35,8 +35,8 @@ char* wilton_logger_initialize(
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
         std::string conf_json_str{conf_json, conf_json_len_u32};
         ss::json_value conf = ss::load_json_from_string(conf_json_str);
-        wl::LoggingConfig lc{conf};
-        wl::WiltonLogger::apply_config(std::move(lc));
+        wl::logging_config lc{conf};
+        wl::wilton_logger::apply_config(std::move(lc));
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -67,7 +67,7 @@ char* wilton_logger_log(
         std::string logger_name_str{logger_name, logger_name_len_u32};
         uint32_t message_len_u32 = static_cast<uint32_t> (message_len);
         std::string message_str{message, message_len_u32};
-        wl::WiltonLogger::log(level_name_str, logger_name_str, message_str);
+        wl::wilton_logger::log(level_name_str, logger_name_str, message_str);
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -93,7 +93,7 @@ char* wilton_logger_is_level_enabled(
         std::string logger_name_str{logger_name, logger_name_len_u32};
         uint32_t level_name_len_u32 = static_cast<uint32_t> (level_name_len);
         std::string level_name_str{level_name, level_name_len_u32};
-        bool res = wl::WiltonLogger::is_enabled_for_level(logger_name_str, level_name_str);
+        bool res = wl::wilton_logger::is_enabled_for_level(logger_name_str, level_name_str);
         if (res) {
             *res_out = 1;
         } else {
@@ -107,7 +107,7 @@ char* wilton_logger_is_level_enabled(
 
 char* wilton_logger_shutdown() {
     try {
-        wl::WiltonLogger::shutdown();
+        wl::wilton_logger::shutdown();
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));

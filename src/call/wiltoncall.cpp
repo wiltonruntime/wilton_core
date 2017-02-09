@@ -12,8 +12,8 @@
 #include "staticlib/config.hpp"
 #include "staticlib/utils.hpp"
 
-#include "common/WiltonInternalException.hpp"
-#include "call/WiltoncallRegistry.hpp"
+#include "common/wilton_internal_exception.hpp"
+#include "call/wiltoncall_registry.hpp"
 #include "call/wiltoncall_internal.hpp"
 
 namespace { // anonymous
@@ -22,8 +22,8 @@ namespace sc = staticlib::config;
 namespace su = staticlib::utils;
 namespace wc = wilton::common;
 
-wilton::call::WiltoncallRegistry& static_registry() {
-    static wilton::call::WiltoncallRegistry registry;
+wilton::call::wiltoncall_registry& static_registry() {
+    static wilton::call::wiltoncall_registry registry;
     return registry;
 }
 
@@ -35,7 +35,7 @@ char* wiltoncall_init() {
         static bool the_false = false;
         static std::atomic<bool> initilized{false};
         if (!initilized.compare_exchange_strong(the_false, true)) {
-            throw wc::WiltonInternalException(TRACEMSG("'wiltoncall' registry is already initialized"));
+            throw wc::wilton_internal_exception(TRACEMSG("'wiltoncall' registry is already initialized"));
         }
         
         // registry
@@ -148,13 +148,13 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
             if (nullptr != err) {
                 std::string msg = TRACEMSG(std::string(err));
                 wilton_free(err);
-                throw wc::WiltonInternalException(msg);
+                throw wc::wilton_internal_exception(msg);
             }
             if (nullptr == out) {
-                throw wc::WiltonInternalException(TRACEMSG("Invalid 'null' result returned"));
+                throw wc::wilton_internal_exception(TRACEMSG("Invalid 'null' result returned"));
             }
             if (!sc::is_uint32(out_len)){
-                throw wc::WiltonInternalException(TRACEMSG(
+                throw wc::wilton_internal_exception(TRACEMSG(
                     "Invalid result length value returned: [" + sc::to_string(out_len) + "]"));
             }
             return std::string(out, static_cast<uint32_t>(out_len));

@@ -13,7 +13,7 @@
 
 #include "wilton/wilton.h"
 
-#include "common/WiltonInternalException.hpp"
+#include "common/wilton_internal_exception.hpp"
 
 namespace wilton {
 namespace common {
@@ -40,7 +40,7 @@ const ss::json_value& empty_json() {
 
 void throw_wilton_error(char* err, const std::string& msg) {
     wilton_free(err);
-    throw WiltonInternalException(msg);
+    throw wilton_internal_exception(msg);
 }
 
 std::string wrap_wilton_output(char* out, int out_len) {
@@ -51,7 +51,7 @@ std::string wrap_wilton_output(char* out, int out_len) {
 
 const std::string& get_json_string(const ss::json_field& field) {
     if (ss::json_type::string != field.type() || field.as_string().empty()) {
-        throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+        throw common::wilton_internal_exception(TRACEMSG("Invalid '" + field.name() + "' field,"
             " type: [" + ss::stringify_json_type(field.type()) + "]," +
             " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
@@ -60,7 +60,7 @@ const std::string& get_json_string(const ss::json_field& field) {
 
 int64_t get_json_int64(const ss::json_field& field) {
     if (ss::json_type::integer != field.type()) {
-        throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+        throw common::wilton_internal_exception(TRACEMSG("Invalid '" + field.name() + "' field,"
                 " type: [" + ss::stringify_json_type(field.type()) + "]," +
                 " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
@@ -69,7 +69,7 @@ int64_t get_json_int64(const ss::json_field& field) {
 
 uint32_t get_json_uint32(const staticlib::serialization::json_field& field) {
     if (ss::json_type::integer != field.type() || !sc::is_uint32(field.as_int64())) {
-        throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+        throw common::wilton_internal_exception(TRACEMSG("Invalid '" + field.name() + "' field,"
                 " type: [" + ss::stringify_json_type(field.type()) + "]," +
                 " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
@@ -78,7 +78,7 @@ uint32_t get_json_uint32(const staticlib::serialization::json_field& field) {
 
 uint16_t get_json_uint16(const staticlib::serialization::json_field& field) {
     if (ss::json_type::integer != field.type() || !sc::is_uint16(field.as_int64())) {
-        throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+        throw common::wilton_internal_exception(TRACEMSG("Invalid '" + field.name() + "' field,"
                 " type: [" + ss::stringify_json_type(field.type()) + "]," +
                 " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
@@ -87,7 +87,7 @@ uint16_t get_json_uint16(const staticlib::serialization::json_field& field) {
 
 bool get_json_bool(const ss::json_field& field) {
     if (ss::json_type::boolean != field.type()) {
-        throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+        throw common::wilton_internal_exception(TRACEMSG("Invalid '" + field.name() + "' field,"
                 " type: [" + ss::stringify_json_type(field.type()) + "]," +
                 " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
@@ -97,7 +97,7 @@ bool get_json_bool(const ss::json_field& field) {
 const std::vector<staticlib::serialization::json_value>& get_json_array(
         const staticlib::serialization::json_field& field) {
     if (ss::json_type::array != field.type()) {
-        throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+        throw common::wilton_internal_exception(TRACEMSG("Invalid '" + field.name() + "' field,"
                 " type: [" + ss::stringify_json_type(field.type()) + "]," +
                 " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
@@ -107,7 +107,7 @@ const std::vector<staticlib::serialization::json_value>& get_json_array(
 const std::vector<staticlib::serialization::json_field>& get_json_object(
         const staticlib::serialization::json_field& field) {
     if (ss::json_type::object != field.type()) {
-        throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+        throw common::wilton_internal_exception(TRACEMSG("Invalid '" + field.name() + "' field,"
                 " type: [" + ss::stringify_json_type(field.type()) + "]," +
                 " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
@@ -116,7 +116,7 @@ const std::vector<staticlib::serialization::json_field>& get_json_object(
 
 void check_json_callback_script(const staticlib::serialization::json_field& field) {
     if (ss::json_type::object != field.type()) {
-        throw common::WiltonInternalException(TRACEMSG("Invalid '" + field.name() + "' field,"
+        throw common::wilton_internal_exception(TRACEMSG("Invalid '" + field.name() + "' field,"
                 " type: [" + ss::stringify_json_type(field.type()) + "]," +
                 " value: [" + ss::dump_json_to_string(field.value()) + "]"));
     }
@@ -127,40 +127,40 @@ void check_json_callback_script(const staticlib::serialization::json_field& fiel
         auto& name = fi.name();
         if ("module" == name) {
             if (ss::json_type::string != fi.type()) {
-                throw common::WiltonInternalException(TRACEMSG("Invalid '" + fi.name() + "' field,"
+                throw common::wilton_internal_exception(TRACEMSG("Invalid '" + fi.name() + "' field,"
                         " type: [" + ss::stringify_json_type(fi.type()) + "]," +
                         " value: [" + ss::dump_json_to_string(fi.value()) + "]"));
             }
             module = true;
         } else if ("func" == name) {
             if (ss::json_type::string != fi.type()) {
-                throw common::WiltonInternalException(TRACEMSG("Invalid '" + fi.name() + "' field,"
+                throw common::wilton_internal_exception(TRACEMSG("Invalid '" + fi.name() + "' field,"
                         " type: [" + ss::stringify_json_type(fi.type()) + "]," +
                         " value: [" + ss::dump_json_to_string(fi.value()) + "]"));
             }
             func = true;
         } else if ("args" == name) {
             if (ss::json_type::array != fi.type()) {
-                throw common::WiltonInternalException(TRACEMSG("Invalid '" + fi.name() + "' field,"
+                throw common::wilton_internal_exception(TRACEMSG("Invalid '" + fi.name() + "' field,"
                         " type: [" + ss::stringify_json_type(fi.type()) + "]," +
                         " value: [" + ss::dump_json_to_string(fi.value()) + "]"));
             }
             args = true;
         } else {
-            throw common::WiltonInternalException(TRACEMSG(
+            throw common::wilton_internal_exception(TRACEMSG(
                     "Unknown data field: [" + name + "] in object: [" + field.name() + "]"));
         }
     }
     if (!module) {
-        throw common::WiltonInternalException(TRACEMSG(
+        throw common::wilton_internal_exception(TRACEMSG(
                 "Required field: 'module' is not supplied in object: [" + field.name() + "]"));
     }
     if (!func) {
-        throw common::WiltonInternalException(TRACEMSG(
+        throw common::wilton_internal_exception(TRACEMSG(
                 "Required field: 'func' is not supplied in object: [" + field.name() + "]"));
     }
     if (!args) {
-        throw common::WiltonInternalException(TRACEMSG(
+        throw common::wilton_internal_exception(TRACEMSG(
                 "Required field: 'func' is not supplied in object: [" + field.name() + "]"));
     }
 }

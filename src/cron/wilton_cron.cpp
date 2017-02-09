@@ -12,7 +12,7 @@
 #include "staticlib/config.hpp"
 #include "staticlib/utils.hpp"
 
-#include "cron/CronTask.hpp"
+#include "cron/cron_task.hpp"
 
 namespace { // anonymous
 
@@ -24,13 +24,13 @@ namespace wcr = wilton::cron;
 
 struct wilton_CronTask {
 private:
-    wcr::CronTask cron;
+    wcr::cron_task cron;
 
 public:
-    wilton_CronTask(wcr::CronTask&& cron) :
+    wilton_CronTask(wcr::cron_task&& cron) :
     cron(std::move(cron)) { }
 
-    wcr::CronTask& impl() {
+    wcr::cron_task& impl() {
         return cron;
     }
 };
@@ -51,7 +51,7 @@ char* wilton_CronTask_start(
     try {
         uint16_t cronexpr_len_u16 = static_cast<uint16_t> (cronexpr_len);
         std::string cronexpr_str{cronexpr, cronexpr_len_u16};
-        wcr::CronTask cron{cronexpr_str, [task_ctx, task_cb]{
+        wcr::cron_task cron{cronexpr_str, [task_ctx, task_cb]{
             task_cb(task_ctx);
         }};
         wilton_CronTask* cron_ptr = new wilton_CronTask{std::move(cron)};

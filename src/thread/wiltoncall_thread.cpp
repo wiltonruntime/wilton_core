@@ -31,10 +31,10 @@ std::string thread_run(const std::string& data) {
             common::check_json_callback_script(fi);
             rcallback = fi.value();
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (ss::json_type::nullt == rcallback.get().type()) throw common::WiltonInternalException(TRACEMSG(
+    if (ss::json_type::nullt == rcallback.get().type()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'callbackScript' not specified"));
     const ss::json_value& callback = rcallback.get();
     std::string* callback_str_ptr = new std::string();
@@ -69,10 +69,10 @@ std::string thread_sleep_millis(const std::string& data) {
         if ("millis" == name) {
             millis = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == millis) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == millis) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'millis' not specified"));
     // call wilton
     char* err = wilton_thread_sleep_millis(static_cast<int> (millis));

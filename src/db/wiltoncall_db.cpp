@@ -53,12 +53,12 @@ std::string db_connection_query(const std::string& data) {
         } else if ("params" == name) {
             params = ss::dump_json_to_string(fi.value());
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'connectionHandle' not specified"));
-    if (rsql.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rsql.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'sql' not specified"));
     const std::string& sql = rsql.get();
     if (params.empty()) {
@@ -66,7 +66,7 @@ std::string db_connection_query(const std::string& data) {
     }
     // get handle
     wilton_DBConnection* conn = static_conn_registry().remove(handle);
-    if (nullptr == conn) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == conn) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'connectionHandle' parameter specified"));
     // call wilton
     char* out;
@@ -93,12 +93,12 @@ std::string db_connection_execute(const std::string& data) {
         } else if ("params" == name) {
             params = ss::dump_json_to_string(fi.value());
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'connectionHandle' not specified"));
-    if (rsql.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rsql.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'sql' not specified"));
     const std::string& sql = rsql.get();
     if (params.empty()) {
@@ -106,7 +106,7 @@ std::string db_connection_execute(const std::string& data) {
     }
     // get handle
     wilton_DBConnection* conn = static_conn_registry().remove(handle);
-    if (nullptr == conn) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == conn) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'connectionHandle' parameter specified"));
     // call wilton
     char* err = wilton_DBConnection_execute(conn, sql.c_str(), sql.length(),
@@ -125,14 +125,14 @@ std::string db_connection_close(const std::string& data) {
         if ("connectionHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'connectionHandle' not specified"));
     // get handle
     wilton_DBConnection* conn = static_conn_registry().remove(handle);
-    if (nullptr == conn) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == conn) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'connectionHandle' parameter specified"));
     // call wilton
     char* err = wilton_DBConnection_close(conn);
@@ -152,14 +152,14 @@ std::string db_transaction_start(const std::string& data) {
         if ("connectionHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'connectionHandle' not specified"));
     // get handle
     wilton_DBConnection* conn = static_conn_registry().remove(handle);
-    if (nullptr == conn) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == conn) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'connectionHandle' parameter specified"));
     wilton_DBTransaction* tran;
     char* err = wilton_DBTransaction_start(conn, std::addressof(tran));
@@ -181,14 +181,14 @@ std::string db_transaction_commit(const std::string& data) {
         if ("transactionHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'transactionHandle' not specified"));
     // get handle
     wilton_DBTransaction* tran = static_tran_registry().remove(handle);
-    if (nullptr == tran) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == tran) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'transactionHandle' parameter specified"));
     char* err = wilton_DBTransaction_commit(tran);
     if (nullptr != err) {
@@ -207,14 +207,14 @@ std::string db_transaction_rollback(const std::string& data) {
         if ("transactionHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'transactionHandle' not specified"));
     // get handle
     wilton_DBTransaction* tran = static_tran_registry().remove(handle);
-    if (nullptr == tran) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == tran) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'transactionHandle' parameter specified"));
     char* err = wilton_DBTransaction_rollback(tran);
     if (nullptr != err) {

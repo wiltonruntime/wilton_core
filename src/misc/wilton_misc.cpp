@@ -12,7 +12,7 @@
 
 #include "staticlib/config.hpp"
 #include "staticlib/utils.hpp"
-#include "TCPConnectChecker.hpp"
+#include "tcp_connect_checker.hpp"
 
 namespace { // anonymous
 
@@ -41,7 +41,7 @@ char* wilton_tcp_wait_for_connection(const char* ip_addr, int ip_addr_len,
         uint16_t tcp_port_u16 = static_cast<uint16_t> (tcp_port);
         uint32_t timeout_millis_u32 = static_cast<uint32_t> (timeout_millis);
         std::chrono::milliseconds timeout{timeout_millis_u32};
-        std::string err = wm::TCPConnectChecker::wait_for_connection(timeout, ip_addr_str, tcp_port_u16);
+        std::string err = wm::tcp_connect_checker::wait_for_connection(timeout, ip_addr_str, tcp_port_u16);
         if (err.empty()) {
             return nullptr;
         } else {

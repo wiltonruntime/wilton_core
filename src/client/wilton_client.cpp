@@ -17,9 +17,9 @@
 #include "staticlib/utils.hpp"
 #include "staticlib/tinydir.hpp"
 
-#include "client/ClientResponse.hpp"
-#include "client/ClientRequestConfig.hpp"
-#include "client/ClientSessionConfig.hpp"
+#include "client/client_response.hpp"
+#include "client/client_request_config.hpp"
+#include "client/client_session_config.hpp"
 
 namespace { // anonymous
 
@@ -58,7 +58,7 @@ char* wilton_HttpClient_create(
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
         std::string json_str{conf_json, conf_json_len_u32};
         ss::json_value json = ss::load_json_from_string(json_str);
-        wc::ClientSessionConfig conf{std::move(json)};
+        wc::client_session_config conf{std::move(json)};
         sh::http_session session{std::move(conf.options)};
         wilton_HttpClient* http_ptr = new wilton_HttpClient(std::move(session));
         *http_out = http_ptr;
@@ -106,7 +106,7 @@ char* wilton_HttpClient_execute(
             std::string meta_str{request_metadata_json, static_cast<uint32_t> (request_metadata_len)};
             opts_json = ss::load_json_from_string(meta_str);
         }
-        wc::ClientRequestConfig opts{std::move(opts_json)};
+        wc::client_request_config opts{std::move(opts_json)};
         std::array<char, 4096> buf;
         si::string_sink sink{};
         ss::json_value resp_json{};
@@ -116,12 +116,12 @@ char* wilton_HttpClient_execute(
             // POST will be used by default for this API call
             sh::http_resource resp = http->impl().open_url(url_str, std::move(data_src), opts.options);            
             si::copy_all(resp, sink, buf);
-            resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
+            resp_json = wc::client_response::to_json(std::move(sink.get_string()), resp.get_info());
         } else {
             // GET will be used by default for this API call
             sh::http_resource resp = http->impl().open_url(url_str, opts.options);
             si::copy_all(resp, sink, buf);
-            resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
+            resp_json = wc::client_response::to_json(std::move(sink.get_string()), resp.get_info());
         }
         std::string resp_complete = ss::dump_json_to_string(resp_json);
         *response_data_out = su::alloc_copy(resp_complete);
@@ -162,14 +162,14 @@ char* wilton_HttpClient_send_file(
             std::string meta_str{request_metadata_json, static_cast<uint32_t> (request_metadata_len)};
             opts_json = ss::load_json_from_string(meta_str);
         }
-        wc::ClientRequestConfig opts{std::move(opts_json)};
+        wc::client_request_config opts{std::move(opts_json)};
         std::array<char, 4096> buf;
         std::string file_path_str{file_path, static_cast<uint32_t> (file_path_len)};
         auto fd = st::file_source(file_path_str);
         sh::http_resource resp = http->impl().open_url(url_str, std::move(fd), opts.options);
         si::string_sink sink{};
         si::copy_all(resp, sink, buf);
-        ss::json_value resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
+        ss::json_value resp_json = wc::client_response::to_json(std::move(sink.get_string()), resp.get_info());
         std::string resp_complete = ss::dump_json_to_string(resp_json);
         if (nullptr != finalizer_cb) {
             finalizer_cb(finalizer_ctx, 1);

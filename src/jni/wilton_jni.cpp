@@ -18,7 +18,7 @@
 #include "wilton/wilton.h"
 #include "wilton/wiltoncall.h"
 
-#include "common/WiltonInternalException.hpp"
+#include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
 #include "jni/jni_config.hpp"
 #include "jni_utils.hpp"
@@ -40,7 +40,7 @@ std::atomic<bool>& static_jvm_active() {
 // forward declaration
 JNIEnv* get_jni_env();
 
-class GlobalRefDeleter {
+class global_ref_deleter {
 public:
     void operator()(jobject ref) {
         if (static_jvm_active().load()) {
@@ -49,23 +49,23 @@ public:
     }
 };
 
-class JniCtx {
+class jni_ctx {
 public:
     JavaVM* vm;
-    std::unique_ptr<_jclass, GlobalRefDeleter> wiltonJniClass;
+    std::unique_ptr<_jclass, global_ref_deleter> wiltonJniClass;
     jmethodID describeThrowableMethod;
-    std::unique_ptr<_jclass, GlobalRefDeleter> wiltonGatewayInterface;
+    std::unique_ptr<_jclass, global_ref_deleter> wiltonGatewayInterface;
     jmethodID runScriptMethod;
-    std::unique_ptr<_jclass, GlobalRefDeleter> wiltonExceptionClass;
-    std::unique_ptr<_jobject, GlobalRefDeleter> wiltonGatewayObject;
+    std::unique_ptr<_jclass, global_ref_deleter> wiltonExceptionClass;
+    std::unique_ptr<_jobject, global_ref_deleter> wiltonGatewayObject;
 
-    JniCtx(const JniCtx&) = delete;
+    jni_ctx(const jni_ctx&) = delete;
 
-    JniCtx& operator=(const JniCtx&) = delete;
+    jni_ctx& operator=(const jni_ctx&) = delete;
 
-    JniCtx(JniCtx&&) = delete;
+    jni_ctx(jni_ctx&&) = delete;
 
-    JniCtx& operator=(JniCtx&& other) {
+    jni_ctx& operator=(jni_ctx&& other) {
         this->vm = other.vm;
         other.vm = nullptr;
         this->wiltonJniClass = std::move(other.wiltonJniClass);
@@ -79,46 +79,46 @@ public:
         return *this;
     }
 
-    JniCtx() { }
+    jni_ctx() { }
 
-    JniCtx(JavaVM* vm) :
+    jni_ctx(JavaVM* vm) :
     vm(vm) {
         // env
         JNIEnv* env;
         auto err = vm->GetEnv(reinterpret_cast<void**> (std::addressof(env)), WILTON_JNI_VERSION);
         if (JNI_OK != err) {
-            throw wc::WiltonInternalException(TRACEMSG("Cannot obtain JNI environment"));
+            throw wc::wilton_internal_exception(TRACEMSG("Cannot obtain JNI environment"));
         }
         // jni class
-        this->wiltonJniClass = std::unique_ptr<_jclass, GlobalRefDeleter>(
-                wj::find_java_class(env, WILTON_JNI_CLASS_SIGNATURE_STR), GlobalRefDeleter());
+        this->wiltonJniClass = std::unique_ptr<_jclass, global_ref_deleter>(
+                wj::find_java_class(env, WILTON_JNI_CLASS_SIGNATURE_STR), global_ref_deleter());
         // describe
         this->describeThrowableMethod = wj::find_java_method_static(env, this->wiltonJniClass.get(),
                 WILTON_JNI_CLASS_DESCRIBETHROWABLE_METHOD_STR, WILTON_JNI_CLASS_DESCRIBETHROWABLE_METHOD_SIGNATURE_STR);
         // gateway
-        this->wiltonGatewayInterface = std::unique_ptr<_jclass, GlobalRefDeleter>(
-                wj::find_java_class(env, WILTON_JNI_GATEWAY_INTERFACE_SIGNATURE_STR), GlobalRefDeleter());
+        this->wiltonGatewayInterface = std::unique_ptr<_jclass, global_ref_deleter>(
+                wj::find_java_class(env, WILTON_JNI_GATEWAY_INTERFACE_SIGNATURE_STR), global_ref_deleter());
         // runscript
         this->runScriptMethod = wj::find_java_method(env, this->wiltonGatewayInterface.get(),
                 WILTON_JNI_GATEWAY_RUNSCRIPT_METHOD_STR, WILTON_JNI_GATEWAY_RUNSCRIPT_METHOD_SIGNATURE_STR);
         // exception
-        this->wiltonExceptionClass = std::unique_ptr<_jclass, GlobalRefDeleter>(
-                wj::find_java_class(env, WILTON_JNI_EXCEPTION_CLASS_SIGNATURE_STR), GlobalRefDeleter());
+        this->wiltonExceptionClass = std::unique_ptr<_jclass, global_ref_deleter>(
+                wj::find_java_class(env, WILTON_JNI_EXCEPTION_CLASS_SIGNATURE_STR), global_ref_deleter());
     }
     
     void set_gateway_object(JNIEnv* env, jobject gateway) {
-        auto ptr = std::unique_ptr<_jobject, GlobalRefDeleter>(
-                static_cast<jobject> (env->NewGlobalRef(gateway)), GlobalRefDeleter());
+        auto ptr = std::unique_ptr<_jobject, global_ref_deleter>(
+                static_cast<jobject> (env->NewGlobalRef(gateway)), global_ref_deleter());
         if (nullptr == ptr.get()) {
-            throw wc::WiltonInternalException(TRACEMSG("Cannot create global ref for specified gateway object"));
+            throw wc::wilton_internal_exception(TRACEMSG("Cannot create global ref for specified gateway object"));
         }
         this->wiltonGatewayObject = std::move(ptr);
     }
 };
 
-JniCtx& static_jni_ctx() {
+jni_ctx& static_jni_ctx() {
     // will be destructed in JNI_OnUnload
-    static JniCtx* ctx = new JniCtx();
+    static jni_ctx* ctx = new jni_ctx();
     return *ctx;
 }
 
@@ -135,7 +135,7 @@ JNIEnv* get_jni_env() {
         }
         // fall-through to report error to client
     default:
-        throw wc::WiltonInternalException(TRACEMSG("System error: cannot obtain JNI environment"));
+        throw wc::wilton_internal_exception(TRACEMSG("System error: cannot obtain JNI environment"));
     }
 }
 
@@ -159,7 +159,7 @@ extern "C" {
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void*) {
     try {
         // move-assign static ctx
-        static_jni_ctx() = JniCtx(vm);
+        static_jni_ctx() = jni_ctx(vm);
         // set init flag
         static_jvm_active().store(true);
         return WILTON_JNI_VERSION;
@@ -251,7 +251,7 @@ char* wiltoncall_runscript(const char* json_in, int json_in_len, char** json_out
     if (nullptr == json_out) return su::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
     if (nullptr == json_out_len) return su::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
     try {
-        JniCtx& ctx = static_jni_ctx();
+        jni_ctx& ctx = static_jni_ctx();
         JNIEnv* env = get_jni_env();
         jstring json_ustr = env->NewStringUTF(json_in);
         jobject res = env->CallObjectMethod(ctx.wiltonGatewayObject.get(),

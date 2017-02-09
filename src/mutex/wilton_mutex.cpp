@@ -9,7 +9,7 @@
 
 #include "staticlib/utils.hpp"
 
-#include "mutex/Mutex.hpp"
+#include "mutex/waitable_mutex.hpp"
 
 namespace { // anonymous
 
@@ -21,14 +21,14 @@ namespace wm = wilton::mutex;
 
 struct wilton_Mutex {
 private:
-    wm::Mutex mutex;
+    wm::waitable_mutex mutex;
 
 public:
 
-    wilton_Mutex(wm::Mutex&& mutex) :
+    wilton_Mutex(wm::waitable_mutex&& mutex) :
     mutex(std::move(mutex)) { }
 
-    wm::Mutex& impl() {
+    wm::waitable_mutex& impl() {
         return mutex;
     }
 };
@@ -36,7 +36,7 @@ public:
 char* wilton_Mutex_create(wilton_Mutex** mutex_out) /* noexcept */ {
     if (nullptr == mutex_out) return su::alloc_copy(TRACEMSG("Null 'mutex_out' parameter specified"));
     try {
-        wm::Mutex mutex{};
+        wm::waitable_mutex mutex{};
         wilton_Mutex* mutex_ptr = new wilton_Mutex{std::move(mutex)};
         *mutex_out = mutex_ptr;
         return nullptr;

@@ -17,7 +17,7 @@
 
 #include "staticlib/serialization.hpp"
 
-#include "common/WiltonInternalException.hpp"
+#include "common/wilton_internal_exception.hpp"
 
 namespace wilton {
 namespace common {

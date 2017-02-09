@@ -53,14 +53,14 @@ std::string mutex_lock(const std::string& data) {
         if ("mutexHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'mutexHandle' not specified"));
     // get handle
     wilton_Mutex* mutex = static_registry().peek(handle);
-    if (nullptr == mutex) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == mutex) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'mutexHandle' parameter specified"));
     // call wilton
     char* err = wilton_Mutex_lock(mutex);
@@ -79,14 +79,14 @@ std::string mutex_unlock(const std::string& data) {
         if ("mutexHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'mutexHandle' not specified"));
     // get handle
     wilton_Mutex* mutex = static_registry().peek(handle);
-    if (nullptr == mutex) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == mutex) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'mutexHandle' parameter specified"));
     // call wilton
     char* err = wilton_Mutex_unlock(mutex);
@@ -112,20 +112,20 @@ std::string mutex_wait(const std::string& data) {
         } else if ("timeoutMillis" == name) {
             timeout_millis = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (ss::json_type::nullt == rcallback.get().type()) throw common::WiltonInternalException(TRACEMSG(
+    if (ss::json_type::nullt == rcallback.get().type()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'conditionCallbackScript' not specified"));
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'mutexHandle' not specified"));
-    if (-1 == timeout_millis) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == timeout_millis) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'timeoutMillis' not specified"));
     const ss::json_value& callback = rcallback.get();
     std::string cbjson = ss::dump_json_to_string(callback);
     // get handle
     wilton_Mutex* mutex = static_registry().peek(handle);
-    if (nullptr == mutex) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == mutex) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'mutexHandle' parameter specified"));
     // call wilton
     char* err = wilton_Mutex_wait(mutex, static_cast<int> (timeout_millis), static_cast<void*> (std::addressof(cbjson)),
@@ -185,14 +185,14 @@ std::string mutex_notify_all(const std::string& data) {
         if ("mutexHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'mutexHandle' not specified"));
     // get handle
     wilton_Mutex* mutex = static_registry().peek(handle);
-    if (nullptr == mutex) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == mutex) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'mutexHandle' parameter specified"));
     // call wilton
     char* err = wilton_Mutex_notify_all(mutex);
@@ -211,14 +211,14 @@ std::string mutex_destroy(const std::string& data) {
         if ("mutexHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'mutexHandle' not specified"));
     // get handle
     wilton_Mutex* mutex = static_registry().remove(handle);
-    if (nullptr == mutex) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == mutex) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'mutexHandle' parameter specified"));
     // call wilton
     char* err = wilton_Mutex_destroy(mutex);

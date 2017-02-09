@@ -42,14 +42,14 @@ std::string httpclient_close(const std::string& data) {
         if ("httpclientHandle" == name) {
             handle = common::get_json_int64(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'httpclientHandle' not specified"));
     // get handle
     wilton_HttpClient* http = static_registry().remove(handle);
-    if (nullptr == http) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == http) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'httpclientHandle' parameter specified"));
     // call wilton
     char* err = wilton_HttpClient_close(http);
@@ -78,18 +78,18 @@ std::string httpclient_execute(const std::string& data) {
         } else if ("metadata" == name) {
             metadata = ss::dump_json_to_string(fi.value());
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'httpclientHandle' not specified"));
-    if (rurl.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rurl.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'url' not specified"));
     const std::string& url = rurl.get();
     const std::string& request_data = rdata.get();
     // get handle
     wilton_HttpClient* http = static_registry().remove(handle);
-    if (nullptr == http) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == http) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'httpclientHandle' parameter specified"));
     // call wilton
     char* out;
@@ -120,20 +120,20 @@ std::string httpclient_send_temp_file(const std::string& data) {
         } else if ("metadata" == name) {
             metadata = ss::dump_json_to_string(fi.value());
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == handle) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'httpclientHandle' not specified"));
-    if (rurl.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rurl.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'url' not specified"));
-    if (rfile.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rfile.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'filePath' not specified"));
     const std::string& url = rurl.get();
     const std::string& file_path = rfile.get();
     // get handle
     wilton_HttpClient* http = static_registry().remove(handle);
-    if (nullptr == http) throw common::WiltonInternalException(TRACEMSG(
+    if (nullptr == http) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'httpclientHandle' parameter specified"));
     // call wilton
     char* out;

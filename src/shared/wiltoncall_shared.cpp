@@ -30,13 +30,13 @@ std::string shared_put(const std::string& data) {
         } else if ("value" == name) {
             rvalue = common::get_json_string(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (rkey.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rkey.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'key' not specified"));
     const std::string& key = rkey.get();
-    if (rvalue.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rvalue.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'value' not specified"));
     const std::string& value = rvalue.get();
     // call wilton
@@ -57,10 +57,10 @@ std::string shared_get(const std::string& data) {
         if ("key" == name) {
             rkey = common::get_json_string(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (rkey.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rkey.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'key' not specified"));
     const std::string& key = rkey.get();
     // call wilton
@@ -92,15 +92,15 @@ std::string shared_wait_change(const std::string& data) {
         } else if ("currentValue" == name) {
             rcvalue = common::get_json_string(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == timeout_millis) throw common::WiltonInternalException(TRACEMSG(
+    if (-1 == timeout_millis) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'timeoutMillis' not specified"));
-    if (rkey.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rkey.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'key' not specified"));
     const std::string& key = rkey.get();
-    if (rcvalue.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rcvalue.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'currentValue' not specified"));
     const std::string& cvalue = rcvalue.get();
     // call wilton
@@ -127,10 +127,10 @@ std::string shared_remove(const std::string& data) {
         if ("key" == name) {
             rkey = common::get_json_string(fi);
         } else {
-            throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (rkey.get().empty()) throw common::WiltonInternalException(TRACEMSG(
+    if (rkey.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'key' not specified"));
     const std::string& key = rkey.get();
     // call wilton
