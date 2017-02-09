@@ -31,10 +31,10 @@ common::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>>& 
 
 std::string cron_start(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     auto rcallback = std::ref(common::empty_json());
     auto rexpr = std::ref(common::empty_string());
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("callbackScript" == name) {
             common::check_json_callback_script(fi);
@@ -45,11 +45,11 @@ std::string cron_start(const std::string& data) {
             throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (ss::JsonType::NULL_T == rcallback.get().type()) throw common::WiltonInternalException(TRACEMSG(
+    if (ss::json_type::nullt == rcallback.get().type()) throw common::WiltonInternalException(TRACEMSG(
             "Required parameter 'callbackScript' not specified"));
     if (rexpr.get().empty()) throw common::WiltonInternalException(TRACEMSG(
             "Required parameter 'url' not specified"));
-    const ss::JsonValue& callback = rcallback.get();
+    const ss::json_value& callback = rcallback.get();
     const std::string& expr = rexpr.get();
     std::string* str_to_pass = new std::string(ss::dump_json_to_string(callback));
     // call wilton
@@ -77,9 +77,9 @@ std::string cron_start(const std::string& data) {
 
 std::string cron_stop(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     int64_t handle = -1;
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("cronHandle" == name) {
             handle = common::get_json_int64(fi);

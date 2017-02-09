@@ -40,9 +40,9 @@ public:
 
     LoggerConfig() { }
 
-    LoggerConfig(const staticlib::serialization::JsonValue& json) {
+    LoggerConfig(const staticlib::serialization::json_value& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.as_object()) {
+        for (const ss::json_field& fi : json.as_object()) {
             auto& fname = fi.name();
             if ("name" == fname) {
                 this->name = common::get_json_string(fi);
@@ -58,7 +58,7 @@ public:
                 "Invalid 'logging.loggers.level' field: []"));
     }
 
-    staticlib::serialization::JsonValue to_json() const {
+    staticlib::serialization::json_value to_json() const {
         return {
             {"name", name},
             {"level", level}

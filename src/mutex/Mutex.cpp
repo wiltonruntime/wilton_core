@@ -25,12 +25,12 @@ using cond_fun = std::function<bool()>;
 
 } // namespace
 
-class Mutex::Impl : public staticlib::pimpl::PimplObject::Impl {
+class Mutex::impl : public staticlib::pimpl::pimpl_object::impl {
     std::mutex mutex;
     std::condition_variable cv;
 
 public:
-    Impl() {}
+    impl() {}
     
     void lock(Mutex&) {
         std::unique_lock<std::mutex> guard{mutex};

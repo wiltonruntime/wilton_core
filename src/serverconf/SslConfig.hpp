@@ -45,9 +45,9 @@ public:
     
     SslConfig() { }
     
-    SslConfig(const staticlib::serialization::JsonValue& json) {
+    SslConfig(const staticlib::serialization::json_value& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.as_object()) {
+        for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("keyFile" == name) {
                 this->keyFile = common::get_json_string(fi);
@@ -64,7 +64,7 @@ public:
         }
     }
     
-    staticlib::serialization::JsonValue to_json() const {
+    staticlib::serialization::json_value to_json() const {
         return {
             { "keyFile", keyFile },
             { "keyPassword", keyPassword},

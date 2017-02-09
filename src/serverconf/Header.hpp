@@ -44,9 +44,9 @@ public:
     name(std::move(name)),
     value(std::move(value)) { }
 
-    Header(const staticlib::serialization::JsonValue& json) {
+    Header(const staticlib::serialization::json_value& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.as_object()) {
+        for (const ss::json_field& fi : json.as_object()) {
             auto& fname = fi.name();
             if ("name" == fname) {
                 this->name = common::get_json_string(fi);
@@ -62,9 +62,9 @@ public:
                 "Invalid 'header.value' field: []"));
     }
 
-    staticlib::serialization::JsonField to_json() const {
+    staticlib::serialization::json_field to_json() const {
         namespace ss = staticlib::serialization;
-        return ss::JsonField{name, ss::JsonValue{value}};
+        return ss::json_field{name, ss::json_value{value}};
     }
 };
 

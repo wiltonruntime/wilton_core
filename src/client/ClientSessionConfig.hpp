@@ -22,7 +22,7 @@ namespace client {
 
 class ClientSessionConfig {
 public:
-    staticlib::httpclient::HttpSessionOptions options;
+    staticlib::httpclient::http_session_options options;
 
     ClientSessionConfig(const ClientSessionConfig&) = delete;
 
@@ -38,12 +38,12 @@ public:
 
     ClientSessionConfig() { }
 
-    ClientSessionConfig(const staticlib::serialization::JsonValue& json) {
+    ClientSessionConfig(const staticlib::serialization::json_value& json) {
         namespace ss = staticlib::serialization;
         // msvs complains to different vectors in foreach here
         auto& vec = json.as_object();
         for (size_t i = 0; i < vec.size(); i++) {
-            const ss::JsonField& fi = vec[i];
+            const ss::json_field& fi = vec[i];
             auto& name = fi.name();
             if ("maxHostConnections" == name) {
                 this->options.max_host_connections = common::get_json_uint32(fi);
@@ -57,7 +57,7 @@ public:
         }
     }
 
-    staticlib::serialization::JsonValue to_json() const {
+    staticlib::serialization::json_value to_json() const {
         return {
             { "maxHostConnections", options.max_host_connections },
             { "maxTotalConnections", options.max_total_connections },

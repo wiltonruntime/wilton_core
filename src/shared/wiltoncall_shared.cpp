@@ -20,10 +20,10 @@ namespace ss = staticlib::serialization;
 
 std::string shared_put(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     auto rkey = std::ref(common::empty_string());
     auto rvalue = std::ref(common::empty_string());
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("key" == name) {
             rkey = common::get_json_string(fi);
@@ -50,9 +50,9 @@ std::string shared_put(const std::string& data) {
 
 std::string shared_get(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     auto rkey = std::ref(common::empty_string());
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("key" == name) {
             rkey = common::get_json_string(fi);
@@ -79,11 +79,11 @@ std::string shared_get(const std::string& data) {
 
 std::string shared_wait_change(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     int64_t timeout_millis = -1;
     auto rkey = std::ref(common::empty_string());
     auto rcvalue = std::ref(common::empty_string());
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("timeoutMillis" == name) {
             timeout_millis = common::get_json_int64(fi);
@@ -120,9 +120,9 @@ std::string shared_wait_change(const std::string& data) {
 
 std::string shared_remove(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     auto rkey = std::ref(common::empty_string());
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("key" == name) {
             rkey = common::get_json_string(fi);

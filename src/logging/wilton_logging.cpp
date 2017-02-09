@@ -34,7 +34,7 @@ char* wilton_logger_initialize(
     try {
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
         std::string conf_json_str{conf_json, conf_json_len_u32};
-        ss::JsonValue conf = ss::load_json_from_string(conf_json_str);
+        ss::json_value conf = ss::load_json_from_string(conf_json_str);
         wl::LoggingConfig lc{conf};
         wl::WiltonLogger::apply_config(std::move(lc));
         return nullptr;

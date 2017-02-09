@@ -18,12 +18,12 @@
 namespace wilton {
 namespace logging {
 
-class WiltonLogger : public staticlib::pimpl::PimplObject {
+class WiltonLogger : public staticlib::pimpl::pimpl_object {
 protected:
     /**
-     * Implementation class
+     * implementation class
      */
-    class Impl;
+    class impl;
 public:
     /**
      * PIMPL-specific constructor

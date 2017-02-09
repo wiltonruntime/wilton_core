@@ -55,7 +55,7 @@ const std::unordered_set<std::string> HEADERS_DISCARD_DUPLICATES{
 
 } //namespace
 
-class Request::Impl : public staticlib::pimpl::PimplObject::Impl {
+class Request::impl : public staticlib::pimpl::pimpl_object::impl {
 
     enum class State {
         CREATED, COMMITTED
@@ -68,7 +68,7 @@ class Request::Impl : public staticlib::pimpl::PimplObject::Impl {
 
 public:
 
-    Impl(void* /* sh::http_request_ptr&& */ req, void* /* sh::http_response_writer_ptr&& */ resp,
+    impl(void* /* sh::http_request_ptr&& */ req, void* /* sh::http_response_writer_ptr&& */ resp,
             const std::map<std::string, std::string>& mustache_partials) :
     state(State::CREATED),
     req(std::move(*static_cast<sh::http_request_ptr*>(req))),
@@ -109,7 +109,7 @@ public:
     }
 
     void send_file(Request&, std::string file_path, std::function<void(bool)> finalizer) {
-        auto fd = st::TinydirFileSource(file_path);
+        auto fd = st::file_source(file_path);
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         auto fd_ptr = std::unique_ptr<std::streambuf>(si::make_unbuffered_istreambuf_ptr(std::move(fd)));
@@ -117,10 +117,10 @@ public:
         sender->send();
     }
 
-    void send_mustache(Request&, std::string mustache_file_path, ss::JsonValue json) {
+    void send_mustache(Request&, std::string mustache_file_path, ss::json_value json) {
         if (!state.compare_exchange_strong(State::CREATED, State::COMMITTED)) throw common::WiltonInternalException(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
-        auto mp = sm::MustacheSource(mustache_file_path, std::move(json), mustache_partials);
+        auto mp = sm::mustache_source(mustache_file_path, std::move(json), mustache_partials);
         auto mp_ptr = std::unique_ptr<std::streambuf>(si::make_unbuffered_istreambuf_ptr(std::move(mp)));
         auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(mp_ptr));
         sender->send();
@@ -199,7 +199,7 @@ PIMPL_FORWARD_METHOD(Request, const std::string&, get_request_data_filename, (),
 PIMPL_FORWARD_METHOD(Request, void, set_response_metadata, (serverconf::ResponseMetadata), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, void, send_response, (const char*)(uint32_t), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, void, send_file, (std::string)(std::function<void(bool)>), (), common::WiltonInternalException)
-PIMPL_FORWARD_METHOD(Request, void, send_mustache, (std::string)(ss::JsonValue), (), common::WiltonInternalException)
+PIMPL_FORWARD_METHOD(Request, void, send_mustache, (std::string)(ss::json_value), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, ResponseWriter, send_later, (), (), common::WiltonInternalException)
 PIMPL_FORWARD_METHOD(Request, void, finish, (), (), common::WiltonInternalException)
 

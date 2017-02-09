@@ -23,9 +23,9 @@ namespace ss = staticlib::serialization;
 
 std::string thread_run(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     auto rcallback = std::ref(common::empty_json());
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("callbackScript" == name) {
             common::check_json_callback_script(fi);
@@ -34,9 +34,9 @@ std::string thread_run(const std::string& data) {
             throw common::WiltonInternalException(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (ss::JsonType::NULL_T == rcallback.get().type()) throw common::WiltonInternalException(TRACEMSG(
+    if (ss::json_type::nullt == rcallback.get().type()) throw common::WiltonInternalException(TRACEMSG(
             "Required parameter 'callbackScript' not specified"));
-    const ss::JsonValue& callback = rcallback.get();
+    const ss::json_value& callback = rcallback.get();
     std::string* callback_str_ptr = new std::string();
     *callback_str_ptr = ss::dump_json_to_string(callback);
     // call wilton
@@ -62,9 +62,9 @@ std::string thread_run(const std::string& data) {
 
 std::string thread_sleep_millis(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     int64_t millis = -1;
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("millis" == name) {
             millis = common::get_json_int64(fi);

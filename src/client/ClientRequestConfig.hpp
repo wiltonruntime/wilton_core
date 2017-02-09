@@ -24,7 +24,7 @@ namespace client {
 
 class ClientRequestConfig {
 public:
-    staticlib::httpclient::HttpRequestOptions options;
+    staticlib::httpclient::http_request_options options;
 
     ClientRequestConfig(const ClientRequestConfig&) = delete;
 
@@ -40,12 +40,12 @@ public:
 
     ClientRequestConfig() { }
 
-    ClientRequestConfig(const staticlib::serialization::JsonValue& json) {
+    ClientRequestConfig(const staticlib::serialization::json_value& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.as_object()) {
+        for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("headers" == name) {
-                for (const ss::JsonField& hf : common::get_json_object(fi)) {
+                for (const ss::json_field& hf : common::get_json_object(fi)) {
                     std::string val = common::get_json_string(hf);
                     options.headers.emplace_back(hf.name(), std::move(val));
                 }
@@ -123,13 +123,13 @@ public:
         }
     }
 
-    staticlib::serialization::JsonValue to_json() const {
+    staticlib::serialization::json_value to_json() const {
         namespace sr = staticlib::ranges;
         namespace ss = staticlib::serialization;
         auto ha = sr::transform(sr::refwrap(options.headers), [](const std::pair<std::string, std::string>& el) {
-            return ss::JsonField{el.first, el.second};
+            return ss::json_field{el.first, el.second};
         });
-        std::vector<ss::JsonField> hfields = sr::emplace_to_vector(std::move(ha));
+        std::vector<ss::json_field> hfields = sr::emplace_to_vector(std::move(ha));
         return {
             {"headers", std::move(hfields)},
             {"method", options.method},

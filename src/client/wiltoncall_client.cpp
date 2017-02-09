@@ -35,9 +35,9 @@ std::string httpclient_create(const std::string& data) {
 
 std::string httpclient_close(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     int64_t handle = -1;
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("httpclientHandle" == name) {
             handle = common::get_json_int64(fi);
@@ -62,12 +62,12 @@ std::string httpclient_close(const std::string& data) {
 
 std::string httpclient_execute(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     int64_t handle = -1;
     auto rurl = std::ref(common::empty_string());
     auto rdata = std::ref(common::empty_string());
     std::string metadata = common::empty_string();
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("httpclientHandle" == name) {
             handle = common::get_json_int64(fi);
@@ -104,12 +104,12 @@ std::string httpclient_execute(const std::string& data) {
 
 std::string httpclient_send_temp_file(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     int64_t handle = -1;
     auto rurl = std::ref(common::empty_string());
     auto rfile = std::ref(common::empty_string());
     std::string metadata = common::empty_string();
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("httpclientHandle" == name) {
             handle = common::get_json_int64(fi);

@@ -47,7 +47,7 @@ char* wilton_render_mustache /* noexcept */ (
         std::string template_text_str{template_text, template_text_len_u32};
         uint32_t values_json_len_u32 = static_cast<uint32_t> (values_json_len);
         std::string values_json_str{values_json, values_json_len_u32};
-        ss::JsonValue json = ss::load_json_from_string(values_json_str);
+        ss::json_value json = ss::load_json_from_string(values_json_str);
         const std::string res = sm::render_string(template_text_str, json);
         *output_text_out = su::alloc_copy(res);
         *output_text_len_out = res.length();
@@ -78,8 +78,8 @@ WILTON_EXPORT char* wilton_render_mustache_file /* noexcept */ (
         std::string template_file_path_str{template_file_path, template_file_path_len_u16};
         uint32_t values_json_len_u32 = static_cast<uint32_t> (values_json_len);
         std::string values_json_str{values_json, values_json_len_u32};
-        ss::JsonValue json = ss::load_json_from_string(values_json_str);
-        auto mp = sm::MustacheSource(template_file_path_str, std::move(json));
+        ss::json_value json = ss::load_json_from_string(values_json_str);
+        auto mp = sm::mustache_source(template_file_path_str, std::move(json));
         auto sink = si::string_sink();
         std::array<char, 4096> buf;
         si::copy_all(mp, sink, buf);

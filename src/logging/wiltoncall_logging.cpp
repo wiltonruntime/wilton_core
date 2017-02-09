@@ -26,11 +26,11 @@ std::string logging_initialize(const std::string& data) {
 
 std::string logging_log(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     auto rlevel = std::ref(common::empty_string());
     auto rlogger = std::ref(common::empty_string());
     auto rmessage = std::ref(common::empty_string());
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("level" == name) {
             rlevel = common::get_json_string(fi);
@@ -58,10 +58,10 @@ std::string logging_log(const std::string& data) {
 
 std::string logging_is_level_enabled(const std::string& data) {
     // parse json
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     auto rlevel = std::ref(common::empty_string());
     auto rlogger = std::ref(common::empty_string());
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("level" == name) {
             rlevel = common::get_json_string(fi);

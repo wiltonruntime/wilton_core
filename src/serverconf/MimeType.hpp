@@ -43,9 +43,9 @@ public:
     extension(extension.data(), extension.length()),
     mime(mime.data(), mime.length()) { }
 
-    MimeType(const staticlib::serialization::JsonValue& json) {
+    MimeType(const staticlib::serialization::json_value& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.as_object()) {
+        for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("extension" == name) {
                 this->extension = common::get_json_string(fi);
@@ -61,7 +61,7 @@ public:
                 "Invalid 'mimeType.mime' field: []"));
     }
     
-    staticlib::serialization::JsonValue to_json() const {    
+    staticlib::serialization::json_value to_json() const {    
         return {
             {"extension", extension},
             {"mime", mime}

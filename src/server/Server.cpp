@@ -48,12 +48,12 @@ using partmap_type = const std::map<std::string, std::string>&;
 
 } // namespace
 
-class Server::Impl : public staticlib::pimpl::PimplObject::Impl {
+class Server::impl : public staticlib::pimpl::pimpl_object::impl {
     std::map<std::string, std::string> mustache_partials;
     std::unique_ptr<sh::http_server> server;
 
 public:
-    Impl(serverconf::ServerConfig conf, std::vector<std::reference_wrapper<HttpPath>> paths) :
+    impl(serverconf::ServerConfig conf, std::vector<std::reference_wrapper<HttpPath>> paths) :
     mustache_partials(load_partials(conf.mustache)),
     server(std::unique_ptr<sh::http_server>(new sh::http_server(
             conf.numberOfThreads, 
@@ -131,9 +131,9 @@ private:
         static std::string MUSTACHE_EXT = ".mustache";
         std::map<std::string, std::string> res;
         for (const std::string& dirpath : cf.partialsDirs) {
-            for (const st::TinydirFile& tf : st::list_directory(dirpath)) {
-                if (!su::ends_with(tf.name(), MUSTACHE_EXT)) continue;
-                std::string name = std::string(tf.name().data(), tf.name().length() - MUSTACHE_EXT.length());
+            for (const st::tinydir_path& tf : st::list_directory(dirpath)) {
+                if (!su::ends_with(tf.filename(), MUSTACHE_EXT)) continue;
+                std::string name = std::string(tf.filename().data(), tf.filename().length() - MUSTACHE_EXT.length());
                 std::string val = read_file(tf);
                 auto pa = res.insert(std::make_pair(std::move(name), std::move(val)));
                 if (!pa.second) throw common::WiltonInternalException(TRACEMSG(
@@ -144,7 +144,7 @@ private:
         return res;
     }
 
-    static std::string read_file(const st::TinydirFile& tf) {
+    static std::string read_file(const st::tinydir_path& tf) {
         auto fd = tf.open_read();
         std::array<char, 4096> buf;
         si::string_sink sink{};

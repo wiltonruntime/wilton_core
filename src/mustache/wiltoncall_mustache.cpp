@@ -20,10 +20,10 @@ namespace ss = staticlib::serialization;
 
 std::string mustache_render(const std::string& data) {
     // parse json
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     auto rtemplate = std::ref(common::empty_string());
     std::string values = common::empty_string();
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("template" == name) {
             rtemplate = common::get_json_string(fi);
@@ -50,10 +50,10 @@ std::string mustache_render(const std::string& data) {
 
 std::string mustache_render_file(const std::string& data) {
     // parse json
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     auto rfile = std::ref(common::empty_string());
     std::string values = common::empty_string();
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("file" == name) {
             rfile = common::get_json_string(fi);

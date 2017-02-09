@@ -47,9 +47,9 @@ public:
     tmpFilenameLength(tmpFilenameLen),
     memoryLimitBytes(memoryLimitBytes) { }
 
-    RequestPayloadConfig(const staticlib::serialization::JsonValue& json) {
+    RequestPayloadConfig(const staticlib::serialization::json_value& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.as_object()) {
+        for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("tmpDirPath" == name) {
                 this->tmpDirPath = common::get_json_string(fi);
@@ -63,7 +63,7 @@ public:
         }
     }
 
-    staticlib::serialization::JsonValue to_json() const {
+    staticlib::serialization::json_value to_json() const {
         return {
             { "tmpDirPath", tmpDirPath },
             { "tmpFilenameLen", tmpFilenameLength },

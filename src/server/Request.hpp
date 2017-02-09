@@ -24,12 +24,12 @@
 namespace wilton {
 namespace server {
 
-class Request : public staticlib::pimpl::PimplObject {
+class Request : public staticlib::pimpl::pimpl_object {
 protected:
     /**
-     * Implementation class
+     * implementation class
      */
-    class Impl;
+    class impl;
 public:
     /**
      * PIMPL-specific constructor
@@ -50,7 +50,7 @@ public:
     
     void send_file(std::string file_path, std::function<void(bool)> finalizer);
     
-    void send_mustache(std::string mustache_file_path, staticlib::serialization::JsonValue json);
+    void send_mustache(std::string mustache_file_path, staticlib::serialization::json_value json);
     
     ResponseWriter send_later();
     

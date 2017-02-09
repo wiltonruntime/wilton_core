@@ -26,28 +26,28 @@ namespace su = staticlib::utils;
 
 struct wilton_DBConnection {
 private:
-    so::Connection conn;
+    so::connection conn;
 
 public:
 
-    wilton_DBConnection(so::Connection&& conn) :
+    wilton_DBConnection(so::connection&& conn) :
     conn(std::move(conn)) { }
 
-    so::Connection& impl() {
+    so::connection& impl() {
         return conn;
     }
 };
 
 struct wilton_DBTransaction {
 private:
-    so::Transaction tran;
+    so::transaction tran;
 
 public:
 
-    wilton_DBTransaction(so::Transaction&& tran) :
+    wilton_DBTransaction(so::transaction&& tran) :
     tran(std::move(tran)) { }
 
-    so::Transaction& impl() {
+    so::transaction& impl() {
         return tran;
     }
 };
@@ -63,7 +63,7 @@ char* wilton_DBConnection_open(
     try {
         uint16_t conn_url_len_u16 = static_cast<uint16_t> (conn_url_len);
         std::string conn_url_str{conn_url, conn_url_len_u16};
-        so::Connection conn{conn_url_str};
+        so::connection conn{conn_url_str};
         wilton_DBConnection* conn_ptr = new wilton_DBConnection{std::move(conn)};
         *conn_out = conn_ptr;
         return nullptr;
@@ -93,14 +93,14 @@ char* wilton_DBConnection_query(
     try {
         uint32_t sql_text_len_u32 = static_cast<uint32_t> (sql_text_len);
         std::string sql_text_str{sql_text, sql_text_len_u32};
-        ss::JsonValue json{};
+        ss::json_value json{};
         if (params_json_len > 0) {
             uint32_t params_json_len_u32 = static_cast<uint32_t> (params_json_len);
             std::string params_json_str{params_json, params_json_len_u32};        
             json = ss::load_json_from_string(params_json_str);
         }
-        std::vector<ss::JsonValue> rs = conn->impl().query(sql_text_str, json);
-        ss::JsonValue rs_json{std::move(rs)};
+        std::vector<ss::json_value> rs = conn->impl().query(sql_text_str, json);
+        ss::json_value rs_json{std::move(rs)};
         std::string rs_str = ss::dump_json_to_string(rs_json);
         *result_set_out = su::alloc_copy(rs_str);
         *result_set_len_out = rs_str.size();
@@ -126,7 +126,7 @@ char* wilton_DBConnection_execute(
     try {
         uint32_t sql_text_len_u32 = static_cast<uint32_t> (sql_text_len);
         std::string sql_text_str{sql_text, sql_text_len_u32};
-        ss::JsonValue json{};
+        ss::json_value json{};
         if (params_json_len > 0) {
             uint32_t params_json_len_u32 = static_cast<uint32_t> (params_json_len);
             std::string params_json_str{params_json, params_json_len_u32};
@@ -156,7 +156,7 @@ char* wilton_DBTransaction_start(
     if (nullptr == conn) return su::alloc_copy(TRACEMSG("Null 'conn' parameter specified"));
     if (nullptr == tran_out) return su::alloc_copy(TRACEMSG("Null 'tran_out' parameter specified"));
     try {
-        so::Transaction tran = conn->impl().start_transaction();
+        so::transaction tran = conn->impl().start_transaction();
         wilton_DBTransaction* tran_ptr = new wilton_DBTransaction(std::move(tran));
         *tran_out = tran_ptr;
         return nullptr;

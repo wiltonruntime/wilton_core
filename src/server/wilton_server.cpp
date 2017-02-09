@@ -148,7 +148,7 @@ char* wilton_Server_create /* noexcept */ (wilton_Server** server_out, const cha
     try {
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
         std::string conf_str{conf_json, conf_json_len_u32};                
-        ss::JsonValue json = ss::load_json_from_string(conf_str);
+        ss::json_value json = ss::load_json_from_string(conf_str);
         uint16_t paths_len_u16 = static_cast<uint16_t>(paths_len);
         auto pathsvec = wrap_paths(paths, paths_len_u16);
         ws::Server server{std::move(json), std::move(pathsvec)};
@@ -179,7 +179,7 @@ char* wilton_Request_get_request_metadata(wilton_Request* request, char** metada
     if (nullptr == metadata_json_len_out) return su::alloc_copy(TRACEMSG("Null 'metadata_json_len_out' parameter specified"));
     try {
         auto meta = request->impl().get_request_metadata();
-        ss::JsonValue json = meta.to_json();
+        ss::json_value json = meta.to_json();
         std::string res = ss::dump_json_to_string(json);
         *metadata_json_out = su::alloc_copy(res);
         *metadata_json_len_out = res.size();
@@ -230,7 +230,7 @@ char* wilton_Request_set_response_metadata(wilton_Request* request,
     try {
         uint32_t metadata_json_len_u32 = static_cast<uint32_t> (metadata_json_len);
         std::string metadata{metadata_json, metadata_json_len_u32};
-        ss::JsonValue json = ss::load_json_from_string(metadata);
+        ss::json_value json = ss::load_json_from_string(metadata);
         wj::ResponseMetadata rm{json};
         request->impl().set_response_metadata(std::move(rm));
         return nullptr;
@@ -299,7 +299,7 @@ char* wilton_Request_send_mustache(
         std::string mustache_file_path_str{mustache_file_path, mustache_file_path_len_u16};
         uint32_t values_json_len_u32 = static_cast<uint32_t> (values_json_len);
         std::string values_json_str{values_json, values_json_len_u32};
-        ss::JsonValue json = ss::load_json_from_string(values_json_str);
+        ss::json_value json = ss::load_json_from_string(values_json_str);
         request->impl().send_mustache(std::move(mustache_file_path_str), std::move(json));
         return nullptr;
     } catch (const std::exception& e) {

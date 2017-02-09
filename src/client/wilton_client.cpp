@@ -35,13 +35,13 @@ namespace wc = wilton::client;
 
 struct wilton_HttpClient {
 private:
-    sh::HttpSession delegate;
+    sh::http_session delegate;
 
 public:
-    wilton_HttpClient(sh::HttpSession&& delegate) :
+    wilton_HttpClient(sh::http_session&& delegate) :
     delegate(std::move(delegate)) { }
 
-    sh::HttpSession& impl() {
+    sh::http_session& impl() {
         return delegate;
     }
 };
@@ -57,9 +57,9 @@ char* wilton_HttpClient_create(
     try {
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
         std::string json_str{conf_json, conf_json_len_u32};
-        ss::JsonValue json = ss::load_json_from_string(json_str);
+        ss::json_value json = ss::load_json_from_string(json_str);
         wc::ClientSessionConfig conf{std::move(json)};
-        sh::HttpSession session{std::move(conf.options)};
+        sh::http_session session{std::move(conf.options)};
         wilton_HttpClient* http_ptr = new wilton_HttpClient(std::move(session));
         *http_out = http_ptr;
         return nullptr;
@@ -101,7 +101,7 @@ char* wilton_HttpClient_execute(
             "Invalid 'request_metadata_len' parameter specified: [" + sc::to_string(request_metadata_len) + "]"));
     try {
         std::string url_str{url, static_cast<uint32_t> (url_len)};
-        ss::JsonValue opts_json{};
+        ss::json_value opts_json{};
         if (request_metadata_len > 0) {
             std::string meta_str{request_metadata_json, static_cast<uint32_t> (request_metadata_len)};
             opts_json = ss::load_json_from_string(meta_str);
@@ -109,17 +109,17 @@ char* wilton_HttpClient_execute(
         wc::ClientRequestConfig opts{std::move(opts_json)};
         std::array<char, 4096> buf;
         si::string_sink sink{};
-        ss::JsonValue resp_json{};
+        ss::json_value resp_json{};
         if (request_data_len > 0) {
             std::string data_str{request_data, static_cast<uint32_t> (request_data_len)};
             si::string_source data_src{std::move(data_str)};
             // POST will be used by default for this API call
-            sh::HttpResource resp = http->impl().open_url(url_str, std::move(data_src), opts.options);            
+            sh::http_resource resp = http->impl().open_url(url_str, std::move(data_src), opts.options);            
             si::copy_all(resp, sink, buf);
             resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
         } else {
             // GET will be used by default for this API call
-            sh::HttpResource resp = http->impl().open_url(url_str, opts.options);
+            sh::http_resource resp = http->impl().open_url(url_str, opts.options);
             si::copy_all(resp, sink, buf);
             resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
         }
@@ -157,7 +157,7 @@ char* wilton_HttpClient_send_file(
             "Invalid 'request_metadata_len' parameter specified: [" + sc::to_string(request_metadata_len) + "]"));
     try {
         std::string url_str{url, static_cast<uint32_t> (url_len)};
-        ss::JsonValue opts_json{};
+        ss::json_value opts_json{};
         if (request_metadata_len > 0) {
             std::string meta_str{request_metadata_json, static_cast<uint32_t> (request_metadata_len)};
             opts_json = ss::load_json_from_string(meta_str);
@@ -165,11 +165,11 @@ char* wilton_HttpClient_send_file(
         wc::ClientRequestConfig opts{std::move(opts_json)};
         std::array<char, 4096> buf;
         std::string file_path_str{file_path, static_cast<uint32_t> (file_path_len)};
-        auto fd = st::TinydirFileSource(file_path_str);
-        sh::HttpResource resp = http->impl().open_url(url_str, std::move(fd), opts.options);
+        auto fd = st::file_source(file_path_str);
+        sh::http_resource resp = http->impl().open_url(url_str, std::move(fd), opts.options);
         si::string_sink sink{};
         si::copy_all(resp, sink, buf);
-        ss::JsonValue resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
+        ss::json_value resp_json = wc::ClientResponse::to_json(std::move(sink.get_string()), resp.get_info());
         std::string resp_complete = ss::dump_json_to_string(resp_json);
         if (nullptr != finalizer_cb) {
             finalizer_cb(finalizer_ctx, 1);

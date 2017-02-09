@@ -20,11 +20,11 @@ namespace ss = staticlib::serialization;
 
 std::string tcp_wait_for_connection(const std::string& data) {
     // json parse
-    ss::JsonValue json = ss::load_json_from_string(data);
+    ss::json_value json = ss::load_json_from_string(data);
     int64_t timeout = -1;
     auto rip = std::ref(common::empty_string());
     int64_t port = -1;
-    for (const ss::JsonField& fi : json.as_object()) {
+    for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("ipAddress" == name) {
             rip = common::get_json_string(fi);

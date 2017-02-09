@@ -22,14 +22,14 @@ namespace client {
 
 class ClientResponse {
 public:
-    static staticlib::serialization::JsonValue to_json(std::string&& data,
-            const staticlib::httpclient::HttpResourceInfo& info) {
+    static staticlib::serialization::json_value to_json(std::string&& data,
+            const staticlib::httpclient::http_resource_info& info) {
         namespace sr = staticlib::ranges;
         namespace ss = staticlib::serialization;
         auto ha = sr::transform(sr::refwrap(info.get_headers()), [](const std::pair<std::string, std::string>& el) {
-            return ss::JsonField{el.first, el.second};
+            return ss::json_field{el.first, el.second};
         });
-        std::vector<ss::JsonField> hfields = sr::emplace_to_vector(std::move(ha));
+        std::vector<ss::json_field> hfields = sr::emplace_to_vector(std::move(ha));
         return {
             {"connectionSuccess", info.connection_success()},
             {"data", std::move(data)},

@@ -64,9 +64,9 @@ class RequestPayloadHandler {
         uint64_t counter = 0;
         std::string buffer = "";
         std::string filename;
-        std::unique_ptr<st::TinydirFileSink> file;
+        std::unique_ptr<st::file_sink> file;
         State state = State::MEMORY;
-        su::RandomStringGenerator rng;
+        su::random_string_generator rng;
 
     public:        
         Data(const serverconf::RequestPayloadConfig& conf) :
@@ -133,7 +133,7 @@ public:
             } else {
                 data->state = State::FILE;
                 data->filename = gen_filename();
-                data->file = std::unique_ptr<st::TinydirFileSink>(new st::TinydirFileSink(data->filename));
+                data->file = std::unique_ptr<st::file_sink>(new st::file_sink(data->filename));
                 if (!data->buffer.empty()) {
                     si::write_all(*data->file, data->buffer);
                     data->buffer = "";
@@ -169,7 +169,7 @@ private:
         switch (data->state) {
         case State::FILE: {
             data->state = State::MEMORY;
-            auto fd = st::TinydirFileSource(data->filename);
+            auto fd = st::file_source(data->filename);
             si::string_sink sink;
             std::array<char, 4096> buf;
             si::copy_all(fd, sink, buf);
@@ -189,7 +189,7 @@ private:
             data->state = State::FILE;
             if (data->filename.empty()) {
                 data->filename = gen_filename();
-                auto fd = st::TinydirFileSink(data->filename);
+                auto fd = st::file_sink(data->filename);
                 si::write_all(fd, data->buffer);
             }
             // fall through

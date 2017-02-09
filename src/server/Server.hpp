@@ -20,12 +20,12 @@
 namespace wilton {
 namespace server {
 
-class Server : public staticlib::pimpl::PimplObject {
+class Server : public staticlib::pimpl::pimpl_object {
 protected:
     /**
-     * Implementation class
+     * implementation class
      */
-    class Impl;
+    class impl;
 public:
     /**
      * PIMPL-specific constructor

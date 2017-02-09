@@ -27,19 +27,19 @@ using task_fun_type = std::function<void()>;
 
 } //namespace
 
-class CronTask::Impl : public staticlib::pimpl::PimplObject::Impl {
+class CronTask::impl : public staticlib::pimpl::pimpl_object::impl {
     std::mutex mutex;
     std::condition_variable cv;
     
-    cr::CronExpression cron;
+    cr::cron_expression cron;
     std::function<void()> task;
     std::thread worker;
     std::atomic<bool> running;
     
 public:
-    ~Impl() STATICLIB_NOEXCEPT {};
+    ~impl() STATICLIB_NOEXCEPT {};
     
-    Impl(const std::string& cronexpr, std::function<void()> crontask) :
+    impl(const std::string& cronexpr, std::function<void()> crontask) :
     cron(cronexpr),
     task(std::move(crontask)),
     running(true) {

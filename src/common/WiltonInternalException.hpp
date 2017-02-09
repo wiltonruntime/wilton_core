@@ -10,7 +10,7 @@
 
 #include <string>
 
-#include "staticlib/config/BaseException.hpp"
+#include "staticlib/config/staticlib_exception.hpp"
 
 namespace wilton {
 namespace common {
@@ -18,7 +18,7 @@ namespace common {
 /**
  * Module specific exception
  */
-class WiltonInternalException : public staticlib::config::BaseException {
+class WiltonInternalException : public staticlib::config::staticlib_exception {
 public:
     /**
      * Default constructor
@@ -31,7 +31,7 @@ public:
      * @param msg error message
      */
     WiltonInternalException(const std::string& msg) :
-    staticlib::config::BaseException(msg) { }
+    staticlib::config::staticlib_exception(msg) { }
 
 };
 

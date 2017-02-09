@@ -43,11 +43,11 @@ const std::chrono::milliseconds ATTEMPT_TIMEOUT = std::chrono::milliseconds(100)
 
 } // namespace
 
-class TCPConnectChecker::Impl : public staticlib::pimpl::PimplObject::Impl {
+class TCPConnectChecker::impl : public staticlib::pimpl::pimpl_object::impl {
     
 public:
 
-    Impl() { }
+    impl() { }
     
     static std::string wait_for_connection(std::chrono::milliseconds timeout,
             const std::string& ip_addr, uint16_t tcp_port) {

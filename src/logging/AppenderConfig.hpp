@@ -46,9 +46,9 @@ public:
 
     AppenderConfig() { }
 
-    AppenderConfig(const staticlib::serialization::JsonValue& json) {
+    AppenderConfig(const staticlib::serialization::json_value& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.as_object()) {
+        for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("appenderType" == name) {
                 this->appenderType = common::get_json_string(fi);
@@ -67,7 +67,7 @@ public:
                 "Invalid 'logging.appenders.filePath' field: []"));
     }
 
-    staticlib::serialization::JsonValue to_json() const {
+    staticlib::serialization::json_value to_json() const {
         return {
             {"appenderType", appenderType},
             {"filePath", filePath},

@@ -17,12 +17,12 @@
 namespace wilton {
 namespace mutex {
 
-class Mutex : public staticlib::pimpl::PimplObject {
+class Mutex : public staticlib::pimpl::pimpl_object {
 protected:
     /**
-     * Implementation class
+     * implementation class
      */
-    class Impl;
+    class impl;
 public:
     /**
      * PIMPL-specific constructor

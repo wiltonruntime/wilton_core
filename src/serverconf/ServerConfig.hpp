@@ -59,9 +59,9 @@ public:
         return *this;
     }
 
-    ServerConfig(const staticlib::serialization::JsonValue& json) {
+    ServerConfig(const staticlib::serialization::json_value& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.as_object()) {
+        for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("numberOfThreads" == name) {
                 this->numberOfThreads = common::get_json_uint16(fi);
@@ -72,7 +72,7 @@ public:
             } else if ("ssl" == name) {
                 this->ssl = SslConfig(fi.value());
             } else if ("documentRoots" == name) {
-                for (const ss::JsonValue& lo : common::get_json_array(fi)) {
+                for (const ss::json_value& lo : common::get_json_array(fi)) {
                     auto jd = serverconf::DocumentRoot(lo);
                     this->documentRoots.emplace_back(std::move(jd));
                 }
@@ -86,7 +86,7 @@ public:
         }
     }
     
-    staticlib::serialization::JsonValue to_json() const {
+    staticlib::serialization::json_value to_json() const {
         namespace sr = staticlib::ranges;
         return {
             {"numberOfThreads", numberOfThreads},

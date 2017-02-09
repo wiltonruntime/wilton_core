@@ -36,13 +36,13 @@ public:
 
     MustacheConfig() { }
 
-    MustacheConfig(const staticlib::serialization::JsonValue& json) {
+    MustacheConfig(const staticlib::serialization::json_value& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.as_object()) {
+        for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("partialsDirs" == name) {
-                for (const ss::JsonValue& va : common::get_json_array(fi)) {
-                    if (ss::JsonType::STRING != va.type() || va.as_string().empty()) {
+                for (const ss::json_value& va : common::get_json_array(fi)) {
+                    if (ss::json_type::string != va.type() || va.as_string().empty()) {
                         throw common::WiltonInternalException(TRACEMSG(
                                 "Invalid 'mustache.partialsDirs.el' value,"
                                 " type: [" + ss::stringify_json_type(va.type()) + "]," +
@@ -56,13 +56,13 @@ public:
         }
     }
 
-    staticlib::serialization::JsonValue to_json() const {
+    staticlib::serialization::json_value to_json() const {
         namespace sr = staticlib::ranges;
         namespace ss = staticlib::serialization;
         return {
             { "partialsDirs", [this]{
                 auto ra = sr::transform(sr::refwrap(partialsDirs), [this](const std::string& el) {
-                    return ss::JsonValue(el);
+                    return ss::json_value(el);
                 });
                 return ra.to_vector();
             }() }

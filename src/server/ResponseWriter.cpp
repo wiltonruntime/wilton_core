@@ -19,11 +19,11 @@ namespace sh = staticlib::httpserver;
 
 } //namespace
 
-class ResponseWriter::Impl : public staticlib::pimpl::PimplObject::Impl {
+class ResponseWriter::impl : public staticlib::pimpl::pimpl_object::impl {
     sh::http_response_writer_ptr writer;
 
 public:
-    Impl(void* /* sh::http_response_writer_ptr* */ writer) :
+    impl(void* /* sh::http_response_writer_ptr* */ writer) :
     writer(std::move(*static_cast<sh::http_response_writer_ptr*> (writer))) { }    
     
     void send(ResponseWriter&, const char* data, uint32_t data_len) {

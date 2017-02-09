@@ -66,9 +66,9 @@ public:
     cacheMaxAgeSeconds(cacheMaxAgeSeconds), 
     mimeTypes(mimes_copy(mimeTypes)) { }
     
-    DocumentRoot(const staticlib::serialization::JsonValue& json) {
+    DocumentRoot(const staticlib::serialization::json_value& json) {
         namespace ss = staticlib::serialization;
-        for (const ss::JsonField& fi : json.as_object()) {
+        for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("resource" == name) {
                 this->resource = common::get_json_string(fi);
@@ -81,7 +81,7 @@ public:
             } else if ("cacheMaxAgeSeconds" == name) {
                 this->cacheMaxAgeSeconds = common::get_json_uint32(fi);
             } else if ("mimeTypes" == name) {
-                for (const ss::JsonValue& ap : common::get_json_array(fi)) {
+                for (const ss::json_value& ap : common::get_json_array(fi)) {
                     auto ja = serverconf::MimeType(ap);
                     mimeTypes.emplace_back(std::move(ja));
                 }
@@ -95,7 +95,7 @@ public:
                     "Invalid 'documentRoot.dirPath' and 'documentRoot.zipPath' fields: [], []"));
     }
        
-    staticlib::serialization::JsonValue to_json() const {
+    staticlib::serialization::json_value to_json() const {
         namespace sr = staticlib::ranges;
         return {
             {"resource", resource},

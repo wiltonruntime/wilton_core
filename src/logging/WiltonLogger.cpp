@@ -54,7 +54,7 @@ log4cplus::LogLevel to_level(const std::string& level_name) {
 
 } // namespace
 
-class WiltonLogger::Impl : public staticlib::pimpl::PimplObject::Impl {
+class WiltonLogger::impl : public staticlib::pimpl::pimpl_object::impl {
 public:
 
     static void log(const std::string& level_name, const std::string& logger_name, const std::string& message) {

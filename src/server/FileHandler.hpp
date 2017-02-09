@@ -71,7 +71,7 @@ public:
         } else {
             try {
                 std::string file_path = std::string(conf->dirPath) +"/" + url_path;
-                auto fd = st::TinydirFileSource(file_path);
+                auto fd = st::file_source(file_path);
                 auto fd_ptr = std::unique_ptr<std::streambuf>(si::make_unbuffered_istreambuf_ptr(std::move(fd)));
                 auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(fd_ptr));
                 set_resp_headers(url_path, resp->get_response());

@@ -35,7 +35,7 @@ namespace su = staticlib::utils;
 
 class ZipHandler {
     std::shared_ptr<serverconf::DocumentRoot> conf;
-    std::shared_ptr<uz::UnzipFileIndex> idx;
+    std::shared_ptr<uz::unzip_file_index> idx;
     
 public:
     // must be copyable to satisfy std::function
@@ -51,14 +51,14 @@ public:
     
     ZipHandler(const serverconf::DocumentRoot& conf) :
     conf(std::make_shared<serverconf::DocumentRoot>(conf.clone())),
-    idx(std::make_shared<uz::UnzipFileIndex>(conf.zipPath)) { }    
+    idx(std::make_shared<uz::unzip_file_index>(conf.zipPath)) { }    
     
     // todo: error messages format
     // todo: path checks
     void operator()(sh::http_request_ptr& req, sh::tcp_connection_ptr& conn) {
         auto resp = sh::http_response_writer::create(conn, req);
         std::string url_path = conf->zipInnerPrefix + std::string{req->get_resource(), conf->resource.length()};
-        uz::FileEntry en = idx->find_zip_entry(url_path);        
+        uz::file_entry en = idx->find_zip_entry(url_path);        
         if (!en.is_empty()) {
             auto stream_ptr = uz::open_zip_entry(*idx, url_path);
             auto sender = std::make_shared<ResponseStreamSender>(resp, std::move(stream_ptr));
