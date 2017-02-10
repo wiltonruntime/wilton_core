@@ -49,9 +49,9 @@ public:
         for (const ss::json_field& fi : json.as_object()) {
             auto& fname = fi.name();
             if ("name" == fname) {
-                this->name = common::get_json_string(fi);
+                this->name = fi.as_string_nonempty_or_throw(name);
             } else if ("value" == fname) {
-                this->value = common::get_json_string(fi);
+                this->value = fi.as_string_nonempty_or_throw(name);
             } else {
                 throw common::wilton_internal_exception(TRACEMSG("Unknown 'header' field: [" + fname + "]"));
             }

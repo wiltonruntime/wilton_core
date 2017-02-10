@@ -24,7 +24,7 @@ namespace ss = staticlib::serialization;
 std::string thread_run(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
-    auto rcallback = std::ref(common::empty_json());
+    auto rcallback = std::ref(ss::null_json_ref());
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("callbackScript" == name) {
@@ -67,7 +67,7 @@ std::string thread_sleep_millis(const std::string& data) {
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("millis" == name) {
-            millis = common::get_json_int64(fi);
+            millis = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }

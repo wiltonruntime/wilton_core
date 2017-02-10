@@ -14,6 +14,7 @@ namespace shared {
 
 namespace { //anonymous
 
+namespace su = staticlib::utils;
 namespace ss = staticlib::serialization;
 
 } // namespace
@@ -21,14 +22,14 @@ namespace ss = staticlib::serialization;
 std::string shared_put(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
-    auto rkey = std::ref(common::empty_string());
-    auto rvalue = std::ref(common::empty_string());
+    auto rkey = std::ref(su::empty_string());
+    auto rvalue = std::ref(su::empty_string());
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("key" == name) {
-            rkey = common::get_json_string(fi);
+            rkey = fi.as_string_nonempty_or_throw(name);
         } else if ("value" == name) {
-            rvalue = common::get_json_string(fi);
+            rvalue = fi.as_string_nonempty_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -51,11 +52,11 @@ std::string shared_put(const std::string& data) {
 std::string shared_get(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
-    auto rkey = std::ref(common::empty_string());
+    auto rkey = std::ref(su::empty_string());
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("key" == name) {
-            rkey = common::get_json_string(fi);
+            rkey = fi.as_string_nonempty_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -81,16 +82,16 @@ std::string shared_wait_change(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
     int64_t timeout_millis = -1;
-    auto rkey = std::ref(common::empty_string());
-    auto rcvalue = std::ref(common::empty_string());
+    auto rkey = std::ref(su::empty_string());
+    auto rcvalue = std::ref(su::empty_string());
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("timeoutMillis" == name) {
-            timeout_millis = common::get_json_int64(fi);
+            timeout_millis = fi.as_int64_or_throw(name);
         } else if ("key" == name) {
-            rkey = common::get_json_string(fi);
+            rkey = fi.as_string_nonempty_or_throw(name);
         } else if ("currentValue" == name) {
-            rcvalue = common::get_json_string(fi);
+            rcvalue = fi.as_string_nonempty_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -121,11 +122,11 @@ std::string shared_wait_change(const std::string& data) {
 std::string shared_remove(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
-    auto rkey = std::ref(common::empty_string());
+    auto rkey = std::ref(su::empty_string());
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("key" == name) {
-            rkey = common::get_json_string(fi);
+            rkey = fi.as_string_nonempty_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }

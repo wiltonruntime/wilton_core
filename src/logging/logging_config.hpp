@@ -48,12 +48,12 @@ public:
         for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("appenders" == name) {
-                for (const ss::json_value& ap : common::get_json_array(fi)) {
+                for (const ss::json_value& ap : fi.as_array_or_throw(name)) {
                     auto ja = appender_config(ap);
                     appenders.emplace_back(std::move(ja));
                 }
             } else if ("loggers" == name) {
-                for (const ss::json_value& lo : common::get_json_array(fi)) {
+                for (const ss::json_value& lo : fi.as_array_or_throw(name)) {
                     auto jl = logger_config(lo);
                     loggers.emplace_back(std::move(jl));
                 }

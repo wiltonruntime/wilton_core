@@ -22,31 +22,11 @@
 namespace wilton {
 namespace common {
 
-const std::string& empty_string();
-
-const staticlib::serialization::json_value& empty_json();
-
 void throw_wilton_error(char* err, const std::string& msg);
 
 std::string wrap_wilton_output(char* out, int out_len);
 
-const std::string& get_json_string(const staticlib::serialization::json_field& field);
-
-int64_t get_json_int64(const staticlib::serialization::json_field& field);
-
-uint32_t get_json_uint32(const staticlib::serialization::json_field& field);
-
-uint16_t get_json_uint16(const staticlib::serialization::json_field& field);
-
-bool get_json_bool(const staticlib::serialization::json_field& field);
-
 void check_json_callback_script(const staticlib::serialization::json_field& field);
-
-const std::vector<staticlib::serialization::json_value>& get_json_array(
-        const staticlib::serialization::json_field& field);
-
-const std::vector<staticlib::serialization::json_field>& get_json_object(
-        const staticlib::serialization::json_field& field);
 
 void dump_error(const std::string& directory, const std::string& msg);
 

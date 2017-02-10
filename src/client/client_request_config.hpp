@@ -45,78 +45,78 @@ public:
         for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("headers" == name) {
-                for (const ss::json_field& hf : common::get_json_object(fi)) {
-                    std::string val = common::get_json_string(hf);
+                for (const ss::json_field& hf : fi.as_object_or_throw(name)) {
+                    std::string val = hf.as_string_nonempty_or_throw(hf.name());
                     options.headers.emplace_back(hf.name(), std::move(val));
                 }
             } else if ("method" == name) {
-                options.method = common::get_json_string(fi);
+                options.method = fi.as_string_nonempty_or_throw(name);
             } else if ("abortOnConnectError" == name) {
-                options.abort_on_connect_error = common::get_json_bool(fi);
+                options.abort_on_connect_error = fi.as_bool_or_throw(name);
             } else if ("abortOnResponseError" == name) {
-                options.abort_on_response_error = common::get_json_bool(fi);
+                options.abort_on_response_error = fi.as_bool_or_throw(name);
             } else if ("readTimeoutMillis" == name) {
-                options.read_timeout_millis = common::get_json_uint32(fi);
+                options.read_timeout_millis = fi.as_uint32_or_throw(name);
             } else if ("fdsetTimeoutMillis" == name) {
-                options.fdset_timeout_millis = common::get_json_uint32(fi);
+                options.fdset_timeout_millis = fi.as_uint32_or_throw(name);
             } else if ("forceHttp10" == name) {
-                options.force_http_10 = common::get_json_bool(fi);
+                options.force_http_10 = fi.as_bool_or_throw(name);
             } else if ("noprogress" == name) {
-                options.noprogress = common::get_json_bool(fi);
+                options.noprogress = fi.as_bool_or_throw(name);
             } else if ("nosignal" == name) {
-                options.nosignal = common::get_json_bool(fi);
+                options.nosignal = fi.as_bool_or_throw(name);
             } else if ("failonerror" == name) {
-                options.failonerror = common::get_json_bool(fi);
+                options.failonerror = fi.as_bool_or_throw(name);
             } else if ("pathAsIs" == name) {
-                options.path_as_is = common::get_json_bool(fi);
+                options.path_as_is = fi.as_bool_or_throw(name);
             } else if ("tcpNodelay" == name) {
-                options.tcp_nodelay = common::get_json_bool(fi);
+                options.tcp_nodelay = fi.as_bool_or_throw(name);
             } else if ("tcpKeepalive" == name) {
-                options.tcp_keepalive = common::get_json_bool(fi);
+                options.tcp_keepalive = fi.as_bool_or_throw(name);
             } else if ("tcpKeepidleSecs" == name) {
-                options.tcp_keepidle_secs = common::get_json_uint32(fi);
+                options.tcp_keepidle_secs = fi.as_uint32_or_throw(name);
             } else if ("tcpKeepintvlSecs" == name) {
-                options.tcp_keepintvl_secs = common::get_json_uint32(fi);
+                options.tcp_keepintvl_secs = fi.as_uint32_or_throw(name);
             } else if ("connecttimeoutMillis" == name) {
-                options.connecttimeout_millis = common::get_json_uint32(fi);
+                options.connecttimeout_millis = fi.as_uint32_or_throw(name);
             } else if ("buffersizeBytes" == name) {
-                options.buffersize_bytes = common::get_json_uint32(fi);
+                options.buffersize_bytes = fi.as_uint32_or_throw(name);
             } else if ("acceptEncoding" == name) {
-                options.accept_encoding = common::get_json_string(fi);
+                options.accept_encoding = fi.as_string_nonempty_or_throw(name);
             } else if ("followlocation" == name) {
-                options.followlocation = common::get_json_bool(fi);
+                options.followlocation = fi.as_bool_or_throw(name);
             } else if ("maxredirs" == name) {
-                options.maxredirs = common::get_json_uint32(fi);
+                options.maxredirs = fi.as_uint32_or_throw(name);
             } else if ("useragent" == name) {
-                options.useragent = common::get_json_string(fi);
+                options.useragent = fi.as_string_nonempty_or_throw(name);
             } else if ("maxSentSpeedLargeBytesPerSecond" == name) {
-                options.max_sent_speed_large_bytes_per_second = common::get_json_uint32(fi);
+                options.max_sent_speed_large_bytes_per_second = fi.as_uint32_or_throw(name);
             } else if ("maxRecvSpeedLargeBytesPerSecond" == name) {
-                options.max_recv_speed_large_bytes_per_second = common::get_json_uint32(fi);
+                options.max_recv_speed_large_bytes_per_second = fi.as_uint32_or_throw(name);
             } else if ("sslcertFilename" == name) {
-                options.sslcert_filename = common::get_json_string(fi);
+                options.sslcert_filename = fi.as_string_nonempty_or_throw(name);
             } else if ("sslcertype" == name) {
-                options.sslcertype = common::get_json_string(fi);
+                options.sslcertype = fi.as_string_nonempty_or_throw(name);
             } else if ("sslkeyFilename" == name) {
-                options.sslkey_filename = common::get_json_string(fi);
+                options.sslkey_filename = fi.as_string_nonempty_or_throw(name);
             } else if ("sslKeyType" == name) {
-                options.ssl_key_type = common::get_json_string(fi);
+                options.ssl_key_type = fi.as_string_nonempty_or_throw(name);
             } else if ("sslKeypasswd" == name) {
-                options.ssl_keypasswd = common::get_json_string(fi);
+                options.ssl_keypasswd = fi.as_string_nonempty_or_throw(name);
             } else if ("requireTls" == name) {
-                options.require_tls = common::get_json_bool(fi);
+                options.require_tls = fi.as_bool_or_throw(name);
             } else if ("sslVerifyhost" == name) {
-                options.ssl_verifyhost = common::get_json_bool(fi);
+                options.ssl_verifyhost = fi.as_bool_or_throw(name);
             } else if ("sslVerifypeer" == name) {
-                options.ssl_verifypeer = common::get_json_bool(fi);
+                options.ssl_verifypeer = fi.as_bool_or_throw(name);
             } else if ("sslVerifystatus" == name) {
-                options.ssl_verifystatus = common::get_json_bool(fi);
+                options.ssl_verifystatus = fi.as_bool_or_throw(name);
             } else if ("cainfoFilename" == name) {
-                options.cainfo_filename = common::get_json_string(fi);
+                options.cainfo_filename = fi.as_string_nonempty_or_throw(name);
             } else if ("crlfileFilename" == name) {
-                options.crlfile_filename = common::get_json_string(fi);
+                options.crlfile_filename = fi.as_string_nonempty_or_throw(name);
             } else if ("sslCipherList" == name) {
-                options.ssl_cipher_list = common::get_json_string(fi);
+                options.ssl_cipher_list = fi.as_string_nonempty_or_throw(name);
             } else {
                 throw common::wilton_internal_exception(TRACEMSG("Unknown 'ClientRequest' field: [" + name + "]"));
             }

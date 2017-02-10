@@ -53,7 +53,7 @@ class server::impl : public staticlib::pimpl::pimpl_object::impl {
     std::unique_ptr<sh::http_server> server_ptr;
 
 public:
-    impl(serverconf::server_config conf, std::vector<std::reference_wrapper<http_path>> paths) :
+    impl(serverconf::server_config conf, std::vector<sc::observer_ptr<http_path>> paths) :
     mustache_partials(load_partials(conf.mustache)),
     server_ptr(std::unique_ptr<sh::http_server>(new sh::http_server(
             conf.numberOfThreads, 
@@ -64,9 +64,9 @@ public:
             conf.ssl.verifyFile,
             create_verifier_cb(conf.ssl.verifySubjectSubstr)))) {
         auto conf_ptr = std::make_shared<serverconf::request_payload_config>(conf.requestPayload.clone());
-        for (const http_path& pa : paths) {
-            auto ha = pa.handler; // copy
-            server_ptr->add_handler(pa.method, pa.path,
+        for (auto& pa : paths) {
+            auto ha = pa->handler; // copy
+            server_ptr->add_handler(pa->method, pa->path,
                     [ha, this](sh::http_request_ptr& req, sh::tcp_connection_ptr & conn) {
                         auto writer = sh::http_response_writer::create(conn, req);
                         request req_wrap{static_cast<void*> (std::addressof(req)),
@@ -74,7 +74,7 @@ public:
                         ha(req_wrap);
                         req_wrap.finish();
                     });
-            server_ptr->add_payload_handler(pa.method, pa.path, [conf_ptr](staticlib::httpserver::http_request_ptr& /* request */) {
+            server_ptr->add_payload_handler(pa->method, pa->path, [conf_ptr](staticlib::httpserver::http_request_ptr& /* request */) {
                 return request_payload_handler{*conf_ptr};
             });
         }
@@ -153,7 +153,7 @@ private:
     }
     
 };
-PIMPL_FORWARD_CONSTRUCTOR(server, (serverconf::server_config)(std::vector<std::reference_wrapper<http_path>>), (), common::wilton_internal_exception)
+PIMPL_FORWARD_CONSTRUCTOR(server, (serverconf::server_config)(std::vector<sc::observer_ptr<http_path>>), (), common::wilton_internal_exception)
 PIMPL_FORWARD_METHOD(server, void, stop, (), (), common::wilton_internal_exception)
 
 } // namespace

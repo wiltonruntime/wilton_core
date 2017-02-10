@@ -51,7 +51,7 @@ std::string mutex_lock(const std::string& data) {
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("mutexHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -77,7 +77,7 @@ std::string mutex_unlock(const std::string& data) {
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("mutexHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -99,7 +99,7 @@ std::string mutex_unlock(const std::string& data) {
 std::string mutex_wait(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
-    auto rcallback = std::ref(common::empty_json());
+    auto rcallback = std::ref(ss::null_json_ref());
     int64_t handle = -1;
     int64_t timeout_millis = -1;
     for (const ss::json_field& fi : json.as_object()) {
@@ -108,9 +108,9 @@ std::string mutex_wait(const std::string& data) {
             common::check_json_callback_script(fi);
             rcallback = fi.value();
         } else if ("mutexHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else if ("timeoutMillis" == name) {
-            timeout_millis = common::get_json_int64(fi);
+            timeout_millis = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -183,7 +183,7 @@ std::string mutex_notify_all(const std::string& data) {
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("mutexHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -209,7 +209,7 @@ std::string mutex_destroy(const std::string& data) {
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("mutexHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }

@@ -57,10 +57,10 @@ const std::unordered_set<std::string> HEADERS_DISCARD_DUPLICATES{
 
 class request::impl : public staticlib::pimpl::pimpl_object::impl {
 
-    enum class State {
+    enum class request_state {
         created, committed
     };
-    std::atomic<const State> state;
+    std::atomic<const request_state> state;
     // owning ptrs here to not restrict clients async ops
     sh::http_request_ptr req;
     sh::http_response_writer_ptr resp;
@@ -70,7 +70,7 @@ public:
 
     impl(void* /* sh::http_request_ptr&& */ req, void* /* sh::http_response_writer_ptr&& */ resp,
             const std::map<std::string, std::string>& mustache_partials) :
-    state(State::created),
+    state(request_state::created),
     req(std::move(*static_cast<sh::http_request_ptr*>(req))),
     resp(std::move(*static_cast<sh::http_response_writer_ptr*> (resp))),
     mustache_partials(mustache_partials) { }
@@ -102,7 +102,7 @@ public:
     }
 
     void send_response(request&, const char* data, uint32_t data_len) {
-        if (!state.compare_exchange_strong(State::created, State::committed)) throw common::wilton_internal_exception(TRACEMSG(
+        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw common::wilton_internal_exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         resp->write(data, data_len);
         resp->send();
@@ -110,7 +110,7 @@ public:
 
     void send_file(request&, std::string file_path, std::function<void(bool)> finalizer) {
         auto fd = st::file_source(file_path);
-        if (!state.compare_exchange_strong(State::created, State::committed)) throw common::wilton_internal_exception(TRACEMSG(
+        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw common::wilton_internal_exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         auto fd_ptr = std::unique_ptr<std::streambuf>(si::make_unbuffered_istreambuf_ptr(std::move(fd)));
         auto sender = std::make_shared<response_stream_sender>(resp, std::move(fd_ptr), std::move(finalizer));
@@ -118,7 +118,7 @@ public:
     }
 
     void send_mustache(request&, std::string mustache_file_path, ss::json_value json) {
-        if (!state.compare_exchange_strong(State::created, State::committed)) throw common::wilton_internal_exception(TRACEMSG(
+        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw common::wilton_internal_exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         auto mp = sm::mustache_source(mustache_file_path, std::move(json), mustache_partials);
         auto mp_ptr = std::unique_ptr<std::streambuf>(si::make_unbuffered_istreambuf_ptr(std::move(mp)));
@@ -127,14 +127,14 @@ public:
     }
     
     response_writer send_later(request&) {
-        if (!state.compare_exchange_strong(State::created, State::committed)) throw common::wilton_internal_exception(TRACEMSG(
+        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw common::wilton_internal_exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         sh::http_response_writer_ptr writer = this->resp;
         return response_writer{static_cast<void*>(std::addressof(writer))};
     }
 
     void finish(request&) {
-        if (state.compare_exchange_strong(State::created, State::committed)) {
+        if (state.compare_exchange_strong(request_state::created, request_state::committed)) {
             resp->send();
         }
     }

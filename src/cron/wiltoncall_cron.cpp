@@ -20,6 +20,7 @@ namespace cron {
 
 namespace { //anonymous
 
+namespace su = staticlib::utils;
 namespace ss = staticlib::serialization;
 
 common::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>>& static_registry() {
@@ -32,15 +33,15 @@ common::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>>& 
 std::string cron_start(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
-    auto rcallback = std::ref(common::empty_json());
-    auto rexpr = std::ref(common::empty_string());
+    auto rcallback = std::ref(ss::null_json_ref());
+    auto rexpr = std::ref(su::empty_string());
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("callbackScript" == name) {
             common::check_json_callback_script(fi);
             rcallback = fi.value();
         } else if ("expression" == name) {
-            rexpr = common::get_json_string(fi);
+            rexpr = fi.as_string_nonempty_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -82,7 +83,7 @@ std::string cron_stop(const std::string& data) {
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("cronHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }

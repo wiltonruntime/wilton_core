@@ -8,7 +8,6 @@
 #ifndef WILTON_SERVER_SERVER_HPP
 #define	WILTON_SERVER_SERVER_HPP
 
-#include <functional>
 #include <vector>
 
 #include "staticlib/pimpl.hpp"
@@ -34,7 +33,7 @@ public:
      */
     PIMPL_CONSTRUCTOR(server)
             
-    server(serverconf::server_config conf, std::vector<std::reference_wrapper<http_path>> paths);
+    server(serverconf::server_config conf, std::vector<sc::observer_ptr<http_path>> paths);
     
     void stop();
     

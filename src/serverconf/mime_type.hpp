@@ -48,9 +48,9 @@ public:
         for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("extension" == name) {
-                this->extension = common::get_json_string(fi);
+                this->extension = fi.as_string_nonempty_or_throw(name);
             } else if ("mime" == name) {
-                this->mime = common::get_json_string(fi);
+                this->mime = fi.as_string_nonempty_or_throw(name);
             } else {
                 throw common::wilton_internal_exception(TRACEMSG("Unknown 'mimeType' field: [" + name + "]"));
             }

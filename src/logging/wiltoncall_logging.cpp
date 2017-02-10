@@ -14,6 +14,7 @@ namespace logging {
 
 namespace { //anonymous
 
+namespace su = staticlib::utils;
 namespace ss = staticlib::serialization;
 
 } // namespace
@@ -27,15 +28,15 @@ std::string logging_initialize(const std::string& data) {
 std::string logging_log(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
-    auto rlevel = std::ref(common::empty_string());
-    auto rlogger = std::ref(common::empty_string());
-    auto rmessage = std::ref(common::empty_string());
+    auto rlevel = std::ref(su::empty_string());
+    auto rlogger = std::ref(su::empty_string());
+    auto rmessage = std::ref(su::empty_string());
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("level" == name) {
-            rlevel = common::get_json_string(fi);
+            rlevel = fi.as_string_nonempty_or_throw(name);
         } else if ("logger" == name) {
-            rlogger = common::get_json_string(fi);
+            rlogger = fi.as_string_nonempty_or_throw(name);
         } else if ("message" == name) {
             rmessage = fi.as_string();
         } else {
@@ -59,14 +60,14 @@ std::string logging_log(const std::string& data) {
 std::string logging_is_level_enabled(const std::string& data) {
     // parse json
     ss::json_value json = ss::load_json_from_string(data);
-    auto rlevel = std::ref(common::empty_string());
-    auto rlogger = std::ref(common::empty_string());
+    auto rlevel = std::ref(su::empty_string());
+    auto rlogger = std::ref(su::empty_string());
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("level" == name) {
-            rlevel = common::get_json_string(fi);
+            rlevel = fi.as_string_nonempty_or_throw(name);
         } else if ("logger" == name) {
-            rlogger = common::get_json_string(fi);
+            rlogger = fi.as_string_nonempty_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }

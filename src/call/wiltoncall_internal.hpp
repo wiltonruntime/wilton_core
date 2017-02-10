@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <string>
 
+#include "staticlib/utils.hpp"
 #include "staticlib/serialization.hpp"
 
 #include "common/wilton_internal_exception.hpp"

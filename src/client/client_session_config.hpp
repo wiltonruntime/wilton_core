@@ -46,11 +46,11 @@ public:
             const ss::json_field& fi = vec[i];
             auto& name = fi.name();
             if ("maxHostConnections" == name) {
-                this->options.max_host_connections = common::get_json_uint32(fi);
+                this->options.max_host_connections = fi.as_uint32_or_throw(name);
             } else if ("maxTotalConnections" == name) {
-                this->options.max_total_connections = common::get_json_uint32(fi);
+                this->options.max_total_connections = fi.as_uint32_or_throw(name);
             } else if ("maxconnects" == name) {
-                this->options.maxconnects = common::get_json_uint32(fi);
+                this->options.maxconnects = fi.as_uint32_or_throw(name);
             } else {
                 throw common::wilton_internal_exception(TRACEMSG("Unknown 'ClientSession' field: [" + name + "]"));
             }

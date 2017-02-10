@@ -46,15 +46,14 @@ public:
 
 struct wilton_Request {
 private:
-    // note: NON-owning
-    wilton::server::request& delegate;
+    sc::observer_ptr<wilton::server::request> delegate;
+    
 public:
-
     wilton_Request(wilton::server::request& delegate) :
-    delegate(delegate) { }
+    delegate(std::addressof(delegate)) { }
 
     wilton::server::request& impl() {
-        return delegate;
+        return *delegate;
     }
 };
 
@@ -87,12 +86,12 @@ public:
 
 namespace { // anonymous
 
-std::vector<std::reference_wrapper<ws::http_path>> wrap_paths(wilton_HttpPath** paths, uint16_t paths_len) {
-    std::vector<std::reference_wrapper < ws::http_path>> res;
+std::vector<sc::observer_ptr<ws::http_path>> wrap_paths(wilton_HttpPath** paths, uint16_t paths_len) {
+    std::vector<sc::observer_ptr<ws::http_path>> res;
     for (int i = 0; i < paths_len; i++) {
         wilton_HttpPath* ptr = paths[i];
-        std::reference_wrapper<ws::http_path> ref = std::ref(ptr->impl());
-        res.push_back(ref);
+        auto obs = sc::make_observer_ptr(ptr->impl());
+        res.push_back(obs);
     }
     return res;
 }

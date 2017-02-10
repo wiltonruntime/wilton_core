@@ -14,6 +14,7 @@ namespace db {
 
 namespace { //anonymous
 
+namespace su = staticlib::utils;
 namespace ss = staticlib::serialization;
 
 common::handle_registry<wilton_DBConnection>& static_conn_registry() {
@@ -42,14 +43,14 @@ std::string db_connection_query(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
     int64_t handle = -1;
-    auto rsql = std::ref(common::empty_string());
-    std::string params = common::empty_string();
+    auto rsql = std::ref(su::empty_string());
+    std::string params = su::empty_string();
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("connectionHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else if ("sql" == name) {
-            rsql = common::get_json_string(fi);
+            rsql = fi.as_string_nonempty_or_throw(name);
         } else if ("params" == name) {
             params = ss::dump_json_to_string(fi.value());
         } else {
@@ -82,14 +83,14 @@ std::string db_connection_execute(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
     int64_t handle = -1;
-    auto rsql = std::ref(common::empty_string());
-    std::string params = common::empty_string();
+    auto rsql = std::ref(su::empty_string());
+    std::string params = su::empty_string();
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("connectionHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else if ("sql" == name) {
-            rsql = common::get_json_string(fi);
+            rsql = fi.as_string_nonempty_or_throw(name);
         } else if ("params" == name) {
             params = ss::dump_json_to_string(fi.value());
         } else {
@@ -123,7 +124,7 @@ std::string db_connection_close(const std::string& data) {
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("connectionHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -150,7 +151,7 @@ std::string db_transaction_start(const std::string& data) {
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("connectionHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -179,7 +180,7 @@ std::string db_transaction_commit(const std::string& data) {
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("transactionHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -205,7 +206,7 @@ std::string db_transaction_rollback(const std::string& data) {
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("transactionHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }

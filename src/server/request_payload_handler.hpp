@@ -54,29 +54,29 @@ namespace su = staticlib::utils;
 } // namespace
 
 class request_payload_handler {
-    enum class State {
+    enum class payload_state {
         memory, file
     };
 
-    class Data {
+    class payload_data {
         friend class request_payload_handler;
         serverconf::request_payload_config conf;
         uint64_t counter = 0;
         std::string buffer = "";
         std::string filename;
         std::unique_ptr<st::file_sink> file;
-        State state = State::memory;
+        payload_state state = payload_state::memory;
         su::random_string_generator rng;
 
     public:        
-        Data(const serverconf::request_payload_config& conf) :
+        payload_data(const serverconf::request_payload_config& conf) :
         conf(conf.clone()) { }
         
-        Data(const Data&) = delete;
-        Data& operator=(const Data&) = delete;
+        payload_data(const payload_data&) = delete;
+        payload_data& operator=(const payload_data&) = delete;
     };
     
-    std::shared_ptr<Data> data;
+    std::shared_ptr<payload_data> data;
 
 public:
     request_payload_handler(const request_payload_handler& other) :
@@ -107,7 +107,7 @@ public:
     }
     
     request_payload_handler(const serverconf::request_payload_config& conf) : 
-    data(std::make_shared<Data>(conf)) { }
+    data(std::make_shared<payload_data>(conf)) { }
 
     static const std::string& get_data_string(staticlib::httpserver::http_request_ptr& request) {
         auto ph = request->get_payload_handler<request_payload_handler>();
@@ -123,7 +123,7 @@ public:
     
     void operator()(const char* s, size_t n) {
         switch (data->state) {
-        case State::memory:
+        case payload_state::memory:
             if (data->buffer.length() + n < data->conf.memoryLimitBytes) {
                 data->buffer.append(s, n);
                 return;
@@ -131,7 +131,7 @@ public:
                 throw common::wilton_internal_exception(TRACEMSG("Request body exceeds" +
                         " limit (bytes): [" + sc::to_string(data->conf.memoryLimitBytes) + "]"));
             } else {
-                data->state = State::file;
+                data->state = payload_state::file;
                 data->filename = gen_filename();
                 data->file = std::unique_ptr<st::file_sink>(new st::file_sink(data->filename));
                 if (!data->buffer.empty()) {
@@ -140,7 +140,7 @@ public:
                 }
             }
             // fall through
-        case State::file:
+        case payload_state::file:
             if (nullptr != data->file.get()) {
                 si::write_all(*data->file, {s, n});
             } else throw common::wilton_internal_exception(TRACEMSG("Invalid payload handler data state"));
@@ -151,7 +151,7 @@ public:
     }
 
 private:        
-    Data& get_data() {        
+    payload_data& get_data() {        
         return *data;
     }
     
@@ -167,15 +167,15 @@ private:
     const std::string& get_data_as_string() {
         close_file_writer();
         switch (data->state) {
-        case State::file: {
-            data->state = State::memory;
+        case payload_state::file: {
+            data->state = payload_state::memory;
             auto fd = st::file_source(data->filename);
             si::string_sink sink;
             std::array<char, 4096> buf;
             si::copy_all(fd, sink, buf);
             data->buffer = std::move(sink.get_string());            
         } // fall through     
-        case State::memory:
+        case payload_state::memory:
             return data->buffer;               
         default:
             throw common::wilton_internal_exception(TRACEMSG("Invalid payload handler state"));
@@ -185,15 +185,15 @@ private:
     const std::string& get_data_as_filename() {
         close_file_writer();
         switch (data->state) {
-        case State::memory:
-            data->state = State::file;
+        case payload_state::memory:
+            data->state = payload_state::file;
             if (data->filename.empty()) {
                 data->filename = gen_filename();
                 auto fd = st::file_sink(data->filename);
                 si::write_all(fd, data->buffer);
             }
             // fall through
-        case State::file:
+        case payload_state::file:
             return data->filename;
         default:
             throw common::wilton_internal_exception(TRACEMSG("Invalid payload handler state"));

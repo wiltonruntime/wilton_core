@@ -14,6 +14,7 @@ namespace mustache {
 
 namespace { //anonymous
 
+namespace su = staticlib::utils;
 namespace ss = staticlib::serialization;
 
 } // namespace
@@ -21,12 +22,12 @@ namespace ss = staticlib::serialization;
 std::string mustache_render(const std::string& data) {
     // parse json
     ss::json_value json = ss::load_json_from_string(data);
-    auto rtemplate = std::ref(common::empty_string());
-    std::string values = common::empty_string();
+    auto rtemplate = std::ref(su::empty_string());
+    std::string values = su::empty_string();
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("template" == name) {
-            rtemplate = common::get_json_string(fi);
+            rtemplate = fi.as_string_nonempty_or_throw(name);
         } else if ("values" == name) {
             values = ss::dump_json_to_string(fi.value());
         } else {
@@ -51,12 +52,12 @@ std::string mustache_render(const std::string& data) {
 std::string mustache_render_file(const std::string& data) {
     // parse json
     ss::json_value json = ss::load_json_from_string(data);
-    auto rfile = std::ref(common::empty_string());
-    std::string values = common::empty_string();
+    auto rfile = std::ref(su::empty_string());
+    std::string values = su::empty_string();
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("file" == name) {
-            rfile = common::get_json_string(fi);
+            rfile = fi.as_string_nonempty_or_throw(name);
         } else if ("values" == name) {
             values = ss::dump_json_to_string(fi.value());
         } else {

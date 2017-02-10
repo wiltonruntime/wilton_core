@@ -51,13 +51,13 @@ public:
         for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("appenderType" == name) {
-                this->appenderType = common::get_json_string(fi);
+                this->appenderType = fi.as_string_nonempty_or_throw(name);
             } else if ("filePath" == name) {
-                this->filePath = common::get_json_string(fi);
+                this->filePath = fi.as_string_nonempty_or_throw(name);
             } else if ("layout" == name) {
-                this->layout = common::get_json_string(fi);
+                this->layout = fi.as_string_nonempty_or_throw(name);
             } else if ("thresholdLevel" == name) {
-                this->thresholdLevel = common::get_json_string(fi);
+                this->thresholdLevel = fi.as_string_nonempty_or_throw(name);
             } else {
                 throw common::wilton_internal_exception(TRACEMSG("Unknown 'logging.appenders' field: [" + name + "]"));
             }

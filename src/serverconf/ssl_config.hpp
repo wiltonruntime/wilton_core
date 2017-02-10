@@ -50,14 +50,14 @@ public:
         for (const ss::json_field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("keyFile" == name) {
-                this->keyFile = common::get_json_string(fi);
+                this->keyFile = fi.as_string_nonempty_or_throw(name);
             } else if ("keyPassword" == name) {
                 // empty string allowed
                 this->keyPassword = fi.as_string();
             } else if ("verifyFile" == name) {
-                this->verifyFile = common::get_json_string(fi);
+                this->verifyFile = fi.as_string_nonempty_or_throw(name);
             } else if ("verifySubjectSubstr" == name) {
-                this->verifySubjectSubstr = common::get_json_string(fi);
+                this->verifySubjectSubstr = fi.as_string_nonempty_or_throw(name);
             } else {
                 throw common::wilton_internal_exception(TRACEMSG("Unknown 'ssl' field: [" + name + "]"));                
             }

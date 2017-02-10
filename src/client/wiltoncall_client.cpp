@@ -14,6 +14,7 @@ namespace client {
 
 namespace { //anonymous
 
+namespace su = staticlib::utils;
 namespace ss = staticlib::serialization;
 
 common::handle_registry<wilton_HttpClient>& static_registry() {
@@ -40,7 +41,7 @@ std::string httpclient_close(const std::string& data) {
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("httpclientHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -64,15 +65,15 @@ std::string httpclient_execute(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
     int64_t handle = -1;
-    auto rurl = std::ref(common::empty_string());
-    auto rdata = std::ref(common::empty_string());
-    std::string metadata = common::empty_string();
+    auto rurl = std::ref(su::empty_string());
+    auto rdata = std::ref(su::empty_string());
+    std::string metadata = su::empty_string();
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("httpclientHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else if ("url" == name) {
-            rurl = common::get_json_string(fi);
+            rurl = fi.as_string_nonempty_or_throw(name);
         } else if ("data" == name) {
             rdata = fi.as_string();
         } else if ("metadata" == name) {
@@ -106,17 +107,17 @@ std::string httpclient_send_temp_file(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
     int64_t handle = -1;
-    auto rurl = std::ref(common::empty_string());
-    auto rfile = std::ref(common::empty_string());
-    std::string metadata = common::empty_string();
+    auto rurl = std::ref(su::empty_string());
+    auto rfile = std::ref(su::empty_string());
+    std::string metadata = su::empty_string();
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("httpclientHandle" == name) {
-            handle = common::get_json_int64(fi);
+            handle = fi.as_int64_or_throw(name);
         } else if ("url" == name) {
-            rurl = common::get_json_string(fi);
+            rurl = fi.as_string_nonempty_or_throw(name);
         } else if ("filePath" == name) {
-            rfile = common::get_json_string(fi);
+            rfile = fi.as_string_nonempty_or_throw(name);
         } else if ("metadata" == name) {
             metadata = ss::dump_json_to_string(fi.value());
         } else {

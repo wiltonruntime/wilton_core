@@ -14,6 +14,7 @@ namespace misc {
 
 namespace { //anonymous
 
+namespace su = staticlib::utils;
 namespace ss = staticlib::serialization;
 
 } // namespace
@@ -22,16 +23,16 @@ std::string tcp_wait_for_connection(const std::string& data) {
     // json parse
     ss::json_value json = ss::load_json_from_string(data);
     int64_t timeout = -1;
-    auto rip = std::ref(common::empty_string());
+    auto rip = std::ref(su::empty_string());
     int64_t port = -1;
     for (const ss::json_field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("ipAddress" == name) {
-            rip = common::get_json_string(fi);
+            rip = fi.as_string_nonempty_or_throw(name);
         } else if ("tcpPort" == name) {
-            port = common::get_json_int64(fi);
+            port = fi.as_int64_or_throw(name);
         } else if ("timeoutMillis" == name) {
-            timeout = common::get_json_int64(fi);
+            timeout = fi.as_int64_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
