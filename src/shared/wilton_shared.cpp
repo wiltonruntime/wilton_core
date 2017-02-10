@@ -149,7 +149,7 @@ char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len
         const std::string& val = it->second.get_value();
         if (val != current_value_str) {
             *changed_value_out = su::alloc_copy(val);
-            *changed_value_out_len = val.length();
+            *changed_value_out_len = static_cast<int>(val.length());
             return nullptr;
         }
         *changed_value_out = nullptr;

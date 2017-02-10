@@ -45,7 +45,7 @@ std::string tcp_wait_for_connection(const std::string& data) {
             "Required parameter 'tcpPort' not specified"));
     const std::string& ip = rip.get();
     // call wilton
-    char* err = wilton_tcp_wait_for_connection(ip.c_str(), ip.size(),
+    char* err = wilton_tcp_wait_for_connection(ip.c_str(), static_cast<int>(ip.length()),
             static_cast<int> (port), static_cast<int> (timeout));
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));

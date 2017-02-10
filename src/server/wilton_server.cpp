@@ -181,7 +181,7 @@ char* wilton_Request_get_request_metadata(wilton_Request* request, char** metada
         ss::json_value json = meta.to_json();
         std::string res = ss::dump_json_to_string(json);
         *metadata_json_out = su::alloc_copy(res);
-        *metadata_json_len_out = res.size();
+        *metadata_json_len_out = static_cast<int>(res.length());
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -197,7 +197,7 @@ char* wilton_Request_get_request_data(wilton_Request* request, char** data_out,
     try {
         const std::string& res = request->impl().get_request_data();
         *data_out = su::alloc_copy(res);
-        *data_len_out = res.size();
+        *data_len_out = static_cast<int>(res.length());
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -212,7 +212,7 @@ WILTON_EXPORT char* wilton_Request_get_request_data_filename(wilton_Request* req
     try {
         const std::string& res = request->impl().get_request_data_filename();
         *filename_out = su::alloc_copy(res);
-        *filename_len_out = res.size();
+        *filename_len_out = static_cast<int>(res.length());
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));

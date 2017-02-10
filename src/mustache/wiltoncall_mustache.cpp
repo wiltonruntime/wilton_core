@@ -43,8 +43,8 @@ std::string mustache_render(const std::string& data) {
     // call wilton
     char* out;
     int out_len;
-    char* err = wilton_render_mustache(templade.c_str(), templade.length(),
-            values.c_str(), values.length(), std::addressof(out), std::addressof(out_len));
+    char* err = wilton_render_mustache(templade.c_str(), static_cast<int>(templade.length()),
+            values.c_str(), static_cast<int>(values.length()), std::addressof(out), std::addressof(out_len));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return common::wrap_wilton_output(out, out_len);
 }
@@ -73,8 +73,8 @@ std::string mustache_render_file(const std::string& data) {
     // call wilton
     char* out;
     int out_len;
-    char* err = wilton_render_mustache_file(file.c_str(), file.length(),
-            values.c_str(), values.length(), std::addressof(out), std::addressof(out_len));
+    char* err = wilton_render_mustache_file(file.c_str(), static_cast<int>(file.length()),
+            values.c_str(), static_cast<int>(values.length()), std::addressof(out), std::addressof(out_len));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return common::wrap_wilton_output(out, out_len);
 }

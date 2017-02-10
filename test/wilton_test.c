@@ -29,14 +29,14 @@ int main() {
     const char* server_conf = "{\"tcpPort\": 8080}";
     
     wilton_HttpPath* path;
-    err = wilton_HttpPath_create(&path, "GET", strlen("GET"), "/", strlen("/"), NULL, hello);
+    err = wilton_HttpPath_create(&path, "GET", (int)strlen("GET"), "/", (int)strlen("/"), NULL, hello);
     check_err(err);
     
-    err = wilton_Server_create(&server, server_conf, strlen(server_conf), &path, 1);
+    err = wilton_Server_create(&server, server_conf, (int)strlen(server_conf), &path, 1);
     check_err(err);
     wilton_HttpPath_destroy(path);
 
-    // getchar();
+    //getchar();
 
     err = wilton_Server_stop(server);
     check_err(err);

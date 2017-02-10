@@ -50,7 +50,7 @@ char* wilton_render_mustache /* noexcept */ (
         ss::json_value json = ss::load_json_from_string(values_json_str);
         const std::string res = sm::render_string(template_text_str, json);
         *output_text_out = su::alloc_copy(res);
-        *output_text_len_out = res.length();
+        *output_text_len_out = static_cast<int>(res.length());
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -84,7 +84,7 @@ WILTON_EXPORT char* wilton_render_mustache_file /* noexcept */ (
         std::array<char, 4096> buf;
         si::copy_all(mp, sink, buf);
         *output_text_out = su::alloc_copy(sink.get_string());
-        *output_text_len_out = sink.get_string().length();
+        *output_text_len_out = static_cast<int>(sink.get_string().length());
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));

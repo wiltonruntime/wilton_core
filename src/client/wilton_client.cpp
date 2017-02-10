@@ -125,7 +125,7 @@ char* wilton_HttpClient_execute(
         }
         std::string resp_complete = ss::dump_json_to_string(resp_json);
         *response_data_out = su::alloc_copy(resp_complete);
-        *response_data_len_out = resp_complete.length();
+        *response_data_len_out = static_cast<int>(resp_complete.length());
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -175,7 +175,7 @@ char* wilton_HttpClient_send_file(
             finalizer_cb(finalizer_ctx, 1);
         }
         *response_data_out = su::alloc_copy(resp_complete);
-        *response_data_len_out = resp_complete.length();
+        *response_data_len_out = static_cast<int>(resp_complete.length());
         return nullptr;
     } catch (const std::exception& e) {
         if (nullptr != finalizer_cb) {

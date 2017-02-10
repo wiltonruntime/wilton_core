@@ -26,7 +26,7 @@ common::handle_registry<wilton_HttpClient>& static_registry() {
 
 std::string httpclient_create(const std::string& data) {
     wilton_HttpClient* http;
-    char* err = wilton_HttpClient_create(std::addressof(http), data.c_str(), data.length());
+    char* err = wilton_HttpClient_create(std::addressof(http), data.c_str(), static_cast<int>(data.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_registry().put(http);
     return ss::dump_json_to_string({
@@ -95,8 +95,9 @@ std::string httpclient_execute(const std::string& data) {
     // call wilton
     char* out;
     int out_len;
-    char* err = wilton_HttpClient_execute(http, url.c_str(), url.length(),
-            request_data.c_str(), request_data.length(), metadata.c_str(), metadata.length(),
+    char* err = wilton_HttpClient_execute(http, url.c_str(), static_cast<int>(url.length()),
+            request_data.c_str(), static_cast<int>(request_data.length()), 
+            metadata.c_str(), static_cast<int>(metadata.length()),
             std::addressof(out), std::addressof(out_len));
     static_registry().put(http);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
@@ -139,14 +140,15 @@ std::string httpclient_send_temp_file(const std::string& data) {
     // call wilton
     char* out;
     int out_len;
-    char* err = wilton_HttpClient_send_file(http, url.c_str(), url.length(),
-            file_path.c_str(), file_path.length(), metadata.c_str(), metadata.length(),
+    char* err = wilton_HttpClient_send_file(http, url.c_str(), static_cast<int>(url.length()),
+            file_path.c_str(), static_cast<int>(file_path.length()), 
+            metadata.c_str(), static_cast<int>(metadata.length()),
             std::addressof(out), std::addressof(out_len),
             new std::string(file_path.data(), file_path.length()),
             [](void* ctx, int) {
                 std::string* filePath_passed = static_cast<std::string*> (ctx);
                 std::remove(filePath_passed->c_str());
-                        delete filePath_passed;
+                delete filePath_passed;
             });
     static_registry().put(http);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));

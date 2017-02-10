@@ -142,8 +142,8 @@ void send_system_error(int64_t requestHandle, std::string errmsg) {
     wilton_Request* request = static_request_registry().remove(requestHandle);
     if (nullptr != request) {
         std::string conf{R"({"statusCode": 500, "statusMessage": "server Error"})"};
-        wilton_Request_set_response_metadata(request, conf.c_str(), conf.length());
-        wilton_Request_send_response(request, errmsg.c_str(), errmsg.length());
+        wilton_Request_set_response_metadata(request, conf.c_str(), static_cast<int>(conf.length()));
+        wilton_Request_send_response(request, errmsg.c_str(), static_cast<int>(errmsg.length()));
         static_request_registry().put(request);
     }
 }
@@ -155,8 +155,10 @@ std::vector<std::unique_ptr<wilton_HttpPath, http_path_deleter>> create_paths(
     for (auto& vi : views) {
         ss::json_value& cbs_to_pass = ctx.add_callback(vi.callbackScript);
         wilton_HttpPath* ptr = nullptr;
-        auto err = wilton_HttpPath_create(std::addressof(ptr), vi.method.c_str(), vi.method.length(),
-                vi.path.c_str(), vi.path.length(), static_cast<void*> (std::addressof(cbs_to_pass)),
+        auto err = wilton_HttpPath_create(std::addressof(ptr), 
+                vi.method.c_str(), static_cast<int>(vi.method.length()),
+                vi.path.c_str(), static_cast<int>(vi.path.length()),
+                static_cast<void*> (std::addressof(cbs_to_pass)),
                 [](void* passed, wilton_Request* request) {
                     int64_t requestHandle = static_request_registry().put(request);
                     ss::json_value* cb_ptr = static_cast<ss::json_value*> (passed);
@@ -206,7 +208,8 @@ std::string server_create(const std::string& data) {
     auto paths_pass = wrap_paths(paths);
     wilton_Server* server = nullptr;
     char* err = wilton_Server_create(std::addressof(server),
-            conf.c_str(), conf.length(), paths_pass.data(), paths_pass.size());
+            conf.c_str(), static_cast<int>(conf.length()), 
+            paths_pass.data(), static_cast<int>(paths_pass.size()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_server_registry().put(server, std::move(ctx));
     return ss::dump_json_to_string({
@@ -351,7 +354,7 @@ std::string request_set_response_metadata(const std::string& data) {
     if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
-    char* err = wilton_Request_set_response_metadata(request, metadata.c_str(), metadata.length());
+    char* err = wilton_Request_set_response_metadata(request, metadata.c_str(), static_cast<int>(metadata.length()));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return "{}";
@@ -380,7 +383,7 @@ std::string request_send_response(const std::string& data) {
     if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
-    char* err = wilton_Request_send_response(request, request_data.c_str(), request_data.length());
+    char* err = wilton_Request_send_response(request, request_data.c_str(), static_cast<int>(request_data.length()));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return "{}";
@@ -410,12 +413,12 @@ std::string request_send_temp_file(const std::string& data) {
     if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
-    char* err = wilton_Request_send_file(request, file.c_str(), file.length(),
+    char* err = wilton_Request_send_file(request, file.c_str(), static_cast<int>(file.length()),
             new std::string(file.data(), file.length()),
             [](void* ctx, int) {
                 std::string* filePath_passed = static_cast<std::string*> (ctx);
                 std::remove(filePath_passed->c_str());
-                        delete filePath_passed;
+                delete filePath_passed;
             });
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
@@ -453,8 +456,8 @@ std::string request_send_mustache(const std::string& data) {
     if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
-    char* err = wilton_Request_send_mustache(request, file.c_str(), file.length(),
-            values.c_str(), values.length());
+    char* err = wilton_Request_send_mustache(request, file.c_str(), static_cast<int>(file.length()),
+            values.c_str(), static_cast<int>(values.length()));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return "{}";
@@ -512,7 +515,7 @@ std::string request_send_with_response_writer(const std::string& data) {
     if (nullptr == writer) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'responseWriterHandle' parameter specified"));
     // call wilton
-    char* err = wilton_ResponseWriter_send(writer, request_data.c_str(), request_data.length());
+    char* err = wilton_ResponseWriter_send(writer, request_data.c_str(), static_cast<int>(request_data.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return "{}";
 }

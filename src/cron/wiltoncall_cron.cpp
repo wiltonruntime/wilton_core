@@ -55,7 +55,7 @@ std::string cron_start(const std::string& data) {
     std::string* str_to_pass = new std::string(ss::dump_json_to_string(callback));
     // call wilton
     wilton_CronTask* cron;
-    char* err = wilton_CronTask_start(std::addressof(cron), expr.c_str(), expr.length(),
+    char* err = wilton_CronTask_start(std::addressof(cron), expr.c_str(), static_cast<int>(expr.length()),
             static_cast<void*> (str_to_pass),
             [](void* passed) {
                 std::string* str = static_cast<std::string*> (passed);

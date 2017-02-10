@@ -121,7 +121,7 @@ char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, 
         json_in_str = std::string(json_in, json_in_len_u32);
         std::string out = static_registry().invoke(call_name_str, json_in_str);
         *json_out = su::alloc_copy(out);
-        *json_out_len = out.length();
+        *json_out_len = static_cast<int>(out.length());
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + 

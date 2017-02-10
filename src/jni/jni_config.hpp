@@ -61,7 +61,7 @@
 
 // directory to dump startup errors into
 #ifndef WILTON_STARTUP_ERR_DIR
-#define WILTON_STARTUP_ERR_DIR
+#define WILTON_STARTUP_ERR_DIR .
 #endif // WILTON_STARTUP_ERR_DIR
 #define WILTON_STARTUP_ERR_DIR_STR WILTON_STR(WILTON_STARTUP_ERR_DIR)
 

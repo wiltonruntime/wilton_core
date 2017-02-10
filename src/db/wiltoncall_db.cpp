@@ -31,7 +31,7 @@ common::handle_registry<wilton_DBTransaction>& static_tran_registry() {
 
 std::string db_connection_open(const std::string& data) {
     wilton_DBConnection* conn;
-    char* err = wilton_DBConnection_open(std::addressof(conn), data.c_str(), data.length());
+    char* err = wilton_DBConnection_open(std::addressof(conn), data.c_str(), static_cast<int>(data.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_conn_registry().put(conn);
     return ss::dump_json_to_string({
@@ -72,8 +72,9 @@ std::string db_connection_query(const std::string& data) {
     // call wilton
     char* out;
     int out_len;
-    char* err = wilton_DBConnection_query(conn, sql.c_str(), sql.length(),
-            params.c_str(), params.length(), std::addressof(out), std::addressof(out_len));
+    char* err = wilton_DBConnection_query(conn, sql.c_str(), static_cast<int>(sql.length()),
+            params.c_str(), static_cast<int>(params.length()),
+            std::addressof(out), std::addressof(out_len));
     static_conn_registry().put(conn);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return common::wrap_wilton_output(out, out_len);
@@ -110,8 +111,8 @@ std::string db_connection_execute(const std::string& data) {
     if (nullptr == conn) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'connectionHandle' parameter specified"));
     // call wilton
-    char* err = wilton_DBConnection_execute(conn, sql.c_str(), sql.length(),
-            params.c_str(), params.length());
+    char* err = wilton_DBConnection_execute(conn, sql.c_str(), static_cast<int>(sql.length()),
+            params.c_str(), static_cast<int>(params.length()));
     static_conn_registry().put(conn);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return "{}";

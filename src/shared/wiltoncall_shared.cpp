@@ -41,7 +41,8 @@ std::string shared_put(const std::string& data) {
             "Required parameter 'value' not specified"));
     const std::string& value = rvalue.get();
     // call wilton
-    char* err = wilton_shared_put(key.c_str(), key.length(), value.c_str(), value.length());
+    char* err = wilton_shared_put(key.c_str(), static_cast<int>(key.length()),
+            value.c_str(), static_cast<int>(value.length()));
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
@@ -67,7 +68,7 @@ std::string shared_get(const std::string& data) {
     // call wilton
     char* out;
     int out_len;
-    char* err = wilton_shared_get(key.c_str(), key.length(),
+    char* err = wilton_shared_get(key.c_str(), static_cast<int>(key.length()),
             std::addressof(out), std::addressof(out_len));
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
@@ -108,7 +109,8 @@ std::string shared_wait_change(const std::string& data) {
     char* out;
     int out_len;
     char* err = wilton_shared_wait_change(static_cast<int> (timeout_millis),
-            key.c_str(), key.length(), cvalue.c_str(), cvalue.length(),
+            key.c_str(), static_cast<int>(key.length()),
+            cvalue.c_str(), static_cast<int>(cvalue.length()),
             std::addressof(out), std::addressof(out_len));
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
@@ -135,7 +137,7 @@ std::string shared_remove(const std::string& data) {
             "Required parameter 'key' not specified"));
     const std::string& key = rkey.get();
     // call wilton
-    char* err = wilton_shared_remove(key.c_str(), key.length());
+    char* err = wilton_shared_remove(key.c_str(), static_cast<int>(key.length()));
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }

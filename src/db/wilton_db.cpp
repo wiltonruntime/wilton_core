@@ -103,7 +103,7 @@ char* wilton_DBConnection_query(
         ss::json_value rs_json{std::move(rs)};
         std::string rs_str = ss::dump_json_to_string(rs_json);
         *result_set_out = su::alloc_copy(rs_str);
-        *result_set_len_out = rs_str.size();
+        *result_set_len_out = static_cast<int>(rs_str.size());
         return nullptr;
     } catch (const std::exception& e) {
         return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));

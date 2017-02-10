@@ -262,7 +262,7 @@ char* wiltoncall_runscript(const char* json_in, int json_in_len, char** json_out
             std::string res_str = nullptr != res ?
             wj::jstring_to_str(env, static_cast<jstring> (res)) : "";
             *json_out = su::alloc_copy(res_str.c_str());
-            *json_out_len = res_str.length();
+            *json_out_len = static_cast<int>(res_str.length());
             return nullptr;
         } else {
             env->ExceptionClear();

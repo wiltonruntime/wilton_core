@@ -20,7 +20,7 @@ namespace ss = staticlib::serialization;
 } // namespace
 
 std::string logging_initialize(const std::string& data) {
-    char* err = wilton_logger_initialize(data.c_str(), data.length());
+    char* err = wilton_logger_initialize(data.c_str(), static_cast<int>(data.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
     return "{}";
 }
@@ -51,8 +51,9 @@ std::string logging_log(const std::string& data) {
     const std::string& logger = rlogger.get();
     const std::string& message = rmessage.get();
     // call wilton
-    char* err = wilton_logger_log(level.c_str(), level.length(), logger.c_str(), logger.length(),
-            message.c_str(), message.length());
+    char* err = wilton_logger_log(level.c_str(), static_cast<int>(level.length()),
+            logger.c_str(), static_cast<int>(logger.length()),
+            message.c_str(), static_cast<int>(message.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
     return "{}";
 }
@@ -80,8 +81,8 @@ std::string logging_is_level_enabled(const std::string& data) {
     const std::string& logger = rlogger.get();
     // call wilton
     int out;
-    char* err = wilton_logger_is_level_enabled(logger.c_str(), logger.length(),
-            level.c_str(), level.length(), std::addressof(out));
+    char* err = wilton_logger_is_level_enabled(logger.c_str(), static_cast<int>(logger.length()),
+            level.c_str(), static_cast<int>(level.length()), std::addressof(out));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
     return ss::dump_json_to_string({
         { "enabled", out != 0}
@@ -90,7 +91,6 @@ std::string logging_is_level_enabled(const std::string& data) {
 
 std::string logging_shutdown(const std::string&) {
     // call wilton
-    int out;
     char* err = wilton_logger_shutdown();
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
     return "{}";
