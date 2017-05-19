@@ -30,7 +30,7 @@ public:
         });
         std::vector<sl::json::field> hfields = sl::ranges::emplace_to_vector(std::move(ha));
         return {
-//            {"connectionSuccess", info.connection_success()},
+            {"connectionSuccess", resource.connection_successful()},
             {"data", std::move(data)},
             {"headers", std::move(hfields)},
             {"effectiveUrl", info.effective_url},
