@@ -68,9 +68,9 @@ std::string cron_start(const std::string& data) {
             });
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_registry().put(cron, std::unique_ptr<std::string>(str_to_pass));
-    return sl::json::value({
+    return sl::json::dumps({
         { "cronHandle", handle}
-    }).dumps();
+    });
 }
 
 std::string cron_stop(const std::string& data) {

@@ -77,9 +77,9 @@ std::string logging_is_level_enabled(const std::string& data) {
     char* err = wilton_logger_is_level_enabled(logger.c_str(), static_cast<int>(logger.length()),
             level.c_str(), static_cast<int>(level.length()), std::addressof(out));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
-    return sl::json::value({
+    return sl::json::dumps({
         { "enabled", out != 0}
-    }).dumps();
+    });
 }
 
 std::string logging_shutdown(const std::string&) {

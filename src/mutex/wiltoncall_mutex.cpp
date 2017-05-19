@@ -34,9 +34,9 @@ std::string mutex_create(const std::string&) {
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err) +
             "\nmutex_create error"));
     int64_t handle = static_registry().put(mutex);
-    return sl::json::value({
+    return sl::json::dumps({
         { "mutexHandle", handle}
-    }).dumps();
+    });
 }
 
 std::string mutex_lock(const std::string& data) {

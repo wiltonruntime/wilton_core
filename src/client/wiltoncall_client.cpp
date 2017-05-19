@@ -26,9 +26,9 @@ std::string httpclient_create(const std::string& data) {
     char* err = wilton_HttpClient_create(std::addressof(http), data.c_str(), static_cast<int>(data.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_registry().put(http);
-    return sl::json::value({
+    return sl::json::dumps({
         { "httpclientHandle", handle}
-    }).dumps();
+    });
 }
 
 std::string httpclient_close(const std::string& data) {

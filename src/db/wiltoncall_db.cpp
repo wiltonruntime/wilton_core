@@ -31,9 +31,9 @@ std::string db_connection_open(const std::string& data) {
     char* err = wilton_DBConnection_open(std::addressof(conn), data.c_str(), static_cast<int>(data.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_conn_registry().put(conn);
-    return sl::json::value({
+    return sl::json::dumps({
         { "connectionHandle", handle}
-    }).dumps();
+    });
 }
 
 std::string db_connection_query(const std::string& data) {
@@ -166,9 +166,9 @@ std::string db_transaction_start(const std::string& data) {
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err +
             "\ndb_transaction_start error for input data"));
     int64_t thandle = static_tran_registry().put(tran);
-    return sl::json::value({
+    return sl::json::dumps({
         { "transactionHandle", thandle}
-    }).dumps();
+    });
 }
 
 std::string db_transaction_commit(const std::string& data) {
