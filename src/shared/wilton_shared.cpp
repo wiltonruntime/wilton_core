@@ -67,12 +67,12 @@ std::unordered_map<std::string, Value>& static_map() {
 } // namespace
 
 char* wilton_shared_put(const char* key, int key_len, const char* value, int value_len) /* noexcept */ {
-    if (nullptr == key) return su::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!sc::is_uint16_positive(key_len)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'key_len' parameter specified: [" + sc::to_string(key_len) + "]"));
-    if (nullptr == value) return su::alloc_copy(TRACEMSG("Null 'value' parameter specified"));
-    if (!sc::is_uint32(value_len)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'value_len' parameter specified: [" + sc::to_string(value_len) + "]"));
+    if (nullptr == key) return sl::utils::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
+    if (!sl::support::is_uint16_positive(key_len)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'key_len' parameter specified: [" + sl::support::to_string(key_len) + "]"));
+    if (nullptr == value) return sl::utils::alloc_copy(TRACEMSG("Null 'value' parameter specified"));
+    if (!sl::support::is_uint32(value_len)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'value_len' parameter specified: [" + sl::support::to_string(value_len) + "]"));
     try {
         // prepare tuple
         uint16_t key_len_u16 = static_cast<uint16_t>(key_len);
@@ -89,16 +89,16 @@ char* wilton_shared_put(const char* key, int key_len, const char* value, int val
         static_map().emplace(std::move(key_str), Value(std::move(value_str)));
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 char* wilton_shared_get(const char* key, int key_len, char** value_out, int* value_out_len) /* noexcept */ {
-    if (nullptr == key) return su::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!sc::is_uint16_positive(key_len)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'key_len' parameter specified: [" + sc::to_string(key_len) + "]"));
-    if (nullptr == value_out) return su::alloc_copy(TRACEMSG("Null 'value_out' parameter specified"));
-    if (nullptr == value_out_len) return su::alloc_copy(TRACEMSG("Null 'value_out_len' parameter specified"));
+    if (nullptr == key) return sl::utils::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
+    if (!sl::support::is_uint16_positive(key_len)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'key_len' parameter specified: [" + sl::support::to_string(key_len) + "]"));
+    if (nullptr == value_out) return sl::utils::alloc_copy(TRACEMSG("Null 'value_out' parameter specified"));
+    if (nullptr == value_out_len) return sl::utils::alloc_copy(TRACEMSG("Null 'value_out_len' parameter specified"));
     try {
         // prepare key
         uint16_t key_len_u16 = static_cast<uint16_t> (key_len);
@@ -107,7 +107,7 @@ char* wilton_shared_get(const char* key, int key_len, char** value_out, int* val
         std::lock_guard<std::mutex> guard{static_mutex()};
         auto it = static_map().find(key_str);
         if (static_map().end() != it) {
-            *value_out = su::alloc_copy(it->second.get_value());
+            *value_out = sl::utils::alloc_copy(it->second.get_value());
             *value_out_len = static_cast<int>(it->second.get_value().length());
         } else {
             *value_out = nullptr;
@@ -115,7 +115,7 @@ char* wilton_shared_get(const char* key, int key_len, char** value_out, int* val
         }
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
@@ -123,16 +123,16 @@ char* wilton_shared_get(const char* key, int key_len, char** value_out, int* val
 char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len,
         const char* current_value, int current_value_len, char** changed_value_out,
         int* changed_value_out_len) /* noexcept */ {
-    if (!sc::is_uint32_positive(timeout_millis)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'timeout_millis' parameter specified: [" + sc::to_string(timeout_millis) + "]"));
-    if (nullptr == key) return su::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!sc::is_uint16_positive(key_len)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'key_len' parameter specified: [" + sc::to_string(key_len) + "]"));
-    if (nullptr == current_value) return su::alloc_copy(TRACEMSG("Null 'current_value' parameter specified"));
-    if (!sc::is_uint32(current_value_len)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'current_value_len' parameter specified: [" + sc::to_string(current_value_len) + "]"));
-    if (nullptr == changed_value_out) return su::alloc_copy(TRACEMSG("Null 'changed_value_out' parameter specified"));
-    if (nullptr == changed_value_out_len) return su::alloc_copy(TRACEMSG("Null 'changed_value_out_len' parameter specified"));
+    if (!sl::support::is_uint32_positive(timeout_millis)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'timeout_millis' parameter specified: [" + sl::support::to_string(timeout_millis) + "]"));
+    if (nullptr == key) return sl::utils::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
+    if (!sl::support::is_uint16_positive(key_len)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'key_len' parameter specified: [" + sl::support::to_string(key_len) + "]"));
+    if (nullptr == current_value) return sl::utils::alloc_copy(TRACEMSG("Null 'current_value' parameter specified"));
+    if (!sl::support::is_uint32(current_value_len)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'current_value_len' parameter specified: [" + sl::support::to_string(current_value_len) + "]"));
+    if (nullptr == changed_value_out) return sl::utils::alloc_copy(TRACEMSG("Null 'changed_value_out' parameter specified"));
+    if (nullptr == changed_value_out_len) return sl::utils::alloc_copy(TRACEMSG("Null 'changed_value_out_len' parameter specified"));
     try {
         // prepare tuple
         uint32_t timeout_millis_u32 = static_cast<uint32_t> (timeout_millis);
@@ -144,11 +144,11 @@ char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len
         std::unique_lock<std::mutex> lock{static_mutex()};
         auto it = static_map().find(key_str);
         if (static_map().end() == it) {
-            return su::alloc_copy(TRACEMSG("Shared record not found, key: [" + key_str + "]"));
+            return sl::utils::alloc_copy(TRACEMSG("Shared record not found, key: [" + key_str + "]"));
         }
         const std::string& val = it->second.get_value();
         if (val != current_value_str) {
-            *changed_value_out = su::alloc_copy(val);
+            *changed_value_out = sl::utils::alloc_copy(val);
             *changed_value_out_len = static_cast<int>(val.length());
             return nullptr;
         }
@@ -162,7 +162,7 @@ char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len
                 return true;
             }
             if (it->second.get_value() != current_value_str) {
-                *changed_value_out = su::alloc_copy(it->second.get_value());
+                *changed_value_out = sl::utils::alloc_copy(it->second.get_value());
                 *changed_value_out_len = static_cast<int> (it->second.get_value().length());
                 return true;
             }
@@ -171,18 +171,18 @@ char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len
         if (nullptr != *changed_value_out) {
             return nullptr;
         } else {
-            return su::alloc_copy(TRACEMSG("Shared record wait timeout exceeded," +
-                    "key: [" + key_str + "], timeout_millis: [" + sc::to_string(timeout_millis_u32) + "]"));
+            return sl::utils::alloc_copy(TRACEMSG("Shared record wait timeout exceeded," +
+                    "key: [" + key_str + "], timeout_millis: [" + sl::support::to_string(timeout_millis_u32) + "]"));
         }
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 char* wilton_shared_remove(const char* key, int key_len) /* noexcept */ {
-    if (nullptr == key) return su::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!sc::is_uint16_positive(key_len)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'key_len' parameter specified: [" + sc::to_string(key_len) + "]"));
+    if (nullptr == key) return sl::utils::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
+    if (!sl::support::is_uint16_positive(key_len)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'key_len' parameter specified: [" + sl::support::to_string(key_len) + "]"));
     try {
         // prepare key
         uint16_t key_len_u16 = static_cast<uint16_t> (key_len);
@@ -196,6 +196,6 @@ char* wilton_shared_remove(const char* key, int key_len) /* noexcept */ {
         }
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }

@@ -11,7 +11,7 @@
 #include <string>
 
 #include "staticlib/config.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
@@ -40,9 +40,8 @@ public:
 
     logger_config() { }
 
-    logger_config(const staticlib::serialization::json_value& json) {
-        namespace ss = staticlib::serialization;
-        for (const ss::json_field& fi : json.as_object()) {
+    logger_config(const sl::json::value& json) {
+        for (const sl::json::field& fi : json.as_object()) {
             auto& fname = fi.name();
             if ("name" == fname) {
                 this->name = fi.as_string_nonempty_or_throw(name);
@@ -58,7 +57,7 @@ public:
                 "Invalid 'logging.loggers.level' field: []"));
     }
 
-    staticlib::serialization::json_value to_json() const {
+    sl::json::value to_json() const {
         return {
             {"name", name},
             {"level", level}

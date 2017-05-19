@@ -12,13 +12,6 @@
 namespace wilton {
 namespace logging {
 
-namespace { //anonymous
-
-namespace su = staticlib::utils;
-namespace ss = staticlib::serialization;
-
-} // namespace
-
 std::string logging_initialize(const std::string& data) {
     char* err = wilton_logger_initialize(data.c_str(), static_cast<int>(data.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
@@ -27,11 +20,11 @@ std::string logging_initialize(const std::string& data) {
 
 std::string logging_log(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
-    auto rlevel = std::ref(su::empty_string());
-    auto rlogger = std::ref(su::empty_string());
-    auto rmessage = std::ref(su::empty_string());
-    for (const ss::json_field& fi : json.as_object()) {
+    sl::json::value json = sl::json::loads(data);
+    auto rlevel = std::ref(sl::utils::empty_string());
+    auto rlogger = std::ref(sl::utils::empty_string());
+    auto rmessage = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("level" == name) {
             rlevel = fi.as_string_nonempty_or_throw(name);
@@ -60,10 +53,10 @@ std::string logging_log(const std::string& data) {
 
 std::string logging_is_level_enabled(const std::string& data) {
     // parse json
-    ss::json_value json = ss::load_json_from_string(data);
-    auto rlevel = std::ref(su::empty_string());
-    auto rlogger = std::ref(su::empty_string());
-    for (const ss::json_field& fi : json.as_object()) {
+    sl::json::value json = sl::json::loads(data);
+    auto rlevel = std::ref(sl::utils::empty_string());
+    auto rlogger = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("level" == name) {
             rlevel = fi.as_string_nonempty_or_throw(name);
@@ -84,9 +77,9 @@ std::string logging_is_level_enabled(const std::string& data) {
     char* err = wilton_logger_is_level_enabled(logger.c_str(), static_cast<int>(logger.length()),
             level.c_str(), static_cast<int>(level.length()), std::addressof(out));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
-    return ss::dump_json_to_string({
+    return sl::json::value({
         { "enabled", out != 0}
-    });
+    }).dumps();
 }
 
 std::string logging_shutdown(const std::string&) {

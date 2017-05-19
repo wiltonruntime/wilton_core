@@ -11,7 +11,7 @@
 #include <string>
 
 #include "staticlib/config.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
@@ -44,9 +44,8 @@ public:
     name(std::move(name)),
     value(std::move(value)) { }
 
-    header(const staticlib::serialization::json_value& json) {
-        namespace ss = staticlib::serialization;
-        for (const ss::json_field& fi : json.as_object()) {
+    header(const sl::json::value& json) {
+        for (const sl::json::field& fi : json.as_object()) {
             auto& fname = fi.name();
             if ("name" == fname) {
                 this->name = fi.as_string_nonempty_or_throw(name);
@@ -62,9 +61,8 @@ public:
                 "Invalid 'header.value' field: []"));
     }
 
-    staticlib::serialization::json_field to_json() const {
-        namespace ss = staticlib::serialization;
-        return ss::json_field{name, ss::json_value{value}};
+    sl::json::field to_json() const {
+        return sl::json::field{name, sl::json::value{value}};
     }
 };
 

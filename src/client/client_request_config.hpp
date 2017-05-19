@@ -12,9 +12,9 @@
 #include <string>
 #include <vector>
 
-#include "staticlib/httpclient.hpp"
+#include "staticlib/http.hpp"
 #include "staticlib/ranges.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
@@ -24,7 +24,7 @@ namespace client {
 
 class client_request_config {
 public:
-    staticlib::httpclient::http_request_options options;
+    sl::http::request_options options;
 
     client_request_config(const client_request_config&) = delete;
 
@@ -40,12 +40,11 @@ public:
 
     client_request_config() { }
 
-    client_request_config(const staticlib::serialization::json_value& json) {
-        namespace ss = staticlib::serialization;
-        for (const ss::json_field& fi : json.as_object()) {
+    client_request_config(const sl::json::value& json) {
+        for (const sl::json::field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("headers" == name) {
-                for (const ss::json_field& hf : fi.as_object_or_throw(name)) {
+                for (const sl::json::field& hf : fi.as_object_or_throw(name)) {
                     std::string val = hf.as_string_nonempty_or_throw(hf.name());
                     options.headers.emplace_back(hf.name(), std::move(val));
                 }
@@ -55,10 +54,6 @@ public:
                 options.abort_on_connect_error = fi.as_bool_or_throw(name);
             } else if ("abortOnResponseError" == name) {
                 options.abort_on_response_error = fi.as_bool_or_throw(name);
-            } else if ("readTimeoutMillis" == name) {
-                options.read_timeout_millis = fi.as_uint32_or_throw(name);
-            } else if ("fdsetTimeoutMillis" == name) {
-                options.fdset_timeout_millis = fi.as_uint32_or_throw(name);
             } else if ("forceHttp10" == name) {
                 options.force_http_10 = fi.as_bool_or_throw(name);
             } else if ("noprogress" == name) {
@@ -123,20 +118,16 @@ public:
         }
     }
 
-    staticlib::serialization::json_value to_json() const {
-        namespace sr = staticlib::ranges;
-        namespace ss = staticlib::serialization;
-        auto ha = sr::transform(sr::refwrap(options.headers), [](const std::pair<std::string, std::string>& el) {
-            return ss::json_field{el.first, el.second};
+    sl::json::value to_json() const {
+        auto ha = sl::ranges::transform(options.headers, [](const std::pair<std::string, std::string>& el) {
+            return sl::json::field{el.first, el.second};
         });
-        std::vector<ss::json_field> hfields = sr::emplace_to_vector(std::move(ha));
+        std::vector<sl::json::field> hfields = sl::ranges::emplace_to_vector(std::move(ha));
         return {
             {"headers", std::move(hfields)},
             {"method", options.method},
             {"abortOnConnectError", options.abort_on_connect_error},
             {"abortOnResponseError", options.abort_on_response_error},
-            {"readTimeoutMillis", options.read_timeout_millis},
-            {"fdsetTimeoutMillis", options.fdset_timeout_millis},
             {"forceHttp10", options.force_http_10},
             {"noprogress", options.noprogress},
             {"nosignal", options.nosignal},

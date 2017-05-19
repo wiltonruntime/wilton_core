@@ -18,7 +18,7 @@
 namespace wilton {
 namespace cron {
 
-class cron_task : public staticlib::pimpl::pimpl_object {
+class cron_task : public sl::pimpl::object {
 protected:
     /**
      * implementation class

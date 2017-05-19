@@ -21,11 +21,6 @@ namespace mutex {
 
 namespace { //anonymous
 
-namespace sc = staticlib::config;
-namespace si = staticlib::io;
-namespace ss = staticlib::serialization;
-namespace su = staticlib::utils;
-
 common::handle_registry<wilton_Mutex>& static_registry() {
     static common::handle_registry<wilton_Mutex> registry;
     return registry;
@@ -39,16 +34,16 @@ std::string mutex_create(const std::string&) {
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err) +
             "\nmutex_create error"));
     int64_t handle = static_registry().put(mutex);
-    return ss::dump_json_to_string({
+    return sl::json::value({
         { "mutexHandle", handle}
-    });
+    }).dumps();
 }
 
 std::string mutex_lock(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("mutexHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -72,9 +67,9 @@ std::string mutex_lock(const std::string& data) {
 
 std::string mutex_unlock(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("mutexHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -98,15 +93,15 @@ std::string mutex_unlock(const std::string& data) {
 
 std::string mutex_wait(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
-    auto rcallback = std::ref(ss::null_json_ref());
+    sl::json::value json = sl::json::loads(data);
+    auto rcallback = std::ref(sl::json::null_value_ref());
     int64_t handle = -1;
     int64_t timeout_millis = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("conditionCallbackScript" == name) {
             common::check_json_callback_script(fi);
-            rcallback = fi.value();
+            rcallback = fi.val();
         } else if ("mutexHandle" == name) {
             handle = fi.as_int64_or_throw(name);
         } else if ("timeoutMillis" == name) {
@@ -115,14 +110,14 @@ std::string mutex_wait(const std::string& data) {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (ss::json_type::nullt == rcallback.get().type()) throw common::wilton_internal_exception(TRACEMSG(
+    if (sl::json::type::nullt == rcallback.get().json_type()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'conditionCallbackScript' not specified"));
     if (-1 == handle) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'mutexHandle' not specified"));
     if (-1 == timeout_millis) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'timeoutMillis' not specified"));
-    const ss::json_value& callback = rcallback.get();
-    std::string cbjson = ss::dump_json_to_string(callback);
+    const sl::json::value& callback = rcallback.get();
+    std::string cbjson = callback.dumps();
     // get handle
     wilton_Mutex* mutex = static_registry().peek(handle);
     if (nullptr == mutex) throw common::wilton_internal_exception(TRACEMSG(
@@ -144,18 +139,18 @@ std::string mutex_wait(const std::string& data) {
                     log_error("wilton.mutex", TRACEMSG("Null condition result returned"));
                     return 1;
                 }
-                if (!sc::is_uint16_positive(out_len)) {
+                if (!sl::support::is_uint16_positive(out_len)) {
                     log_error("wilton.mutex", TRACEMSG(
-                        "Invalid output length returned from condition: [" + sc::to_string(out_len) + "]"));
+                        "Invalid output length returned from condition: [" + sl::support::to_string(out_len) + "]"));
                     return 1;
                 }
                 // parse json
-                auto src = si::array_source(out, static_cast<uint16_t> (out_len));
-                ss::json_value res = ss::load_json(src);
+                auto src = sl::io::array_source(out, static_cast<uint16_t> (out_len));
+                sl::json::value res = sl::json::load(src);
                 int32_t tribool = -1;
-                for (const ss::json_field& fi : res.as_object()) {
+                for (const sl::json::field& fi : res.as_object()) {
                     auto& name = fi.name();
-                    if ("condition" == name && ss::json_type::boolean == fi.type()) {
+                    if ("condition" == name && sl::json::type::boolean == fi.json_type()) {
                         tribool = fi.as_bool() ? 1 : 0;
                     } else {
                         log_error("wilton.mutex", TRACEMSG("Unknown condition result data field: [" + name + "]"));
@@ -178,9 +173,9 @@ std::string mutex_wait(const std::string& data) {
 
 std::string mutex_notify_all(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("mutexHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -204,9 +199,9 @@ std::string mutex_notify_all(const std::string& data) {
 
 std::string mutex_destroy(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("mutexHandle" == name) {
             handle = fi.as_int64_or_throw(name);

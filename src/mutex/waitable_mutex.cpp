@@ -12,7 +12,8 @@
 #include <condition_variable>
 
 #include "staticlib/config.hpp"
-#include "staticlib/pimpl/pimpl_forward_macros.hpp"
+#include "staticlib/support.hpp"
+#include "staticlib/pimpl/forward_macros.hpp"
 
 namespace wilton {
 namespace mutex {
@@ -25,7 +26,7 @@ using cond_fun = std::function<bool()>;
 
 } // namespace
 
-class waitable_mutex::impl : public staticlib::pimpl::pimpl_object::impl {
+class waitable_mutex::impl : public staticlib::pimpl::object::impl {
     std::mutex mutex;
     std::condition_variable cv;
 
@@ -46,7 +47,7 @@ public:
         cv.wait_for(guard, std::chrono::milliseconds(timeout_millis), cond);
         if (!cond()) {
             throw common::wilton_internal_exception(TRACEMSG(
-                    "waitable_mutex wait timed out, timeout_millis: [" + sc::to_string(timeout_millis) + "]"));
+                    "waitable_mutex wait timed out, timeout_millis: [" + sl::support::to_string(timeout_millis) + "]"));
         }
     }
 

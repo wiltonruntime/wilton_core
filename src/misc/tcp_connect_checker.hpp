@@ -19,7 +19,7 @@
 namespace wilton {
 namespace misc {
 
-class tcp_connect_checker : public staticlib::pimpl::pimpl_object {
+class tcp_connect_checker : public sl::pimpl::object {
 protected:
     /**
      * implementation class

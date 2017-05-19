@@ -12,19 +12,12 @@
 namespace wilton {
 namespace shared {
 
-namespace { //anonymous
-
-namespace su = staticlib::utils;
-namespace ss = staticlib::serialization;
-
-} // namespace
-
 std::string shared_put(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
-    auto rkey = std::ref(su::empty_string());
-    auto rvalue = std::ref(su::empty_string());
-    for (const ss::json_field& fi : json.as_object()) {
+    sl::json::value json = sl::json::loads(data);
+    auto rkey = std::ref(sl::utils::empty_string());
+    auto rvalue = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("key" == name) {
             rkey = fi.as_string_nonempty_or_throw(name);
@@ -52,9 +45,9 @@ std::string shared_put(const std::string& data) {
 
 std::string shared_get(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
-    auto rkey = std::ref(su::empty_string());
-    for (const ss::json_field& fi : json.as_object()) {
+    sl::json::value json = sl::json::loads(data);
+    auto rkey = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("key" == name) {
             rkey = fi.as_string_nonempty_or_throw(name);
@@ -81,11 +74,11 @@ std::string shared_get(const std::string& data) {
 
 std::string shared_wait_change(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t timeout_millis = -1;
-    auto rkey = std::ref(su::empty_string());
-    auto rcvalue = std::ref(su::empty_string());
-    for (const ss::json_field& fi : json.as_object()) {
+    auto rkey = std::ref(sl::utils::empty_string());
+    auto rcvalue = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("timeoutMillis" == name) {
             timeout_millis = fi.as_int64_or_throw(name);
@@ -123,9 +116,9 @@ std::string shared_wait_change(const std::string& data) {
 
 std::string shared_remove(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
-    auto rkey = std::ref(su::empty_string());
-    for (const ss::json_field& fi : json.as_object()) {
+    sl::json::value json = sl::json::loads(data);
+    auto rkey = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("key" == name) {
             rkey = fi.as_string_nonempty_or_throw(name);

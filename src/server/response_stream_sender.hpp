@@ -29,25 +29,22 @@
 
 #include "asio.hpp"
 
-#include "staticlib/httpserver/http_response_writer.hpp"
-#include "staticlib/httpserver/tcp_connection.hpp"
+#include "staticlib/pion.hpp"
 
-#include "staticlib/io/operations.hpp"
-#include "staticlib/io/streambuf_source.hpp"
-
+#include "staticlib/io.hpp"
 
 namespace wilton {
 namespace server {
 
 class response_stream_sender : public std::enable_shared_from_this<response_stream_sender> {
-    staticlib::httpserver::http_response_writer_ptr writer;
+    sl::pion::http_response_writer_ptr writer;
     std::unique_ptr<std::streambuf> stream;
     std::function<void(bool)> finalizer;
 
     std::array<char, 4096> buf;
 
 public:
-    response_stream_sender(staticlib::httpserver::http_response_writer_ptr writer, 
+    response_stream_sender(sl::pion::http_response_writer_ptr writer, 
             std::unique_ptr<std::streambuf>&& stream, 
             std::function<void(bool)> finalizer = [](bool){}) :
     writer(std::move(writer)),
@@ -55,11 +52,11 @@ public:
     finalizer(std::move(finalizer)) { }
 
     void send() {
-        asio::error_code ec{};
+        std::error_code ec{};
         handle_write(ec, 0);
     }
 
-    void handle_write(const asio::error_code& ec, size_t /* bytes_written */) {
+    void handle_write(const std::error_code& ec, size_t /* bytes_written */) {
         namespace si = staticlib::io;
         if (!ec) {
             auto src = si::streambuf_source(stream.get());
@@ -81,7 +78,7 @@ public:
             }
         } else {
             // make sure it will get closed
-            writer->get_connection()->set_lifecycle(staticlib::httpserver::tcp_connection::LIFECYCLE_CLOSE);
+            writer->get_connection()->set_lifecycle(sl::pion::tcp_connection::LIFECYCLE_CLOSE);
             finalizer(false);
         }
     }

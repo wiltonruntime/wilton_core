@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "staticlib/ranges.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
@@ -59,9 +59,8 @@ public:
         return *this;
     }
 
-    server_config(const staticlib::serialization::json_value& json) {
-        namespace ss = staticlib::serialization;
-        for (const ss::json_field& fi : json.as_object()) {
+    server_config(const sl::json::value& json) {
+        for (const sl::json::field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("numberOfThreads" == name) {
                 this->numberOfThreads = fi.as_uint16_or_throw(name);
@@ -70,31 +69,30 @@ public:
             } else if ("ipAddress" == name) {
                 this->ipAddress = fi.as_string_nonempty_or_throw(name);
             } else if ("ssl" == name) {
-                this->ssl = ssl_config(fi.value());
+                this->ssl = ssl_config(fi.val());
             } else if ("documentRoots" == name) {
-                for (const ss::json_value& lo : fi.as_array_or_throw(name)) {
+                for (const sl::json::value& lo : fi.as_array_or_throw(name)) {
                     auto jd = serverconf::document_root(lo);
                     this->documentRoots.emplace_back(std::move(jd));
                 }
             } else if ("requestPayload" == name) {
-                this->requestPayload = serverconf::request_payload_config(fi.value());
+                this->requestPayload = serverconf::request_payload_config(fi.val());
             } else if ("mustache" == name) {
-                this->mustache = mustache_config(fi.value());
+                this->mustache = mustache_config(fi.val());
             } else {
                 throw common::wilton_internal_exception(TRACEMSG("Unknown field: [" + name + "]"));
             }
         }
     }
     
-    staticlib::serialization::json_value to_json() const {
-        namespace sr = staticlib::ranges;
+    sl::json::value to_json() const {
         return {
             {"numberOfThreads", numberOfThreads},
             {"tcpPort", tcpPort},
             {"ipAddress", ipAddress},
             {"ssl", ssl.to_json()},
             {"documentRoots", [this]() {
-                auto drs = sr::transform(sr::refwrap(documentRoots), [](const serverconf::document_root& el) {
+                auto drs = sl::ranges::transform(documentRoots, [](const serverconf::document_root& el) {
                     return el.to_json();
                 });
                 return drs.to_vector();

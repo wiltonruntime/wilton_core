@@ -13,7 +13,7 @@
 
 #include "staticlib/config.hpp"
 #include "staticlib/ranges.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
@@ -44,16 +44,15 @@ public:
         return *this;
     }
     
-    response_metadata(const staticlib::serialization::json_value& json) {
-        namespace ss = staticlib::serialization;
-        for (const ss::json_field& fi : json.as_object()) {
+    response_metadata(const sl::json::value& json) {
+        for (const sl::json::field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("statusCode" == name) {
                 this->statusCode = fi.as_uint16_or_throw(name);
             } else if ("statusMessage" == name) {
                 this->statusMessage = fi.as_string_nonempty_or_throw(name);
             } else if ("headers" == name) {
-                for (const ss::json_field& hf : fi.as_object_or_throw(name)) {
+                for (const sl::json::field& hf : fi.as_object_or_throw(name)) {
                     std::string val = hf.as_string_nonempty_or_throw(hf.name());
                     this->headers.emplace_back(hf.name(), std::move(val));
                 }
@@ -63,13 +62,11 @@ public:
         }
     }
 
-    staticlib::serialization::json_value to_json() const {
-        namespace sr = staticlib::ranges;
-        namespace ss = staticlib::serialization;
-        auto ha = sr::transform(sr::refwrap(headers), [](const serverconf::header & el) {
+    sl::json::value to_json() const {
+        auto ha = sl::ranges::transform(headers, [](const serverconf::header & el) {
             return el.to_json();
         });
-        std::vector<ss::json_field> hfields = sr::emplace_to_vector(std::move(ha));
+        std::vector<sl::json::field> hfields = sl::ranges::emplace_to_vector(std::move(ha));
         return {
             {"statusCode", statusCode},
             {"statusMessage", statusMessage},

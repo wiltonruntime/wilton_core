@@ -12,20 +12,13 @@
 namespace wilton {
 namespace misc {
 
-namespace { //anonymous
-
-namespace su = staticlib::utils;
-namespace ss = staticlib::serialization;
-
-} // namespace
-
 std::string tcp_wait_for_connection(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t timeout = -1;
-    auto rip = std::ref(su::empty_string());
+    auto rip = std::ref(sl::utils::empty_string());
     int64_t port = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("ipAddress" == name) {
             rip = fi.as_string_nonempty_or_throw(name);

@@ -10,7 +10,7 @@
 
 #include <string>
 
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
@@ -45,9 +45,8 @@ public:
     
     ssl_config() { }
     
-    ssl_config(const staticlib::serialization::json_value& json) {
-        namespace ss = staticlib::serialization;
-        for (const ss::json_field& fi : json.as_object()) {
+    ssl_config(const sl::json::value& json) {
+        for (const sl::json::field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("keyFile" == name) {
                 this->keyFile = fi.as_string_nonempty_or_throw(name);
@@ -64,7 +63,7 @@ public:
         }
     }
     
-    staticlib::serialization::json_value to_json() const {
+    sl::json::value to_json() const {
         return {
             { "keyFile", keyFile },
             { "keyPassword", keyPassword},

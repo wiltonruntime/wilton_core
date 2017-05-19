@@ -16,10 +16,10 @@
 
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
-#include "staticlib/httpserver.hpp"
+#include "staticlib/pion.hpp"
 #include "staticlib/mustache.hpp"
-#include "staticlib/pimpl/pimpl_forward_macros.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/pimpl/forward_macros.hpp"
+#include "staticlib/json.hpp"
 #include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
@@ -37,14 +37,6 @@ namespace server {
 
 namespace { // anonymous
 
-namespace sc = staticlib::config;
-namespace si = staticlib::io;
-namespace sh = staticlib::httpserver;
-namespace sm = staticlib::mustache;
-namespace ss = staticlib::serialization;
-namespace st = staticlib::tinydir;
-namespace su = staticlib::utils;
-
 using partmap_type = const std::map<std::string, std::string>&;
 
 const std::unordered_set<std::string> HEADERS_DISCARD_DUPLICATES{
@@ -55,29 +47,29 @@ const std::unordered_set<std::string> HEADERS_DISCARD_DUPLICATES{
 
 } //namespace
 
-class request::impl : public staticlib::pimpl::pimpl_object::impl {
+class request::impl : public sl::pimpl::object::impl {
 
     enum class request_state {
         created, committed
     };
     std::atomic<const request_state> state;
     // owning ptrs here to not restrict clients async ops
-    sh::http_request_ptr req;
-    sh::http_response_writer_ptr resp;
+    sl::pion::http_request_ptr req;
+    sl::pion::http_response_writer_ptr resp;
     const std::map<std::string, std::string>& mustache_partials;
 
 public:
 
-    impl(void* /* sh::http_request_ptr&& */ req, void* /* sh::http_response_writer_ptr&& */ resp,
+    impl(void* /* sl::pion::http_request_ptr&& */ req, void* /* sl::pion::http_response_writer_ptr&& */ resp,
             const std::map<std::string, std::string>& mustache_partials) :
     state(request_state::created),
-    req(std::move(*static_cast<sh::http_request_ptr*>(req))),
-    resp(std::move(*static_cast<sh::http_response_writer_ptr*> (resp))),
+    req(std::move(*static_cast<sl::pion::http_request_ptr*>(req))),
+    resp(std::move(*static_cast<sl::pion::http_response_writer_ptr*> (resp))),
     mustache_partials(mustache_partials) { }
 
     serverconf::request_metadata get_request_metadata(request&) {
-        std::string http_ver = sc::to_string(req->get_version_major()) +
-                "." + sc::to_string(req->get_version_minor());
+        std::string http_ver = sl::support::to_string(req->get_version_major()) +
+                "." + sl::support::to_string(req->get_version_minor());
         auto headers = get_request_headers(*req);
         auto queries = get_queries(*req);
         std::string protocol = resp->get_connection()->get_ssl_flag() ? "https" : "http";
@@ -109,19 +101,19 @@ public:
     }
 
     void send_file(request&, std::string file_path, std::function<void(bool)> finalizer) {
-        auto fd = st::file_source(file_path);
+        auto fd = sl::tinydir::file_source(file_path);
         if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw common::wilton_internal_exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
-        auto fd_ptr = std::unique_ptr<std::streambuf>(si::make_unbuffered_istreambuf_ptr(std::move(fd)));
+        auto fd_ptr = std::unique_ptr<std::streambuf>(sl::io::make_unbuffered_istreambuf_ptr(std::move(fd)));
         auto sender = std::make_shared<response_stream_sender>(resp, std::move(fd_ptr), std::move(finalizer));
         sender->send();
     }
 
-    void send_mustache(request&, std::string mustache_file_path, ss::json_value json) {
+    void send_mustache(request&, std::string mustache_file_path, sl::json::value json) {
         if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw common::wilton_internal_exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
-        auto mp = sm::mustache_source(mustache_file_path, std::move(json), mustache_partials);
-        auto mp_ptr = std::unique_ptr<std::streambuf>(si::make_unbuffered_istreambuf_ptr(std::move(mp)));
+        auto mp = sl::mustache::source(mustache_file_path, std::move(json), mustache_partials);
+        auto mp_ptr = std::unique_ptr<std::streambuf>(sl::io::make_unbuffered_istreambuf_ptr(std::move(mp)));
         auto sender = std::make_shared<response_stream_sender>(resp, std::move(mp_ptr));
         sender->send();
     }
@@ -129,7 +121,7 @@ public:
     response_writer send_later(request&) {
         if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw common::wilton_internal_exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
-        sh::http_response_writer_ptr writer = this->resp;
+        sl::pion::http_response_writer_ptr writer = this->resp;
         return response_writer{static_cast<void*>(std::addressof(writer))};
     }
 
@@ -146,7 +138,7 @@ private:
     // from, host, if-modified-since, if-unmodified-since, last-modified, location, 
     // max-forwards, proxy-authorization, referer, retry-after, or user-agent are discarded.
     // For all other headers, the values are joined together with ', '.
-    std::vector<serverconf::header> get_request_headers(sh::http_request& req) {
+    std::vector<serverconf::header> get_request_headers(sl::pion::http_request& req) {
         std::unordered_map<std::string, serverconf::header> map{};
         for (const auto& en : req.get_headers()) {
             auto ha = serverconf::header(en.first, en.second);
@@ -167,7 +159,7 @@ private:
         return res;
     }
     
-    std::vector<std::pair<std::string, std::string>> get_queries(sh::http_request& req) {
+    std::vector<std::pair<std::string, std::string>> get_queries(sl::pion::http_request& req) {
         std::unordered_map<std::string, std::string> map{};
         for (const auto& en : req.get_queries()) {
             auto inserted = map.emplace(en.first, en.second);
@@ -199,7 +191,7 @@ PIMPL_FORWARD_METHOD(request, const std::string&, get_request_data_filename, (),
 PIMPL_FORWARD_METHOD(request, void, set_response_metadata, (serverconf::response_metadata), (), common::wilton_internal_exception)
 PIMPL_FORWARD_METHOD(request, void, send_response, (const char*)(uint32_t), (), common::wilton_internal_exception)
 PIMPL_FORWARD_METHOD(request, void, send_file, (std::string)(std::function<void(bool)>), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(request, void, send_mustache, (std::string)(ss::json_value), (), common::wilton_internal_exception)
+PIMPL_FORWARD_METHOD(request, void, send_mustache, (std::string)(sl::json::value), (), common::wilton_internal_exception)
 PIMPL_FORWARD_METHOD(request, response_writer, send_later, (), (), common::wilton_internal_exception)
 PIMPL_FORWARD_METHOD(request, void, finish, (), (), common::wilton_internal_exception)
 

@@ -15,10 +15,9 @@
 #include "asio.hpp"
 
 #include "staticlib/config.hpp"
-#include "staticlib/httpserver.hpp"
+#include "staticlib/pion.hpp"
 #include "staticlib/io.hpp"
-#include "staticlib/pimpl/pimpl_forward_macros.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/pimpl/forward_macros.hpp"
 #include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
@@ -37,25 +36,18 @@ namespace server {
 
 namespace { // anonymous
 
-namespace sc = staticlib::config;
-namespace sh = staticlib::httpserver;
-namespace si = staticlib::io;
-namespace ss = staticlib::serialization;
-namespace st = staticlib::tinydir;
-namespace su = staticlib::utils;
-
 using partmap_type = const std::map<std::string, std::string>&;
 
 } // namespace
 
-class server::impl : public staticlib::pimpl::pimpl_object::impl {
+class server::impl : public sl::pimpl::object::impl {
     std::map<std::string, std::string> mustache_partials;
-    std::unique_ptr<sh::http_server> server_ptr;
+    std::unique_ptr<sl::pion::http_server> server_ptr;
 
 public:
-    impl(serverconf::server_config conf, std::vector<sc::observer_ptr<http_path>> paths) :
+    impl(serverconf::server_config conf, std::vector<sl::support::observer_ptr<http_path>> paths) :
     mustache_partials(load_partials(conf.mustache)),
-    server_ptr(std::unique_ptr<sh::http_server>(new sh::http_server(
+    server_ptr(std::unique_ptr<sl::pion::http_server>(new sl::pion::http_server(
             conf.numberOfThreads, 
             conf.tcpPort,
             asio::ip::address_v4::from_string(conf.ipAddress),
@@ -67,14 +59,14 @@ public:
         for (auto& pa : paths) {
             auto ha = pa->handler; // copy
             server_ptr->add_handler(pa->method, pa->path,
-                    [ha, this](sh::http_request_ptr& req, sh::tcp_connection_ptr & conn) {
-                        auto writer = sh::http_response_writer::create(conn, req);
+                    [ha, this](sl::pion::http_request_ptr& req, sl::pion::tcp_connection_ptr& conn) {
+                        auto writer = sl::pion::http_response_writer::create(conn, req);
                         request req_wrap{static_cast<void*> (std::addressof(req)),
                                 static_cast<void*> (std::addressof(writer)), this->mustache_partials};
                         ha(req_wrap);
                         req_wrap.finish();
                     });
-            server_ptr->add_payload_handler(pa->method, pa->path, [conf_ptr](staticlib::httpserver::http_request_ptr& /* request */) {
+            server_ptr->add_payload_handler(pa->method, pa->path, [conf_ptr](sl::pion::http_request_ptr& /* request */) {
                 return request_payload_handler{*conf_ptr};
             });
         }
@@ -84,7 +76,7 @@ public:
             } else if (dr.zipPath.length() > 0) {
                 server_ptr->add_handler("GET", dr.resource, zip_handler(dr));
             } else throw common::wilton_internal_exception(TRACEMSG(
-                    "Invalid 'documentRoot': [" + ss::dump_json_to_string(dr.to_json()) + "]"));
+                    "Invalid 'documentRoot': [" + dr.to_json().dumps() + "]"));
         }        
         server_ptr->start();
     }
@@ -94,7 +86,7 @@ public:
     }
     
 private:
-    static std::function<std::string(std::size_t, asio::ssl::context::password_purpose) > create_pwd_cb(const std::string& password) {
+    static std::function<std::string(std::size_t, asio::ssl::context::password_purpose)> create_pwd_cb(const std::string& password) {
         return [password](std::size_t, asio::ssl::context::password_purpose) {
             return password;
         };
@@ -131,29 +123,28 @@ private:
         static std::string MUSTACHE_EXT = ".mustache";
         std::map<std::string, std::string> res;
         for (const std::string& dirpath : cf.partialsDirs) {
-            for (const st::tinydir_path& tf : st::list_directory(dirpath)) {
-                if (!su::ends_with(tf.filename(), MUSTACHE_EXT)) continue;
+            for (const sl::tinydir::path& tf : sl::tinydir::list_directory(dirpath)) {
+                if (!sl::utils::ends_with(tf.filename(), MUSTACHE_EXT)) continue;
                 std::string name = std::string(tf.filename().data(), tf.filename().length() - MUSTACHE_EXT.length());
                 std::string val = read_file(tf);
                 auto pa = res.insert(std::make_pair(std::move(name), std::move(val)));
                 if (!pa.second) throw common::wilton_internal_exception(TRACEMSG(
                         "Invalid duplicate 'mustache.partialsDirs' element," +
-                        " dirpath: [" + dirpath + "], path: [" + tf.path() + "]"));
+                        " dirpath: [" + dirpath + "], path: [" + tf.filepath() + "]"));
             }
         }
         return res;
     }
 
-    static std::string read_file(const st::tinydir_path& tf) {
+    static std::string read_file(const sl::tinydir::path& tf) {
         auto fd = tf.open_read();
-        std::array<char, 4096> buf;
-        si::string_sink sink{};
-        si::copy_all(fd, sink, buf);
+        sl::io::string_sink sink{};
+        sl::io::copy_all(fd, sink);
         return std::move(sink.get_string());
     }
     
 };
-PIMPL_FORWARD_CONSTRUCTOR(server, (serverconf::server_config)(std::vector<sc::observer_ptr<http_path>>), (), common::wilton_internal_exception)
+PIMPL_FORWARD_CONSTRUCTOR(server, (serverconf::server_config)(std::vector<sl::support::observer_ptr<http_path>>), (), common::wilton_internal_exception)
 PIMPL_FORWARD_METHOD(server, void, stop, (), (), common::wilton_internal_exception)
 
 } // namespace

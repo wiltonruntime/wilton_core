@@ -14,7 +14,7 @@
 
 #include "staticlib/config.hpp"
 #include "staticlib/ranges.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "serverconf/header.hpp"
@@ -69,17 +69,15 @@ public:
     queries(std::move(queries)),
     headers(std::move(headers)) { }
         
-    staticlib::serialization::json_value to_json() const {
-        namespace ss = staticlib::serialization;
-        namespace sr = staticlib::ranges;
-        auto ha = sr::transform(sr::refwrap(headers), [](const serverconf::header& el) {
+    sl::json::value to_json() const {
+        auto ha = sl::ranges::transform(headers, [](const serverconf::header& el) {
             return el.to_json();
         });
-        std::vector<ss::json_field> hfields = sr::emplace_to_vector(std::move(ha));
-        auto qu = sr::transform(sr::refwrap(queries), [](const std::pair<std::string, std::string>& pa) {
-            return ss::json_field(pa.first, pa.second);
+        std::vector<sl::json::field> hfields = sl::ranges::emplace_to_vector(std::move(ha));
+        auto qu = sl::ranges::transform(sl::ranges::refwrap(queries), [](const std::pair<std::string, std::string>& pa) {
+            return sl::json::field(pa.first, pa.second);
         });
-        std::vector<ss::json_field> qfields = sr::emplace_to_vector(std::move(qu));
+        std::vector<sl::json::field> qfields = sl::ranges::emplace_to_vector(std::move(qu));
         return {
             {"httpVersion", httpVersion},
             {"protocol", protocol},

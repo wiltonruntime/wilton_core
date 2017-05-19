@@ -14,7 +14,7 @@
 
 #include "staticlib/config.hpp"
 #include "staticlib/ranges.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
@@ -66,9 +66,8 @@ public:
     cacheMaxAgeSeconds(cacheMaxAgeSeconds), 
     mimeTypes(mimes_copy(mimeTypes)) { }
     
-    document_root(const staticlib::serialization::json_value& json) {
-        namespace ss = staticlib::serialization;
-        for (const ss::json_field& fi : json.as_object()) {
+    document_root(const sl::json::value& json) {
+        for (const sl::json::field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("resource" == name) {
                 this->resource = fi.as_string_nonempty_or_throw(name);
@@ -81,7 +80,7 @@ public:
             } else if ("cacheMaxAgeSeconds" == name) {
                 this->cacheMaxAgeSeconds = fi.as_uint32_or_throw(name);
             } else if ("mimeTypes" == name) {
-                for (const ss::json_value& ap : fi.as_array_or_throw(name)) {
+                for (const sl::json::value& ap : fi.as_array_or_throw(name)) {
                     auto ja = serverconf::mime_type(ap);
                     mimeTypes.emplace_back(std::move(ja));
                 }
@@ -95,7 +94,7 @@ public:
                     "Invalid 'documentRoot.dirPath' and 'documentRoot.zipPath' fields: [], []"));
     }
        
-    staticlib::serialization::json_value to_json() const {
+    sl::json::value to_json() const {
         namespace sr = staticlib::ranges;
         return {
             {"resource", resource},
@@ -104,7 +103,7 @@ public:
             {"zipInnerPrefix", zipInnerPrefix},
             {"cacheMaxAgeSeconds", cacheMaxAgeSeconds},
             {"mimeTypes", [this] {
-                auto ra = sr::transform(sr::refwrap(mimeTypes), [](const mime_type& el) {
+                auto ra = sl::ranges::transform(sl::ranges::refwrap(mimeTypes), [](const mime_type& el) {
                     return el.to_json();
                 });
                 return ra.to_vector();
@@ -123,10 +122,10 @@ public:
 private:
     static std::vector<mime_type> mimes_copy(const std::vector<mime_type>& vec) {
         namespace sr = staticlib::ranges;
-        auto copied = sr::transform(sr::refwrap(vec), [](const mime_type & el) {
+        auto copied = sl::ranges::transform(sl::ranges::refwrap(vec), [](const mime_type & el) {
             return el.clone();
         });
-        return sr::emplace_to_vector(std::move(copied));
+        return sl::ranges::emplace_to_vector(std::move(copied));
     }
 
     static std::vector<mime_type> default_mimes() {

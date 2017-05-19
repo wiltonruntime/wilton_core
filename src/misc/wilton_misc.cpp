@@ -28,13 +28,13 @@ void wilton_free(char* errmsg) /* noexcept */ {
 
 char* wilton_tcp_wait_for_connection(const char* ip_addr, int ip_addr_len, 
         int tcp_port, int timeout_millis) /* noexcept */ {
-    if (nullptr == ip_addr) return su::alloc_copy(TRACEMSG("Null 'ip_addr' parameter specified"));
-    if (!sc::is_uint32(ip_addr_len)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'ip_addr_len' parameter specified: [" + sc::to_string(ip_addr_len) + "]"));
-    if (!sc::is_uint16_positive(tcp_port)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'tcp_port' parameter specified: [" + sc::to_string(tcp_port) + "]"));
-    if (!sc::is_uint32_positive(timeout_millis)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'timeout_millis' parameter specified: [" + sc::to_string(timeout_millis) + "]"));
+    if (nullptr == ip_addr) return sl::utils::alloc_copy(TRACEMSG("Null 'ip_addr' parameter specified"));
+    if (!sl::support::is_uint32(ip_addr_len)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'ip_addr_len' parameter specified: [" + sl::support::to_string(ip_addr_len) + "]"));
+    if (!sl::support::is_uint16_positive(tcp_port)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'tcp_port' parameter specified: [" + sl::support::to_string(tcp_port) + "]"));
+    if (!sl::support::is_uint32_positive(timeout_millis)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'timeout_millis' parameter specified: [" + sl::support::to_string(timeout_millis) + "]"));
     try {
         uint32_t ip_addr_len_u32 = static_cast<uint32_t> (ip_addr_len);
         std::string ip_addr_str{ip_addr, ip_addr_len_u32};
@@ -45,9 +45,9 @@ char* wilton_tcp_wait_for_connection(const char* ip_addr, int ip_addr_len,
         if (err.empty()) {
             return nullptr;
         } else {
-            return su::alloc_copy(err);
+            return sl::utils::alloc_copy(err);
         }
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }

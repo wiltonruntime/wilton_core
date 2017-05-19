@@ -11,8 +11,8 @@
 #include <cstdint>
 #include <string>
 
-#include "staticlib/httpclient.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/http.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
@@ -22,7 +22,7 @@ namespace client {
 
 class client_session_config {
 public:
-    staticlib::httpclient::http_session_options options;
+    sl::http::session_options options;
 
     client_session_config(const client_session_config&) = delete;
 
@@ -38,13 +38,13 @@ public:
 
     client_session_config() { }
 
-    client_session_config(const staticlib::serialization::json_value& json) {
-        namespace ss = staticlib::serialization;
+    client_session_config(const sl::json::value& json) {
         // msvs complains to different vectors in foreach here
         auto& vec = json.as_object();
         for (size_t i = 0; i < vec.size(); i++) {
-            const ss::json_field& fi = vec[i];
+            const sl::json::field& fi = vec[i];
             auto& name = fi.name();
+            // todo: more options
             if ("maxHostConnections" == name) {
                 this->options.max_host_connections = fi.as_uint32_or_throw(name);
             } else if ("maxTotalConnections" == name) {
@@ -57,7 +57,7 @@ public:
         }
     }
 
-    staticlib::serialization::json_value to_json() const {
+    sl::json::value to_json() const {
         return {
             { "maxHostConnections", options.max_host_connections },
             { "maxTotalConnections", options.max_total_connections },

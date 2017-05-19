@@ -22,7 +22,7 @@ namespace su = staticlib::utils;
 } // namespace
 
 char* wilton_thread_run(void* cb_ctx, void (*cb)(void* cb_ctx)) /* noexcept */ {
-    if (nullptr == cb) return su::alloc_copy(TRACEMSG("Null 'cb' parameter specified"));
+    if (nullptr == cb) return sl::utils::alloc_copy(TRACEMSG("Null 'cb' parameter specified"));
     try {
         auto th = std::thread([cb, cb_ctx]() {
             try {
@@ -34,18 +34,18 @@ char* wilton_thread_run(void* cb_ctx, void (*cb)(void* cb_ctx)) /* noexcept */ {
         th.detach();
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 char* wilton_thread_sleep_millis(int millis) /* noexcept */ {
-    if (!sc::is_uint32_positive(millis)) return su::alloc_copy(TRACEMSG(
-            "Invalid 'millis' parameter specified: [" + sc::to_string(millis) + "]"));
+    if (!sl::support::is_uint32_positive(millis)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'millis' parameter specified: [" + sl::support::to_string(millis) + "]"));
     try {
         uint32_t millis_u32 = static_cast<uint32_t> (millis);
         std::this_thread::sleep_for(std::chrono::milliseconds{millis_u32});
         return nullptr;
     } catch (const std::exception& e) {
-        return su::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }

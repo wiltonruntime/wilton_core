@@ -18,7 +18,7 @@
 namespace wilton {
 namespace logging {
 
-class wilton_logger : public staticlib::pimpl::pimpl_object {
+class wilton_logger : public sl::pimpl::object {
 protected:
     /**
      * implementation class

@@ -32,7 +32,7 @@
 #include <memory>
 #include <string>
 
-#include "staticlib/httpserver/http_request.hpp"
+#include "staticlib/pion.hpp"
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
 #include "staticlib/tinydir.hpp"
@@ -43,15 +43,6 @@
 
 namespace wilton {
 namespace server {
-
-namespace { // anonymous
-
-namespace sc = staticlib::config;
-namespace si = staticlib::io;
-namespace st = staticlib::tinydir;
-namespace su = staticlib::utils;
-
-} // namespace
 
 class request_payload_handler {
     enum class payload_state {
@@ -64,9 +55,9 @@ class request_payload_handler {
         uint64_t counter = 0;
         std::string buffer = "";
         std::string filename;
-        std::unique_ptr<st::file_sink> file;
+        std::unique_ptr<sl::tinydir::file_sink> file;
         payload_state state = payload_state::memory;
-        su::random_string_generator rng;
+        sl::utils::random_string_generator rng;
 
     public:        
         payload_data(const serverconf::request_payload_config& conf) :
@@ -109,13 +100,13 @@ public:
     request_payload_handler(const serverconf::request_payload_config& conf) : 
     data(std::make_shared<payload_data>(conf)) { }
 
-    static const std::string& get_data_string(staticlib::httpserver::http_request_ptr& request) {
+    static const std::string& get_data_string(sl::pion::http_request_ptr& request) {
         auto ph = request->get_payload_handler<request_payload_handler>();
         if (!ph) throw common::wilton_internal_exception(TRACEMSG("System error in payload handler access"));
         return ph->get_data_as_string();
     }
 
-    static const std::string& get_data_filename(staticlib::httpserver::http_request_ptr& request) {
+    static const std::string& get_data_filename(sl::pion::http_request_ptr& request) {
         auto ph = request->get_payload_handler<request_payload_handler>();
         if (!ph) throw common::wilton_internal_exception(TRACEMSG("System error in payload handler access"));
         return ph->get_data_as_filename();
@@ -129,20 +120,20 @@ public:
                 return;
             } else if (data->conf.tmpDirPath.empty()) {
                 throw common::wilton_internal_exception(TRACEMSG("Request body exceeds" +
-                        " limit (bytes): [" + sc::to_string(data->conf.memoryLimitBytes) + "]"));
+                        " limit (bytes): [" + sl::support::to_string(data->conf.memoryLimitBytes) + "]"));
             } else {
                 data->state = payload_state::file;
                 data->filename = gen_filename();
-                data->file = std::unique_ptr<st::file_sink>(new st::file_sink(data->filename));
+                data->file = std::unique_ptr<sl::tinydir::file_sink>(new sl::tinydir::file_sink(data->filename));
                 if (!data->buffer.empty()) {
-                    si::write_all(*data->file, data->buffer);
+                    sl::io::write_all(*data->file, data->buffer);
                     data->buffer = "";
                 }
             }
             // fall through
         case payload_state::file:
             if (nullptr != data->file.get()) {
-                si::write_all(*data->file, {s, n});
+                sl::io::write_all(*data->file, {s, n});
             } else throw common::wilton_internal_exception(TRACEMSG("Invalid payload handler data state"));
             return;
         default:
@@ -156,7 +147,7 @@ private:
     }
     
     std::string gen_filename() {
-        return data->conf.tmpDirPath + "/" + sc::to_string(data->counter++) + "_" +
+        return data->conf.tmpDirPath + "/" + sl::support::to_string(data->counter++) + "_" +
                 data->rng.generate(data->conf.tmpFilenameLength);
     }
     
@@ -169,10 +160,10 @@ private:
         switch (data->state) {
         case payload_state::file: {
             data->state = payload_state::memory;
-            auto fd = st::file_source(data->filename);
-            si::string_sink sink;
+            auto fd = sl::tinydir::file_source(data->filename);
+            sl::io::string_sink sink;
             std::array<char, 4096> buf;
-            si::copy_all(fd, sink, buf);
+            sl::io::copy_all(fd, sink, buf);
             data->buffer = std::move(sink.get_string());            
         } // fall through     
         case payload_state::memory:
@@ -189,8 +180,8 @@ private:
             data->state = payload_state::file;
             if (data->filename.empty()) {
                 data->filename = gen_filename();
-                auto fd = st::file_sink(data->filename);
-                si::write_all(fd, data->buffer);
+                auto fd = sl::tinydir::file_sink(data->filename);
+                sl::io::write_all(fd, data->buffer);
             }
             // fall through
         case payload_state::file:

@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "staticlib/ranges.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
@@ -43,17 +43,16 @@ public:
 
     logging_config() { }
 
-    logging_config(const staticlib::serialization::json_value& json) {
-        namespace ss = staticlib::serialization;
-        for (const ss::json_field& fi : json.as_object()) {
+    logging_config(const sl::json::value& json) {
+        for (const sl::json::field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("appenders" == name) {
-                for (const ss::json_value& ap : fi.as_array_or_throw(name)) {
+                for (const sl::json::value& ap : fi.as_array_or_throw(name)) {
                     auto ja = appender_config(ap);
                     appenders.emplace_back(std::move(ja));
                 }
             } else if ("loggers" == name) {
-                for (const ss::json_value& lo : fi.as_array_or_throw(name)) {
+                for (const sl::json::value& lo : fi.as_array_or_throw(name)) {
                     auto jl = logger_config(lo);
                     loggers.emplace_back(std::move(jl));
                 }
@@ -63,19 +62,16 @@ public:
         }
     }
 
-    staticlib::serialization::json_value to_json() const {
-        namespace sr = staticlib::ranges;
-        
-        
+    sl::json::value to_json() const {
         return {
             {"appenders", [this](){
-                auto ra = sr::transform(appenders, [](const appender_config & el) {
+                auto ra = sl::ranges::transform(appenders, [](const appender_config & el) {
                     return el.to_json();
                 });
                 return ra.to_vector();
             }()},
             {"loggers", [this](){
-                auto ra = sr::transform(loggers, [](const logger_config & el) {
+                auto ra = sl::ranges::transform(loggers, [](const logger_config & el) {
                     return el.to_json();
                 });
                 return ra.to_vector();

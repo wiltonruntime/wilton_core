@@ -17,7 +17,7 @@
 namespace wilton {
 namespace server {
 
-class response_writer : public staticlib::pimpl::pimpl_object {
+class response_writer : public sl::pimpl::object {
 protected:
     /**
      * implementation class
@@ -34,7 +34,7 @@ public:
     void send(const char* data, uint32_t data_len);
   
     // private api
-    response_writer(void* /* staticlib::httpserver::http_response_writer_ptr&& */ writer);
+    response_writer(void* /* sl::pion::http_response_writer_ptr&& */ writer);
 };
 
 } // namespace

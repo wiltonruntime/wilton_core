@@ -14,24 +14,22 @@
 #include <thread>
 
 #include "staticlib/cron.hpp"
-#include "staticlib/pimpl/pimpl_forward_macros.hpp"
+#include "staticlib/pimpl/forward_macros.hpp"
 
 namespace wilton {
 namespace cron {
 
 namespace { // anonymous
 
-namespace cr = staticlib::cron;
-
 using task_fun_type = std::function<void()>;
 
 } //namespace
 
-class cron_task::impl : public staticlib::pimpl::pimpl_object::impl {
+class cron_task::impl : public staticlib::pimpl::object::impl {
     std::mutex mutex;
     std::condition_variable cv;
     
-    cr::cron_expression cron;
+    sl::cron::expression cron;
     std::function<void()> task;
     std::thread worker;
     std::atomic<bool> running;
@@ -45,7 +43,7 @@ public:
     running(true) {
         worker = std::thread([this] {
             while (running.load()) {
-                std::chrono::seconds secs = cron.next();
+                auto secs = cron.next<std::chrono::seconds>();
                 {
                     std::unique_lock<std::mutex> guard{mutex};
                     cv.wait_for(guard, secs, [this]{
@@ -62,7 +60,7 @@ public:
     void stop(cron_task&) {
         running.store(false);
         cv.notify_all();
-        this->worker.join();
+        worker.join();
     }
 };
 PIMPL_FORWARD_CONSTRUCTOR(cron_task, (const std::string&)(task_fun_type), (), common::wilton_internal_exception)

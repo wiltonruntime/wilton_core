@@ -12,8 +12,9 @@
 #include <string>
 #include <vector>
 
-#include "staticlib/httpclient.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/http.hpp"
+#include "staticlib/json.hpp"
+#include "staticlib/ranges.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 
@@ -22,20 +23,18 @@ namespace client {
 
 class client_response {
 public:
-    static staticlib::serialization::json_value to_json(std::string&& data,
-            const staticlib::httpclient::http_resource_info& info) {
-        namespace sr = staticlib::ranges;
-        namespace ss = staticlib::serialization;
-        auto ha = sr::transform(sr::refwrap(info.get_headers()), [](const std::pair<std::string, std::string>& el) {
-            return ss::json_field{el.first, el.second};
+    static sl::json::value to_json(std::string&& data, const sl::http::resource& resource,
+            const sl::http::resource_info& info) {
+        auto ha = sl::ranges::transform(resource.get_headers(), [](const std::pair<std::string, std::string>& el) {
+            return sl::json::field{el.first, el.second};
         });
-        std::vector<ss::json_field> hfields = sr::emplace_to_vector(std::move(ha));
+        std::vector<sl::json::field> hfields = sl::ranges::emplace_to_vector(std::move(ha));
         return {
-            {"connectionSuccess", info.connection_success()},
+//            {"connectionSuccess", info.connection_success()},
             {"data", std::move(data)},
             {"headers", std::move(hfields)},
             {"effectiveUrl", info.effective_url},
-            {"responseCode", static_cast<int64_t> (info.response_code)},
+            {"responseCode", static_cast<int64_t> (resource.get_status_code())},
             {"totalTimeSecs", info.total_time_secs},
             {"namelookupTimeSecs", info.namelookup_time_secs},
             {"connectTimeSecs", info.connect_time_secs},

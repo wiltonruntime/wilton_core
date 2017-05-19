@@ -14,9 +14,6 @@ namespace client {
 
 namespace { //anonymous
 
-namespace su = staticlib::utils;
-namespace ss = staticlib::serialization;
-
 common::handle_registry<wilton_HttpClient>& static_registry() {
     static common::handle_registry<wilton_HttpClient> registry;
     return registry;
@@ -29,16 +26,16 @@ std::string httpclient_create(const std::string& data) {
     char* err = wilton_HttpClient_create(std::addressof(http), data.c_str(), static_cast<int>(data.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_registry().put(http);
-    return ss::dump_json_to_string({
+    return sl::json::value({
         { "httpclientHandle", handle}
-    });
+    }).dumps();
 }
 
 std::string httpclient_close(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("httpclientHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -63,12 +60,12 @@ std::string httpclient_close(const std::string& data) {
 
 std::string httpclient_execute(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    auto rurl = std::ref(su::empty_string());
-    auto rdata = std::ref(su::empty_string());
-    std::string metadata = su::empty_string();
-    for (const ss::json_field& fi : json.as_object()) {
+    auto rurl = std::ref(sl::utils::empty_string());
+    auto rdata = std::ref(sl::utils::empty_string());
+    std::string metadata = sl::utils::empty_string();
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("httpclientHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -77,7 +74,7 @@ std::string httpclient_execute(const std::string& data) {
         } else if ("data" == name) {
             rdata = fi.as_string();
         } else if ("metadata" == name) {
-            metadata = ss::dump_json_to_string(fi.value());
+            metadata = fi.val().dumps();
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -106,12 +103,12 @@ std::string httpclient_execute(const std::string& data) {
 
 std::string httpclient_send_temp_file(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    auto rurl = std::ref(su::empty_string());
-    auto rfile = std::ref(su::empty_string());
-    std::string metadata = su::empty_string();
-    for (const ss::json_field& fi : json.as_object()) {
+    auto rurl = std::ref(sl::utils::empty_string());
+    auto rfile = std::ref(sl::utils::empty_string());
+    std::string metadata = sl::utils::empty_string();
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("httpclientHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -120,7 +117,7 @@ std::string httpclient_send_temp_file(const std::string& data) {
         } else if ("filePath" == name) {
             rfile = fi.as_string_nonempty_or_throw(name);
         } else if ("metadata" == name) {
-            metadata = ss::dump_json_to_string(fi.value());
+            metadata = fi.val().dumps();
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }

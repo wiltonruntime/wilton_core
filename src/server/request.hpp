@@ -14,7 +14,7 @@
 #include <string>
 
 #include "staticlib/pimpl.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "server/response_writer.hpp"
@@ -24,7 +24,7 @@
 namespace wilton {
 namespace server {
 
-class request : public staticlib::pimpl::pimpl_object {
+class request : public sl::pimpl::object {
 protected:
     /**
      * implementation class
@@ -50,7 +50,7 @@ public:
     
     void send_file(std::string file_path, std::function<void(bool)> finalizer);
     
-    void send_mustache(std::string mustache_file_path, staticlib::serialization::json_value json);
+    void send_mustache(std::string mustache_file_path, sl::json::value json);
     
     response_writer send_later();
     
@@ -58,8 +58,8 @@ public:
     
     // private api
     
-    request(void* /* staticlib::httpserver::http_request_ptr&& */ req, 
-            void* /* staticlib::httpserver::http_response_writer_ptr&& */ resp,
+    request(void* /* sl::pion::http_request_ptr&& */ req, 
+            void* /* sl::pion::http_response_writer_ptr&& */ resp,
             const std::map<std::string, std::string>& mustache_partials);
 };
 

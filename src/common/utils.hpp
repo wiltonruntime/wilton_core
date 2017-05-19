@@ -15,7 +15,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 
@@ -26,7 +26,7 @@ void throw_wilton_error(char* err, const std::string& msg);
 
 std::string wrap_wilton_output(char* out, int out_len);
 
-void check_json_callback_script(const staticlib::serialization::json_field& field);
+void check_json_callback_script(const sl::json::field& field);
 
 void dump_error(const std::string& directory, const std::string& msg);
 

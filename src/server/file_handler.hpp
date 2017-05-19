@@ -15,7 +15,7 @@
 
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
-#include "staticlib/httpserver.hpp"
+#include "staticlib/pion.hpp"
 #include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
@@ -25,16 +25,6 @@
 
 namespace wilton {
 namespace server {
-
-namespace { // anonymous
-
-namespace sc = staticlib::config;
-namespace si = staticlib::io;
-namespace sh = staticlib::httpserver;
-namespace st = staticlib::tinydir;
-namespace su = staticlib::utils;
-
-} //namespace
 
 class file_handler {
     std::shared_ptr<serverconf::document_root> conf;
@@ -58,29 +48,29 @@ public:
     
     // todo: error messages format
     // todo: path checks
-    void operator()(sh::http_request_ptr& req, sh::tcp_connection_ptr& conn) {
-        auto resp = sh::http_response_writer::create(conn, req);
+    void operator()(sl::pion::http_request_ptr& req, sl::pion::tcp_connection_ptr& conn) {
+        auto resp = sl::pion::http_response_writer::create(conn, req);
         std::string url_path = std::string{req->get_resource(), conf->resource.length()};
         if (url_path.find("..") != std::string::npos) {
-            resp->get_response().set_status_code(sh::http_request::RESPONSE_CODE_BAD_REQUEST);
-            resp->get_response().set_status_message(sh::http_request::RESPONSE_MESSAGE_BAD_REQUEST);
-            resp << sh::http_request::RESPONSE_CODE_BAD_REQUEST << " "
-                    << sh::http_request::RESPONSE_MESSAGE_BAD_REQUEST << ":"
+            resp->get_response().set_status_code(sl::pion::http_request::RESPONSE_CODE_BAD_REQUEST);
+            resp->get_response().set_status_message(sl::pion::http_request::RESPONSE_MESSAGE_BAD_REQUEST);
+            resp << sl::pion::http_request::RESPONSE_CODE_BAD_REQUEST << " "
+                    << sl::pion::http_request::RESPONSE_MESSAGE_BAD_REQUEST << ":"
                     << " [" << url_path << "]\n";
             resp->send();
         } else {
             try {
                 std::string file_path = std::string(conf->dirPath) +"/" + url_path;
-                auto fd = st::file_source(file_path);
-                auto fd_ptr = std::unique_ptr<std::streambuf>(si::make_unbuffered_istreambuf_ptr(std::move(fd)));
+                auto fd = sl::tinydir::file_source(file_path);
+                auto fd_ptr = std::unique_ptr<std::streambuf>(sl::io::make_unbuffered_istreambuf_ptr(std::move(fd)));
                 auto sender = std::make_shared<response_stream_sender>(resp, std::move(fd_ptr));
                 set_resp_headers(url_path, resp->get_response());
                 sender->send();
             } catch (const std::exception&) {
-                resp->get_response().set_status_code(sh::http_request::RESPONSE_CODE_NOT_FOUND);
-                resp->get_response().set_status_message(sh::http_request::RESPONSE_MESSAGE_NOT_FOUND);
-                resp << sh::http_request::RESPONSE_CODE_NOT_FOUND << " "
-                        << sh::http_request::RESPONSE_MESSAGE_NOT_FOUND << ":"
+                resp->get_response().set_status_code(sl::pion::http_request::RESPONSE_CODE_NOT_FOUND);
+                resp->get_response().set_status_message(sl::pion::http_request::RESPONSE_MESSAGE_NOT_FOUND);
+                resp << sl::pion::http_request::RESPONSE_CODE_NOT_FOUND << " "
+                        << sl::pion::http_request::RESPONSE_MESSAGE_NOT_FOUND << ":"
                         << " [" << url_path << "]\n";
                 resp->send();
             }
@@ -88,17 +78,17 @@ public:
     }
     
 private:
-    void set_resp_headers(const std::string& url_path, sh::http_response& resp) {
+    void set_resp_headers(const std::string& url_path, sl::pion::http_response& resp) {
         std::string ct{"application/octet-stream"};
         for(const auto& mi : conf->mimeTypes) {
-            if (su::ends_with(url_path, mi.extension)) {
+            if (sl::utils::ends_with(url_path, mi.extension)) {
                 ct = mi.mime;
                 break;
             }
         }
         resp.change_header("Content-Type", ct);
         // set caching
-        resp.change_header("Cache-Control", "max-age=" + sc::to_string(conf->cacheMaxAgeSeconds) + ", public");
+        resp.change_header("Cache-Control", "max-age=" + sl::support::to_string(conf->cacheMaxAgeSeconds) + ", public");
     }
     
 };

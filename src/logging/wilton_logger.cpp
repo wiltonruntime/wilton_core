@@ -15,7 +15,7 @@
 #include "log4cplus/nullappender.h"
 #include "log4cplus/fileappender.h"
 
-#include "staticlib/pimpl/pimpl_forward_macros.hpp"
+#include "staticlib/pimpl/forward_macros.hpp"
 #include "staticlib/utils.hpp"
 
 #include "common/wilton_internal_exception.hpp"
@@ -54,7 +54,7 @@ log4cplus::LogLevel to_level(const std::string& level_name) {
 
 } // namespace
 
-class wilton_logger::impl : public staticlib::pimpl::pimpl_object::impl {
+class wilton_logger::impl : public staticlib::pimpl::object::impl {
 public:
 
     static void log(const std::string& level_name, const std::string& logger_name, const std::string& message) {
@@ -117,8 +117,8 @@ private:
                 (path.length() > 1 && ':' == path[1])) {
             return path;
         }
-        std::string execpath = su::current_executable_path();
-        std::string dirpath = su::strip_filename(execpath);
+        std::string execpath = sl::utils::current_executable_path();
+        std::string dirpath = sl::utils::strip_filename(execpath);
         return dirpath + path;
     }
 

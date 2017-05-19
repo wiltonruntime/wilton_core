@@ -30,7 +30,8 @@
 #include "asio.hpp"
 
 #include "staticlib/config.hpp"
-#include "staticlib/pimpl/pimpl_forward_macros.hpp"
+#include "staticlib/support.hpp"
+#include "staticlib/pimpl/forward_macros.hpp"
 
 namespace wilton {
 namespace misc {
@@ -43,7 +44,7 @@ const std::chrono::milliseconds attempt_timeout = std::chrono::milliseconds(100)
 
 } // namespace
 
-class tcp_connect_checker::impl : public staticlib::pimpl::pimpl_object::impl {
+class tcp_connect_checker::impl : public staticlib::pimpl::object::impl {
     
 public:
 
@@ -54,7 +55,7 @@ public:
         Checker checker{timeout, ip_addr, tcp_port};
         uint64_t start = current_time_millis();
         uint64_t tc = static_cast<uint64_t>(timeout.count());
-        std::string err = "ERROR: Invalid timeout: [" + sc::to_string(tc) + "] (-1)";
+        std::string err = "ERROR: Invalid timeout: [" + sl::support::to_string(tc) + "] (-1)";
         while (current_time_millis() - start < tc) {
             err = checker.check();
             if (err.empty()) break;
@@ -91,16 +92,16 @@ private:
             std::atomic_bool timer_cancelled{false};
             std::string error_message = "";
             timer.expires_from_now(timeout);
-            socket.async_connect(endpoint, [&](const asio::error_code& ec) {
+            socket.async_connect(endpoint, [&](const std::error_code& ec) {
                 std::lock_guard<std::mutex> guard{mutex};
                 if (connect_cancelled) return;
                 timer_cancelled = true;
                 timer.cancel();
                 if(ec) {
-                    error_message = "ERROR: " + ec.message() + " (" + sc::to_string(ec.value()) + ")";
+                    error_message = "ERROR: " + ec.message() + " (" + sl::support::to_string(ec.value()) + ")";
                 }
             });
-            timer.async_wait([&](const asio::error_code&) {
+            timer.async_wait([&](const std::error_code&) {
                 std::lock_guard<std::mutex> guard{mutex};
                 if (timer_cancelled) return;
                 connect_cancelled = true;

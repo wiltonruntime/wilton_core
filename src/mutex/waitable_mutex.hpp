@@ -17,7 +17,7 @@
 namespace wilton {
 namespace mutex {
 
-class waitable_mutex : public staticlib::pimpl::pimpl_object {
+class waitable_mutex : public sl::pimpl::object {
 protected:
     /**
      * implementation class

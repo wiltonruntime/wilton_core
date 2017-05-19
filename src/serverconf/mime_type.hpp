@@ -13,7 +13,7 @@
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 namespace wilton {
 namespace serverconf {
@@ -43,9 +43,8 @@ public:
     extension(extension.data(), extension.length()),
     mime(mime.data(), mime.length()) { }
 
-    mime_type(const staticlib::serialization::json_value& json) {
-        namespace ss = staticlib::serialization;
-        for (const ss::json_field& fi : json.as_object()) {
+    mime_type(const sl::json::value& json) {
+        for (const sl::json::field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("extension" == name) {
                 this->extension = fi.as_string_nonempty_or_throw(name);
@@ -61,7 +60,7 @@ public:
                 "Invalid 'mimeType.mime' field: []"));
     }
     
-    staticlib::serialization::json_value to_json() const {    
+    sl::json::value to_json() const {    
         return {
             {"extension", extension},
             {"mime", mime}

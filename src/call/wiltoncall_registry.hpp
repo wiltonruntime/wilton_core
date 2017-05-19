@@ -12,7 +12,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "staticlib/serialization.hpp"
+#include "staticlib/json.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 
@@ -20,8 +20,6 @@ namespace wilton {
 namespace call {
 
 namespace { // anonymous
-
-namespace ss = staticlib::serialization;
 
 using fun_type = std::function<std::string(const std::string&)>;
 using map_type = std::unordered_map<std::string, fun_type>;

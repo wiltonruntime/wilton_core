@@ -21,15 +21,11 @@ namespace server {
 
 namespace { //anonymous
 
-namespace sc = staticlib::config;
-namespace su = staticlib::utils;
-namespace ss = staticlib::serialization;
-
 class http_view {
 public:
     std::string method;
     std::string path;
-    ss::json_value callbackScript;
+    sl::json::value callbackScript;
 
     http_view(const http_view&) = delete;
 
@@ -42,11 +38,11 @@ public:
 
     http_view& operator=(http_view&&) = delete;
 
-    http_view(const ss::json_value& json) {
-        if (ss::json_type::object != json.type()) throw common::wilton_internal_exception(TRACEMSG(
+    http_view(const sl::json::value& json) {
+        if (sl::json::type::object != json.json_type()) throw common::wilton_internal_exception(TRACEMSG(
                 "Invalid 'views' entry: must be an 'object'," +
-                " entry: [" + ss::dump_json_to_string(json) + "]"));
-        for (const ss::json_field& fi : json.as_object()) {
+                " entry: [" + json.dumps() + "]"));
+        for (const sl::json::field& fi : json.as_object()) {
             auto& name = fi.name();
             if ("method" == name) {
                 method = fi.as_string_nonempty_or_throw(name);
@@ -54,7 +50,7 @@ public:
                 path = fi.as_string_nonempty_or_throw(name);
             } else if ("callbackScript" == name) {
                 common::check_json_callback_script(fi);
-                callbackScript = fi.value().clone();
+                callbackScript = fi.val().clone();
             } else {
                 throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
             }
@@ -71,7 +67,7 @@ public:
 
 class server_ctx {
     // iterators must be permanent
-    std::list<ss::json_value> callbackScripts;
+    std::list<sl::json::value> callbackScripts;
 
 public:
     server_ctx(const server_ctx&) = delete;
@@ -85,7 +81,7 @@ public:
 
     server_ctx() { }
 
-    ss::json_value& add_callback(const ss::json_value& callback) {
+    sl::json::value& add_callback(const sl::json::value& callback) {
         callbackScripts.emplace_back(callback.clone());
         return callbackScripts.back();
     }
@@ -106,25 +102,25 @@ common::handle_registry<wilton_ResponseWriter>& static_response_writer_registry(
     return registry;
 }
 
-std::vector<http_view> extract_and_delete_views(ss::json_value& conf) {
-    std::vector<ss::json_field>& fields = conf.as_object_or_throw(TRACEMSG(
+std::vector<http_view> extract_and_delete_views(sl::json::value& conf) {
+    std::vector<sl::json::field>& fields = conf.as_object_or_throw(TRACEMSG(
             "Invalid configuration object specified: invalid type," +
-            " conf: [" + ss::dump_json_to_string(conf) + "]"));
+            " conf: [" + conf.dumps() + "]"));
     std::vector<http_view> views;
     uint32_t i = 0;
     for (auto it = fields.begin(); it != fields.end(); ++it) {
-        ss::json_field& fi = *it;
+        sl::json::field& fi = *it;
         if ("views" == fi.name()) {
-            if (ss::json_type::array != fi.type()) throw common::wilton_internal_exception(TRACEMSG(
+            if (sl::json::type::array != fi.json_type()) throw common::wilton_internal_exception(TRACEMSG(
                     "Invalid configuration object specified: 'views' attr is not a list," +
-                    " conf: [" + ss::dump_json_to_string(conf) + "]"));
+                    " conf: [" + conf.dumps() + "]"));
             if (0 == fi.as_array().size()) throw common::wilton_internal_exception(TRACEMSG(
                     "Invalid configuration object specified: 'views' attr is am empty list," +
-                    " conf: [" + ss::dump_json_to_string(conf) + "]"));
+                    " conf: [" + conf.dumps() + "]"));
             for (auto& va : fi.as_array()) {
-                if (ss::json_type::object != va.type()) throw common::wilton_internal_exception(TRACEMSG(
+                if (sl::json::type::object != va.json_type()) throw common::wilton_internal_exception(TRACEMSG(
                         "Invalid configuration object specified: 'views' is not a 'object'," +
-                        "index: [" + sc::to_string(i) + "], conf: [" + ss::dump_json_to_string(conf) + "]"));
+                        "index: [" + sl::support::to_string(i) + "], conf: [" + conf.dumps() + "]"));
                 views.emplace_back(http_view(va));
             }
             // drop views attr and return immediately (iters are invalidated)
@@ -135,7 +131,7 @@ std::vector<http_view> extract_and_delete_views(ss::json_value& conf) {
     }
     throw common::wilton_internal_exception(TRACEMSG(
             "Invalid configuration object specified: 'views' list not specified," +
-            " conf: [" + ss::dump_json_to_string(conf) + "]"));
+            " conf: [" + conf.dumps() + "]"));
 }
 
 void send_system_error(int64_t requestHandle, std::string errmsg) {
@@ -153,7 +149,7 @@ std::vector<std::unique_ptr<wilton_HttpPath, http_path_deleter>> create_paths(
     // assert(views.size() == ctx.get_modules_names().size())
     std::vector<std::unique_ptr<wilton_HttpPath, http_path_deleter>> res;
     for (auto& vi : views) {
-        ss::json_value& cbs_to_pass = ctx.add_callback(vi.callbackScript);
+        sl::json::value& cbs_to_pass = ctx.add_callback(vi.callbackScript);
         wilton_HttpPath* ptr = nullptr;
         auto err = wilton_HttpPath_create(std::addressof(ptr), 
                 vi.method.c_str(), static_cast<int>(vi.method.length()),
@@ -161,12 +157,12 @@ std::vector<std::unique_ptr<wilton_HttpPath, http_path_deleter>> create_paths(
                 static_cast<void*> (std::addressof(cbs_to_pass)),
                 [](void* passed, wilton_Request* request) {
                     int64_t requestHandle = static_request_registry().put(request);
-                    ss::json_value* cb_ptr = static_cast<ss::json_value*> (passed);
-                    ss::json_value params = cb_ptr->clone();
+                    sl::json::value* cb_ptr = static_cast<sl::json::value*> (passed);
+                    sl::json::value params = cb_ptr->clone();
                     // params structure is pre-checked
-                    std::vector<ss::json_value>& args = params.getattr_or_throw("args").as_array_or_throw();
+                    std::vector<sl::json::value>& args = params.getattr_or_throw("args").as_array_or_throw();
                     args.emplace_back(requestHandle);
-                    std::string params_str = ss::dump_json_to_string(params);
+                    std::string params_str = params.dumps();
                     // output will be ignored
                     char* out;
                     int out_len;
@@ -199,10 +195,10 @@ std::vector<wilton_HttpPath*> wrap_paths(std::vector<std::unique_ptr<wilton_Http
 } // namespace
 
 std::string server_create(const std::string& data) {
-    ss::json_value json = ss::load_json_from_string(data);
-    auto conf_in = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
+    auto conf_in = sl::json::loads(data);
     auto views = extract_and_delete_views(conf_in);
-    auto conf = ss::dump_json_to_string(conf_in);
+    auto conf = conf_in.dumps();
     server_ctx ctx;
     auto paths = create_paths(views, ctx);
     auto paths_pass = wrap_paths(paths);
@@ -212,16 +208,16 @@ std::string server_create(const std::string& data) {
             paths_pass.data(), static_cast<int>(paths_pass.size()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_server_registry().put(server, std::move(ctx));
-    return ss::dump_json_to_string({
+    return sl::json::value({
         { "serverHandle", handle}
-    });
+    }).dumps();
 }
 
 std::string server_stop(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("serverHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -246,9 +242,9 @@ std::string server_stop(const std::string& data) {
 
 std::string request_get_metadata(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("requestHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -276,9 +272,9 @@ std::string request_get_metadata(const std::string& data) {
 
 std::string request_get_data(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("requestHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -304,9 +300,9 @@ std::string request_get_data(const std::string& data) {
 
 std::string request_get_data_filename(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("requestHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -332,15 +328,15 @@ std::string request_get_data_filename(const std::string& data) {
 
 std::string request_set_response_metadata(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    std::string metadata = su::empty_string();
-    for (const ss::json_field& fi : json.as_object()) {
+    std::string metadata = sl::utils::empty_string();
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("requestHandle" == name) {
             handle = fi.as_int64_or_throw(name);
         } else if ("metadata" == name) {
-            metadata = ss::dump_json_to_string(fi.value());
+            metadata = fi.val().dumps();
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -362,10 +358,10 @@ std::string request_set_response_metadata(const std::string& data) {
 
 std::string request_send_response(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    auto rdata = std::ref(su::empty_string());
-    for (const ss::json_field& fi : json.as_object()) {
+    auto rdata = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("requestHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -391,10 +387,10 @@ std::string request_send_response(const std::string& data) {
 
 std::string request_send_temp_file(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    std::string file = su::empty_string();
-    for (const ss::json_field& fi : json.as_object()) {
+    std::string file = sl::utils::empty_string();
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("requestHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -427,18 +423,18 @@ std::string request_send_temp_file(const std::string& data) {
 
 std::string request_send_mustache(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    auto rfile = std::ref(su::empty_string());
-    std::string values = su::empty_string();
-    for (const ss::json_field& fi : json.as_object()) {
+    auto rfile = std::ref(sl::utils::empty_string());
+    std::string values = sl::utils::empty_string();
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("requestHandle" == name) {
             handle = fi.as_int64_or_throw(name);
         } else if ("mustacheFilePath" == name) {
             rfile = fi.as_string_nonempty_or_throw(name);
         } else if ("values" == name) {
-            values = ss::dump_json_to_string(fi.value());
+            values = fi.val().dumps();
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -465,9 +461,9 @@ std::string request_send_mustache(const std::string& data) {
 
 std::string request_send_later(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    for (const ss::json_field& fi : json.as_object()) {
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("requestHandle" == name) {
             handle = fi.as_int64_or_throw(name);
@@ -487,17 +483,17 @@ std::string request_send_later(const std::string& data) {
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t rwhandle = static_response_writer_registry().put(writer);
-    return ss::dump_json_to_string({
+    return sl::json::value({
         { "responseWriterHandle", rwhandle}
-    });
+    }).dumps();
 }
 
 std::string request_send_with_response_writer(const std::string& data) {
     // json parse
-    ss::json_value json = ss::load_json_from_string(data);
+    sl::json::value json = sl::json::loads(data);
     int64_t handle = -1;
-    auto rdata = std::ref(su::empty_string());
-    for (const ss::json_field& fi : json.as_object()) {
+    auto rdata = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("responseWriterHandle" == name) {
             handle = fi.as_int64_or_throw(name);
