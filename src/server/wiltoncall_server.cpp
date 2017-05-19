@@ -208,9 +208,9 @@ std::string server_create(const std::string& data) {
             paths_pass.data(), static_cast<int>(paths_pass.size()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_server_registry().put(server, std::move(ctx));
-    return sl::json::value({
+    return sl::json::dumps({
         { "serverHandle", handle}
-    }).dumps();
+    });
 }
 
 std::string server_stop(const std::string& data) {
@@ -483,9 +483,9 @@ std::string request_send_later(const std::string& data) {
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t rwhandle = static_response_writer_registry().put(writer);
-    return sl::json::value({
+    return sl::json::dumps({
         { "responseWriterHandle", rwhandle}
-    }).dumps();
+    });
 }
 
 std::string request_send_with_response_writer(const std::string& data) {
