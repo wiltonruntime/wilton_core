@@ -6,6 +6,7 @@
  */
 
 #include "wilton/wilton.h"
+#include "wilton/wiltoncall.h"
 
 #include "stdio.h"
 #include "stdlib.h"
@@ -23,16 +24,16 @@ void check_err(char* err) {
     }
 }
 
-int main() {
+void test_server() {
     char* err;
     wilton_Server* server;
     const char* server_conf = "{\"tcpPort\": 8080}";
-    
+
     wilton_HttpPath* path;
-    err = wilton_HttpPath_create(&path, "GET", (int)strlen("GET"), "/", (int)strlen("/"), NULL, hello);
+    err = wilton_HttpPath_create(&path, "GET", (int) strlen("GET"), "/", (int) strlen("/"), NULL, hello);
     check_err(err);
-    
-    err = wilton_Server_create(&server, server_conf, (int)strlen(server_conf), &path, 1);
+
+    err = wilton_Server_create(&server, server_conf, (int) strlen(server_conf), &path, 1);
     check_err(err);
     wilton_HttpPath_destroy(path);
 
@@ -40,6 +41,21 @@ int main() {
 
     err = wilton_Server_stop(server);
     check_err(err);
+}
+
+void test_duktape() {
+    const char* in = "{\"module\": \"../test/test\"}";
+    char* out;
+    int out_len;
+    char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);
+    puts(out);
+    wilton_free(out);
+    check_err(err);
+}
+
+int main() {
+//    test_server();
+    test_duktape();
 
     return 0;
 }
