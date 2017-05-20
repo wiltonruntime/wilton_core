@@ -1,9 +1,11 @@
 /* 
- * File:   wilton_jni.cpp
+ * File:   wiltoncall_jni.cpp
  * Author: alex
  *
  * Created on January 10, 2017, 6:34 PM
  */
+
+#include "call/wiltoncall_internal.hpp"
 
 #include <atomic>
 #include <memory>
@@ -16,11 +18,9 @@
 #include "staticlib/utils.hpp"
 
 #include "wilton/wilton.h"
-#include "wilton/wiltoncall.h"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
-#include "call/wiltoncall_internal.hpp"
 #include "jni/jni_config.hpp"
 #include "jni_utils.hpp"
 
@@ -245,10 +245,7 @@ JNIEXPORT jstring JNICALL WILTON_JNI_FUNCTION(wiltoncall)
 
 } // C
 
-namespace wilton {
-namespace engine {
-
-char* runscript_jni(const char* json_in, int json_in_len, char** json_out, 
+char* wiltoncall_runscript_jni(const char* json_in, int json_in_len, char** json_out, 
         int* json_out_len) /* noexcept */ {
     if (nullptr == json_in) return sl::utils::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
     if (!sl::support::is_uint32(json_in_len)) return sl::utils::alloc_copy(TRACEMSG(
@@ -278,17 +275,4 @@ char* runscript_jni(const char* json_in, int json_in_len, char** json_out,
     } catch (const std::exception& e) {
         return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
-}
-
-// todo: removeme
-char* runscript_duktape(const char* json_in, int json_in_len, char** json_out,
-        int* json_out_len) /* noexcept */ {
-    (void) json_in;
-    (void) json_in_len;
-    (void) json_out;
-    (void) json_out_len;
-    return sl::utils::alloc_copy(TRACEMSG("Duktape engine not implemented"));
-}
-
-} // namespace
 }

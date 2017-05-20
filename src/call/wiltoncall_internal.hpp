@@ -14,6 +14,8 @@
 #include "staticlib/utils.hpp"
 #include "staticlib/json.hpp"
 
+#include "wilton/wiltoncall.h"
+
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
 
