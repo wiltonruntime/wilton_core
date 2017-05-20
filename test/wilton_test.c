@@ -44,17 +44,20 @@ void test_server() {
 }
 
 void test_duktape() {
-    const char* in = "{\"module\": \"../test/test\"}";
+    const char* in = "{\"module\": \"tests/hello_duktape\", \"func\": \"hello\", \"args\": []}";
     char* out;
     int out_len;
     char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);
-    puts(out);
-    wilton_free(out);
     check_err(err);
+    printf("output: %s\n", out);
+    wilton_free(out);
 }
 
 int main() {
 //    test_server();
+    test_duktape();
+    test_duktape();
+    test_duktape();
     test_duktape();
 
     return 0;

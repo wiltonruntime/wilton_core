@@ -31,9 +31,9 @@ public:
      */
     PIMPL_CONSTRUCTOR(duktape_engine)
             
-    duktape_engine();
+    duktape_engine(const std::string& path_to_scripts_dir);
 
-    std::string run_script(const std::string& script_body, const std::string& filename);
+    std::string run_script(const std::string& callback_script_json);
 };
 
 } // namespace

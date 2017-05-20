@@ -28,6 +28,15 @@ std::unordered_map<std::thread::id, wilton::duktape::duktape_engine>& static_eng
     return engines;
 }
 
+const std::string& scripts_dir() {
+    static std::string dir = [] {
+        auto exepath = sl::utils::current_executable_path();
+        auto exedir = sl::utils::strip_filename(exepath);
+        return exedir + "js";
+    } ();
+    return dir;
+}
+
 // no TLS in vs2013
 wilton::duktape::duktape_engine& thread_local_engine() {
     static std::mutex mx;
@@ -36,17 +45,10 @@ wilton::duktape::duktape_engine& thread_local_engine() {
     auto tid = std::this_thread::get_id();
     auto it = map.find(tid);
     if (map.end() == it) {
-        auto pa = map.emplace(tid, wilton::duktape::duktape_engine());
+        auto pa = map.emplace(tid, wilton::duktape::duktape_engine(scripts_dir()));
         it = pa.first;
     }
     return it->second;
-}
-
-std::string read_file(const std::string& path) {
-    auto src = sl::tinydir::file_source(path);
-    auto sink = sl::io::string_sink();
-    sl::io::copy_all(src, sink);
-    return sink.get_string();
 }
 
 } // anonymous
@@ -59,12 +61,10 @@ char* wiltoncall_runscript_duktape(const char* json_in, int json_in_len, char** 
     if (nullptr == json_out) return sl::utils::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
     if (nullptr == json_out_len) return sl::utils::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
     try {
-        auto src = sl::io::array_source(json_in, static_cast<size_t> (json_in_len));
-        auto cs = sl::json::load(src);
-        auto path = cs["module"].as_string_nonempty_or_throw() + ".js";
-        auto code = read_file(path);
+        uint32_t json_in_len_u32 = static_cast<uint32_t>(json_in_len);
+        auto json = std::string(json_in, json_in_len_u32);
         auto& en = thread_local_engine();
-        auto res = en.run_script(code, path);
+        auto res = en.run_script(json);
         *json_out = sl::utils::alloc_copy(res);
         *json_out_len = res.length();
         return nullptr;
