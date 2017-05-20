@@ -52,23 +52,20 @@ void test_duktape_fail() {
     wilton_free(err);
 }
 
-void test_duktape() {
-    const char* in = "{\"module\": \"tests/hello_duktape\", \"func\": \"hello\", \"args\": []}";
+void test_wiltonjs() {
+    wiltoncall_init("duktape", strlen("duktape"));
+    const char* in = "{\"module\": \"tests/runtests\", \"func\": \"runTests\", \"args\": []}";
     char* out;
     int out_len;
     char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);    
     check_err(err);
-    printf("output: %s\n", out);
     wilton_free(out);
 }
 
 int main() {
 //    test_server();
-    test_duktape_fail();
-    test_duktape();
-    test_duktape();
-    test_duktape();
-    test_duktape();
+//    test_duktape_fail();
+    test_wiltonjs();
 
     return 0;
 }

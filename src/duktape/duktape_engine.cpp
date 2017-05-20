@@ -161,6 +161,7 @@ public:
                 "   load('" + reqjs_path + "loader.js');" +
                 "   load('" + reqjs_path + "runner.js');" +
                 "   requirejs.config({" +
+                "       waitSeconds: 30," +
                 "       baseUrl: '" + modules_path + "'" +
                 "   });" +
                 "}());";

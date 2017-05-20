@@ -68,7 +68,7 @@ set ( ${PROJECT_NAME}_DEPS_PUBLIC wilton )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PUBLIC_PC REQUIRED ${PROJECT_NAME}_DEPS_PUBLIC )
 
 # tests
-if ( "${STATICLIB_ROOT_SOURCE_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}" )
+if ( "${STATICLIB_ROOT_SOURCE_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}" )    
     # C
     enable_testing ( )
     add_executable ( wilton_test ${CMAKE_CURRENT_LIST_DIR}/wilton_test.c )
@@ -84,5 +84,10 @@ if ( "${STATICLIB_ROOT_SOURCE_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}" )
     else ( )
         add_test ( wilton_test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/wilton_test )
     endif ( )
+    # JavaScript
+    add_custom_target ( ${PROJECT_NAME}_copyjs ALL
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_CURRENT_LIST_DIR}/js
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/js )
 endif ( )
 
