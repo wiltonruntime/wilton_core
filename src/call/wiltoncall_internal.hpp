@@ -155,6 +155,17 @@ std::string tcp_wait_for_connection(const std::string& data);
     
 } // namespace
 
+
+
+// script engine entry points
+namespace engine {
+
+char* runscript_jni(const char* json_in, int json_in_len, char** json_out, int* json_out_len);
+
+char* runscript_duktape(const char* json_in, int json_in_len, char** json_out, int* json_out_len);
+
+} // namespace
+
 } // namespace
 
 #endif	/* WILTON_CALL_WILTONCALL_INTERNAL_HPP */

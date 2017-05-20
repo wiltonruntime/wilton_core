@@ -20,6 +20,7 @@
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
+#include "call/wiltoncall_internal.hpp"
 #include "jni/jni_config.hpp"
 #include "jni_utils.hpp"
 
@@ -193,7 +194,8 @@ JNIEXPORT void JNICALL WILTON_JNI_FUNCTION(wiltoninit)
         // set gateway
         static_jni_ctx().set_gateway_object(env, gateway);
         // wiltoncalls
-        auto err_init = wiltoncall_init();
+        std::string engine = "jni";
+        auto err_init = wiltoncall_init(engine.c_str(), engine.length());
         if (nullptr != err_init) {
             wc::throw_wilton_error(err_init, TRACEMSG(err_init));
         }
@@ -243,7 +245,10 @@ JNIEXPORT jstring JNICALL WILTON_JNI_FUNCTION(wiltoncall)
 
 } // C
 
-char* wiltoncall_runscript(const char* json_in, int json_in_len, char** json_out, 
+namespace wilton {
+namespace engine {
+
+char* runscript_jni(const char* json_in, int json_in_len, char** json_out, 
         int* json_out_len) /* noexcept */ {
     if (nullptr == json_in) return sl::utils::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
     if (!sl::support::is_uint32(json_in_len)) return sl::utils::alloc_copy(TRACEMSG(
@@ -273,4 +278,17 @@ char* wiltoncall_runscript(const char* json_in, int json_in_len, char** json_out
     } catch (const std::exception& e) {
         return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
+}
+
+// todo: removeme
+char* runscript_duktape(const char* json_in, int json_in_len, char** json_out,
+        int* json_out_len) /* noexcept */ {
+    (void) json_in;
+    (void) json_in_len;
+    (void) json_out;
+    (void) json_out_len;
+    return sl::utils::alloc_copy(TRACEMSG("Duktape engine not implemented"));
+}
+
+} // namespace
 }

@@ -126,9 +126,12 @@ std::string mutex_wait(const std::string& data) {
     char* err = wilton_Mutex_wait(mutex, static_cast<int> (timeout_millis), static_cast<void*> (std::addressof(cbjson)),
             [](void* passed) {
                 std::string* sptr = static_cast<std::string*> (passed);
+                sl::json::value cb_json = sl::json::loads(*sptr);
+                std::string engine = cb_json["engine"].as_string();
                 char* out;
                 int out_len;
-                auto err = wiltoncall_runscript(sptr->c_str(), static_cast<int> (sptr->length()),
+                auto err = wiltoncall_runscript(engine.c_str(), engine.length(), 
+                        sptr->c_str(), static_cast<int> (sptr->length()),
                         std::addressof(out), std::addressof(out_len));                
                 if (nullptr != err) {
                     log_error("wilton.mutex", TRACEMSG(err));

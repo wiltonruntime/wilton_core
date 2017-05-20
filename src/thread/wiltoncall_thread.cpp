@@ -37,10 +37,13 @@ std::string thread_run(const std::string& data) {
     char* err = wilton_thread_run(callback_str_ptr,
             [](void* passed) {
                 std::string* sptr = static_cast<std::string*>(passed);
+                sl::json::value cb_json = sl::json::loads(*sptr);
+                std::string engine = cb_json["engine"].as_string();
                 // output will be ignored
                 char* out;
                 int out_len;
-                auto err = wiltoncall_runscript(sptr->c_str(), static_cast<int>(sptr->length()),
+                auto err = wiltoncall_runscript(engine.c_str(), engine.length(),
+                        sptr->c_str(), static_cast<int>(sptr->length()),
                         std::addressof(out), std::addressof(out_len));
                 delete sptr;
                 if (nullptr != err) {

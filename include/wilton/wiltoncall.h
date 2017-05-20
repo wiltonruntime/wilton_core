@@ -14,7 +14,9 @@
 extern "C" {
 #endif
 
-WILTON_EXPORT char* wiltoncall_init();    
+WILTON_EXPORT char* wiltoncall_init(
+        const char* default_script_engine_name,
+        int default_script_engine_name_len);
     
 WILTON_EXPORT char* wiltoncall(
         const char* call_name,
@@ -24,9 +26,9 @@ WILTON_EXPORT char* wiltoncall(
         char** json_out,
         int* json_out_len);
 
-// must be implemented by scripting runtime,
-// see wilton_jni for example
 WILTON_EXPORT char* wiltoncall_runscript(
+        const char* script_engine_name,
+        int script_engine_name_len,
         const char* json_in,
         int json_in_len,
         char** json_out,

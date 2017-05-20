@@ -61,6 +61,12 @@ void check_json_callback_script(const sl::json::field& field) {
                         " value: [" + fi.val().dumps() + "]"));
             }
             args = true;
+        } else if ("engine" == name) {
+            if (sl::json::type::string != fi.json_type()) {
+                throw common::wilton_internal_exception(TRACEMSG("Invalid '" + fi.name() + "' field,"
+                        " type: [" + sl::json::stringify_json_type(fi.json_type()) + "]," +
+                        " value: [" + fi.val().dumps() + "]"));
+            }
         } else {
             throw common::wilton_internal_exception(TRACEMSG(
                     "Unknown data field: [" + name + "] in object: [" + field.name() + "]"));

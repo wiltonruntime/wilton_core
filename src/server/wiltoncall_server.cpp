@@ -163,10 +163,12 @@ std::vector<std::unique_ptr<wilton_HttpPath, http_path_deleter>> create_paths(
                     std::vector<sl::json::value>& args = params.getattr_or_throw("args").as_array_or_throw();
                     args.emplace_back(requestHandle);
                     std::string params_str = params.dumps();
+                    std::string engine = params["engine"].as_string();
                     // output will be ignored
                     char* out;
                     int out_len;
-                    auto err = wiltoncall_runscript(params_str.c_str(), static_cast<int> (params_str.length()),
+                    auto err = wiltoncall_runscript(engine.c_str(), engine.length(), 
+                            params_str.c_str(), static_cast<int> (params_str.length()),
                             std::addressof(out), std::addressof(out_len));
                     if (nullptr == err) {
                         wilton_free(out);

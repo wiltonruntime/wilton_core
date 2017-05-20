@@ -56,11 +56,14 @@ std::string cron_start(const std::string& data) {
             static_cast<void*> (str_to_pass),
             [](void* passed) {
                 std::string* str = static_cast<std::string*> (passed);
+                sl::json::value cb_json = sl::json::loads(*str);
+                std::string engine = cb_json["engine"].as_string();
                 // output will be ignored
                 char* out;
                 int out_len;
-                auto err = wiltoncall_runscript(str->c_str(), static_cast<int> (str->length()),
-                std::addressof(out), std::addressof(out_len));
+                auto err = wiltoncall_runscript(engine.c_str(), engine.length(), 
+                        str->c_str(), static_cast<int> (str->length()),
+                        std::addressof(out), std::addressof(out_len));
                 if (nullptr != err) {
                     log_error("wilton.cron", TRACEMSG(err));
                     wilton_free(err);
