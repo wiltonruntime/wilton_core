@@ -31,6 +31,7 @@ std::unordered_map<std::thread::id, wilton::duktape::duktape_engine>& static_eng
 const std::string& scripts_dir() {
     static std::string dir = [] {
         auto exepath = sl::utils::current_executable_path();
+        std::replace(exepath.begin(), exepath.end(), '\\', '/');
         auto exedir = sl::utils::strip_filename(exepath);
         return exedir + "js";
     } ();

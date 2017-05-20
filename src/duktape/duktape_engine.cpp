@@ -125,7 +125,7 @@ duk_ret_t wiltoncall_func(duk_context* ctx) /* noexcept */ {
                 "\n'wiltoncall' error for name: [" + name + "]").c_str());
         wilton_free(err);
         duk_throw(ctx);
-        return -1;
+        //return -1;
     }
 }
 
