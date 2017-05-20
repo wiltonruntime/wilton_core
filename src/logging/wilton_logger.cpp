@@ -32,7 +32,6 @@ namespace su = staticlib::utils;
 
 std::atomic_bool initialized{false};
 std::atomic_bool shutted_down{false};
-bool the_false{false};
 
 log4cplus::LogLevel to_level(const std::string& level_name) {
     if ("TRACE" == level_name) {
@@ -66,6 +65,7 @@ public:
     }
 
     static void apply_config(const logging_config& config) {
+        bool the_false = false;
         if (initialized.compare_exchange_strong(the_false, true)) {
 #ifndef STATICLIB_LINUX
             log4cplus::initialize();
@@ -90,6 +90,7 @@ public:
     }
     
     static void shutdown() {
+        bool the_false = false;
         if (shutted_down.compare_exchange_strong(the_false, true)) {
             log4cplus::Logger::shutdown();
         }

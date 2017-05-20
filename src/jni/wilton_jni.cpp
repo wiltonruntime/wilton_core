@@ -180,7 +180,7 @@ JNIEXPORT void JNI_OnUnload(JavaVM*, void*) {
 JNIEXPORT void JNICALL WILTON_JNI_FUNCTION(wiltoninit)
 (JNIEnv* env, jclass, jobject gateway, jstring logging_conf) {
     // check called once
-    static bool the_false = false;
+    bool the_false = false;
     static std::atomic<bool> initilized{false};
     if (!initilized.compare_exchange_strong(the_false, true)) {
         env->ThrowNew(static_jni_ctx().wiltonExceptionClass.get(),

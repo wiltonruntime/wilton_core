@@ -32,7 +32,7 @@ wilton::call::wiltoncall_registry& static_registry() {
 char* wiltoncall_init() {
     try {
         // check called once
-        static bool the_false = false;
+        bool the_false = false;
         static std::atomic<bool> initilized{false};
         if (!initilized.compare_exchange_strong(the_false, true)) {
             throw wc::wilton_internal_exception(TRACEMSG("'wiltoncall' registry is already initialized"));
