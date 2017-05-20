@@ -10,8 +10,6 @@
 #include <cstring>
 #include <functional>
 #include <memory>
-#include <vector>
-#include <unordered_map>
 
 #include "duktape.h"
 
@@ -40,105 +38,6 @@ void ctx_deleter(duk_context* ctx) {
     }
 }
 
-/*
-        duktape_error_checker ec;
-        auto it = cache.find(filename);
-        if (it == cache.end()) {
-            auto def = sl::support::defer([this]() STATICLIB_NOEXCEPT {
-                this->pop_stack();
-            });
-            duk_push_string(ctx.get(), script_body.c_str());
-            duk_push_string(ctx.get(), filename.c_str());
-            ec = duk_pcompile(ctx.get(), DUK_COMPILE_EVAL);
-            duk_dump_function(ctx.get());
-            size_t len;
-            auto buf_ptr = duk_get_buffer(ctx.get(), -1, std::addressof(len));
-            if (nullptr == buf_ptr) {
-                throw common::wilton_internal_exception(TRACEMSG(
-                        "Error obtaining Duktape bytecode buffer"));
-            }
-            std::vector<unsigned char> vec;
-            vec.resize(len);
-            std::memcpy(vec.data(), buf_ptr, len);
-            auto pa = cache.emplace(filename, std::move(vec));
-            it = pa.first;
-        }
-        auto def = sl::support::defer([this]() STATICLIB_NOEXCEPT {
-            this->pop_stack();
-        });
-        std::vector<unsigned char>& bytecode = it->second;
-        duk_push_fixed_buffer(ctx.get(), bytecode.size());
-        size_t load_size;
-        auto load_ptr = duk_get_buffer(ctx.get(), -1, std::addressof(load_size));
-        if (nullptr == load_ptr) {
-            throw common::wilton_internal_exception(TRACEMSG(
-                    "Error loading Duktape bytecode"));
-        }
-        std::memcpy(load_ptr, bytecode.data(), bytecode.size());
-        duk_load_function(ctx.get());
- */
-
-// todo: pre-compiled cache
-duk_ret_t load_func(duk_context* ctx) {
-    size_t path_len;
-    const char* path_ptr = duk_get_lstring(ctx, 0, std::addressof(path_len));
-    if (nullptr == path_ptr) {
-        std::string msg = TRACEMSG("Invalid 'load' arguments");
-        duk_push_error_object(ctx, DUK_ERR_TYPE_ERROR, msg.c_str());
-    }
-    std::string path = std::string(path_ptr, path_len);
-    auto src = sl::tinydir::file_source(path);
-    auto sink = sl::io::string_sink();
-    sl::io::copy_all(src, sink);
-    
-//    std::cout << sink.get_string() << std::endl;;
-
-    duk_push_lstring(ctx, sink.get_string().c_str(), sink.get_string().length());
-    duk_push_lstring(ctx, path.c_str(), path.length());
-    auto err = duk_pcompile(ctx, DUK_COMPILE_EVAL);
-    if (DUK_EXEC_SUCCESS == err) {
-        err = duk_pcall(ctx, 0);
-    }
-    if (DUK_EXEC_SUCCESS != err) {
-        const char* msg_ptr = duk_safe_to_string(ctx, -1);
-        std::string msg = TRACEMSG("Error compiling file: [" + path + "],"
-                " code: [" + sl::support::to_string(err) + "], message: [" + msg_ptr + "]");
-        duk_pop(ctx);
-        duk_push_error_object(ctx, DUK_ERR_TYPE_ERROR, msg.c_str());
-    } else {
-        duk_pop(ctx);
-        duk_push_true(ctx);
-    }
-    return 1;
-}
-
-duk_ret_t wiltoncall_func(duk_context* ctx) {
-    size_t name_len;
-    const char* name = duk_get_lstring(ctx, 0, std::addressof(name_len));
-    if (nullptr == name) {
-        name = "";
-        name_len = 0;
-    }
-    size_t input_len;
-    const char* input = duk_get_lstring(ctx, 1, std::addressof(input_len));
-    if (nullptr == input) {
-        input = "";
-        input_len = 0;
-    }
-    char* out;
-    int out_len;
-    auto err = wiltoncall(name, static_cast<int> (name_len), input, static_cast<int> (input_len),
-            std::addressof(out), std::addressof(out_len));
-    if (nullptr == err) {
-        duk_push_lstring(ctx, out, out_len);
-        wilton_free(out);
-    } else {
-        duk_push_string(ctx, err);
-        wilton_free(err);
-    }
-    return 1;
-}
-
 void pop_stack(duk_context* ctx) {
     duk_pop_n(ctx, duk_get_top(ctx));
 }
@@ -158,6 +57,78 @@ std::string format_error(duk_context* ctx) {
     }
 }
 
+duk_ret_t load_func(duk_context* ctx) {
+    std::string path = "";
+    try {        
+        size_t path_len;
+        const char* path_ptr = duk_get_lstring(ctx, 0, std::addressof(path_len));
+        if (nullptr == path_ptr) {
+            throw common::wilton_internal_exception(TRACEMSG("Invalid 'load' arguments"));
+        }    
+        path = std::string(path_ptr, path_len);
+        // read file
+        auto src = sl::tinydir::file_source(path);
+        auto sink = sl::io::string_sink();
+        sl::io::copy_all(src, sink);
+        // compile source
+        duk_push_lstring(ctx, sink.get_string().c_str(), sink.get_string().length());
+        duk_push_lstring(ctx, path.c_str(), path.length());
+        auto err = duk_pcompile(ctx, DUK_COMPILE_EVAL);
+        if (DUK_EXEC_SUCCESS == err) {
+            err = duk_pcall(ctx, 0);
+        }
+        if (DUK_EXEC_SUCCESS != err) {
+            std::string msg = format_error(ctx);
+            duk_pop(ctx);
+            throw common::wilton_internal_exception(TRACEMSG(msg + "\nCall error"));
+        } else {
+            duk_pop(ctx);
+            duk_push_true(ctx);
+        }
+        return 1;
+    } catch (const std::exception& e) {
+        duk_push_error_object(ctx, DUK_ERR_ERROR, TRACEMSG(e.what() + 
+                "\nError loading script, path: [" + path + "]").c_str());
+        duk_throw(ctx);
+        return -1;
+    } catch (...) {
+        duk_push_error_object(ctx, DUK_ERR_ERROR, TRACEMSG(
+                "Error loading script, path: [" + path + "]").c_str());
+        duk_throw(ctx);
+        return -1;
+    }    
+}
+
+duk_ret_t wiltoncall_func(duk_context* ctx) /* noexcept */ {
+    size_t name_len;
+    const char* name = duk_get_lstring(ctx, 0, std::addressof(name_len));
+    if (nullptr == name) {
+        name = "";
+        name_len = 0;
+    }
+    size_t input_len;
+    const char* input = duk_get_lstring(ctx, 1, std::addressof(input_len));
+    if (nullptr == input) {
+        input = "";
+        input_len = 0;
+    }
+    char* out;
+    int out_len;
+    auto err = wiltoncall(name, static_cast<int> (name_len), input, static_cast<int> (input_len),
+            std::addressof(out), std::addressof(out_len));
+    if (nullptr == err) {
+        duk_push_lstring(ctx, out, out_len);
+        wilton_free(out);
+        return 1;
+    } else {
+        duk_push_error_object(ctx, DUK_ERR_ERROR, TRACEMSG(err +
+                "\n'wiltoncall' error for name: [" + name + "]").c_str());
+        wilton_free(err);
+        duk_throw(ctx);
+        return -1;
+    }
+}
+
 void register_c_func(duk_context* ctx, const std::string& name, duk_c_function fun, size_t argnum) {
     duk_push_global_object(ctx);
     duk_push_c_function(ctx, fun, argnum);
@@ -169,7 +140,6 @@ void register_c_func(duk_context* ctx, const std::string& name, duk_c_function f
 
 class duktape_engine::impl : public sl::pimpl::object::impl {
     std::unique_ptr<duk_context, std::function<void(duk_context*)>> dukctx;
-    std::unordered_map<std::string, std::vector<unsigned char>> cache;
     
 public:
     impl(const std::string& path_to_scripts_dir) :

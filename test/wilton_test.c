@@ -43,11 +43,20 @@ void test_server() {
     check_err(err);
 }
 
+void test_duktape_fail() {
+    const char* in = "{\"module\": \"tests/hello_duktapeX\", \"func\": \"hello\", \"args\": []}";
+    char* out;
+    int out_len;
+    char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);
+    puts(err);
+    wilton_free(err);
+}
+
 void test_duktape() {
     const char* in = "{\"module\": \"tests/hello_duktape\", \"func\": \"hello\", \"args\": []}";
     char* out;
     int out_len;
-    char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);
+    char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);    
     check_err(err);
     printf("output: %s\n", out);
     wilton_free(out);
@@ -55,6 +64,7 @@ void test_duktape() {
 
 int main() {
 //    test_server();
+    test_duktape_fail();
     test_duktape();
     test_duktape();
     test_duktape();
