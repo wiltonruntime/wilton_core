@@ -9,6 +9,7 @@
 #define	WILTON_CALL_WILTONCALL_INTERNAL_HPP
 
 #include <cstdint>
+#include <thread>
 #include <string>
 
 #include "staticlib/utils.hpp"
@@ -158,13 +159,11 @@ std::string tcp_wait_for_connection(const std::string& data);
 } // namespace
 
 
+// internal api
 
-// script engine entry points
-namespace engine {
+namespace duktape {
 
-char* runscript_jni(const char* json_in, int json_in_len, char** json_out, int* json_out_len);
-
-char* runscript_duktape(const char* json_in, int json_in_len, char** json_out, int* json_out_len);
+void clean_thread_local(const std::thread::id& tid);
 
 } // namespace
 

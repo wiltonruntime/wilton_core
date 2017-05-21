@@ -13,8 +13,11 @@
 #include <mutex>
 #include <thread>
 
+#include "staticlib/support.hpp"
 #include "staticlib/cron.hpp"
 #include "staticlib/pimpl/forward_macros.hpp"
+
+#include "call/wiltoncall_internal.hpp"
 
 namespace wilton {
 namespace cron {
@@ -42,6 +45,9 @@ public:
     task(std::move(crontask)),
     running(true) {
         worker = std::thread([this] {
+            auto cleaner = sl::support::defer([]() STATICLIB_NOEXCEPT {
+                wilton::duktape::clean_thread_local(std::this_thread::get_id());
+            });
             while (running.load()) {
                 auto secs = cron.next<std::chrono::seconds>();
                 {

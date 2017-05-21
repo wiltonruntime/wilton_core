@@ -12,7 +12,10 @@
 #include <chrono>
 
 #include "staticlib/config.hpp"
+#include "staticlib/support.hpp"
 #include "staticlib/utils.hpp"
+
+#include "call/wiltoncall_internal.hpp"
 
 namespace { // anonymous
 
@@ -25,6 +28,9 @@ char* wilton_thread_run(void* cb_ctx, void (*cb)(void* cb_ctx)) /* noexcept */ {
     if (nullptr == cb) return sl::utils::alloc_copy(TRACEMSG("Null 'cb' parameter specified"));
     try {
         auto th = std::thread([cb, cb_ctx]() {
+            auto cleaner = sl::support::defer([]() STATICLIB_NOEXCEPT {
+                wilton::duktape::clean_thread_local(std::this_thread::get_id());
+            });
             try {
                 cb(cb_ctx);
             } catch (...) {

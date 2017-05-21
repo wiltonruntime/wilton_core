@@ -21,6 +21,7 @@
 #include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
+#include "call/wiltoncall_internal.hpp"
 #include "common/wilton_internal_exception.hpp"
 #include "logging/wilton_logger.hpp"
 #include "server/file_handler.hpp"
@@ -77,7 +78,10 @@ public:
                 server_ptr->add_handler("GET", dr.resource, zip_handler(dr));
             } else throw common::wilton_internal_exception(TRACEMSG(
                     "Invalid 'documentRoot': [" + dr.to_json().dumps() + "]"));
-        }        
+        }
+        server_ptr->get_scheduler().set_thread_stop_hook([](const std::thread::id& tid) STATICLIB_NOEXCEPT {
+            wilton::duktape::clean_thread_local(tid);
+        });
         server_ptr->start();
     }
 
