@@ -17,17 +17,23 @@ cmake_minimum_required ( VERSION 2.8.12 )
 # project
 project ( wilton CXX )
 set ( ${PROJECT_NAME}_STATICLIB_VERSION 0.8.0 )
-set ( ${PROJECT_NAME}_DESCRIPTION "Wilton Web Toolkit C library" )
+set ( ${PROJECT_NAME}_DESCRIPTION "Wilton Web Toolkit library" )
 set ( ${PROJECT_NAME}_URL https://github.com/wilton-web-toolkit/libwilton )
 include ( ${CMAKE_CURRENT_LIST_DIR}/resources/macros.cmake )
 
 # check deplibs cache
 if ( STATICLIB_USE_DEPLIBS_CACHE )
-    set ( ${PROJECT_NAME}_CACHED_LIB_PATH ${STATICLIB_DEPLIBS_CACHE_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX} )
-    if ( EXISTS ${${PROJECT_NAME}_CACHED_LIB_PATH} )
+    set ( ${PROJECT_NAME}_CACHED_STATIC_LIB_PATH ${STATICLIB_DEPLIBS_CACHE_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX} )
+    set ( ${PROJECT_NAME}_CACHED_SHARED_LIB_PATH ${STATICLIB_DEPLIBS_CACHE_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX} )
+    if ( EXISTS ${${PROJECT_NAME}_CACHED_STATIC_LIB_PATH} )
         add_library( ${PROJECT_NAME} STATIC IMPORTED GLOBAL )
-        set_target_properties( ${PROJECT_NAME} PROPERTIES IMPORTED_LOCATION ${${PROJECT_NAME}_CACHED_LIB_PATH} )
-        message ( STATUS "Using cached library: [${${PROJECT_NAME}_CACHED_LIB_PATH}]" )
+        set_target_properties( ${PROJECT_NAME} PROPERTIES IMPORTED_LOCATION ${${PROJECT_NAME}_CACHED_STATIC_LIB_PATH} )
+        message ( STATUS "Using cached library: [${${PROJECT_NAME}_CACHED_STATIC_LIB_PATH}]" )
+        return ( )
+    elseif ( EXISTS ${${PROJECT_NAME}_CACHED_SHARED_LIB_PATH} )
+        add_library( ${PROJECT_NAME} SHARED IMPORTED GLOBAL )
+        set_target_properties( ${PROJECT_NAME} PROPERTIES IMPORTED_LOCATION ${${PROJECT_NAME}_CACHED_SHARED_LIB_PATH} )
+        message ( STATUS "Using cached library: [${${PROJECT_NAME}_CACHED_SHARED_LIB_PATH}]" )
         return ( )
     endif ( )
 endif ( )
@@ -188,22 +194,11 @@ add_custom_target ( mvninstall_shared
         WORKING_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}        
         COMMENT "Installing shared library into local Maven repository ..." )
 
-add_custom_target ( mvninstall_static
-        COMMAND mvn install:install-file
-                -Dfile=${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
-                -DgroupId=net.wiltonwebtoolkit
-                -DartifactId=${PROJECT_NAME}
-                -Dversion=${${PROJECT_NAME}_STATICLIB_VERSION}
-                -Dclassifier=${${PROJECT_NAME}_CLASSIFIER}
-                -Dpackaging=${${PROJECT_NAME}_STATIC_SUFFIX}
-        WORKING_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}        
-        COMMENT "Installing static library into local Maven repository ..." )
-
 add_custom_target ( mvninstall_import
         COMMAND mvn install:install-file
                 -Dfile=${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
                 -DgroupId=net.wiltonwebtoolkit
-                -DartifactId=${PROJECT_NAME}-import
+                -DartifactId=${PROJECT_NAME}
                 -Dversion=${${PROJECT_NAME}_STATICLIB_VERSION}
                 -Dclassifier=${${PROJECT_NAME}_CLASSIFIER}
                 -Dpackaging=${${PROJECT_NAME}_STATIC_SUFFIX}
