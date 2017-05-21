@@ -16,7 +16,7 @@ cmake_minimum_required ( VERSION 2.8.12 )
 
 # project
 project ( wilton CXX )
-set ( ${PROJECT_NAME}_STATICLIB_VERSION 1.0 )
+set ( ${PROJECT_NAME}_STATICLIB_VERSION 0.8.0 )
 set ( ${PROJECT_NAME}_DESCRIPTION "Wilton Web Toolkit C library" )
 set ( ${PROJECT_NAME}_URL https://github.com/wilton-web-toolkit/libwilton )
 include ( ${CMAKE_CURRENT_LIST_DIR}/resources/macros.cmake )
@@ -50,6 +50,25 @@ if ( ${PROJECT_NAME}_ENABLE_DOCS )
 endif ( )
 
 # standalone build
+if ( NOT DEFINED STATICLIB_TOOLCHAIN )
+    if ( NOT DEFINED ${PROJECT_NAME}_TOOLCHAIN )
+        if ( WIN32 )
+            if ( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+                set ( ${PROJECT_NAME}_TOOLCHAIN "windows_amd64_msvc" )
+            else ( )
+                set ( ${PROJECT_NAME}_TOOLCHAIN "windows_i386_msvc" )
+            endif ( )
+        elseif ( APPLE )
+            set ( ${PROJECT_NAME}_TOOLCHAIN "macosx_amd64_clang" )
+        elseif ( UNIX )
+            set ( ${PROJECT_NAME}_TOOLCHAIN "linux_amd64_gcc" )
+        else ( )
+            message ( FATAL_ERROR "Cannot determine toolchain to use, please specify [${PROJECT_NAME}_TOOLCHAIN]" )
+        endif ( )
+    endif ( )
+else ( )
+    set ( ${PROJECT_NAME}_TOOLCHAIN ${STATICLIB_TOOLCHAIN} )
+endif ( )
 if ( NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY )
     set ( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 endif ( )
@@ -138,6 +157,58 @@ if ( ${PROJECT_NAME}_SHARED )
     target_compile_definitions ( ${PROJECT_NAME} PRIVATE -DWILTON_SHARED )
     target_link_libraries ( ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS_PC_LIBRARIES} )
 endif ( )
+
+# maven install
+if ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "android_armeabi_[^_]+" )
+    set ( ${PROJECT_NAME}_CLASSIFIER "android_armeabi" CACHE INTERNAL "" )
+    set ( ${PROJECT_NAME}_JAR_LIB_DIR "armeabi" CACHE INTERNAL "" )
+elseif ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "android_i386_[^_]+" )
+    set ( ${PROJECT_NAME}_CLASSIFIER "android_i386" CACHE INTERNAL "" )
+    set ( ${PROJECT_NAME}_JAR_LIB_DIR "x86" CACHE INTERNAL "" )
+elseif ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "linux_amd64_[^_]+" )
+    set ( ${PROJECT_NAME}_CLASSIFIER "linux_amd64" CACHE INTERNAL "" )
+elseif ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "windows_amd64_[^_]+" )
+    set ( ${PROJECT_NAME}_CLASSIFIER "windows_amd64" CACHE INTERNAL "" )
+elseif ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "windows_i386_[^_]+" )
+    set ( ${PROJECT_NAME}_CLASSIFIER "windows_i386" CACHE INTERNAL "" )
+else ( )
+    message ( FATAL_ERROR "Unsupported toolchain: [${PROJECT_NAME}_TOOLCHAIN]" )
+endif ( )
+string ( SUBSTRING ${CMAKE_SHARED_LIBRARY_SUFFIX} 1 -1 ${PROJECT_NAME}_SHARED_SUFFIX )
+string ( SUBSTRING ${CMAKE_STATIC_LIBRARY_SUFFIX} 1 -1 ${PROJECT_NAME}_STATIC_SUFFIX )
+
+add_custom_target ( mvninstall_shared
+        COMMAND mvn install:install-file
+                -Dfile=${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}
+                -DgroupId=net.wiltonwebtoolkit
+                -DartifactId=${PROJECT_NAME}
+                -Dversion=${${PROJECT_NAME}_STATICLIB_VERSION}
+                -Dclassifier=${${PROJECT_NAME}_CLASSIFIER}
+                -Dpackaging=${${PROJECT_NAME}_SHARED_SUFFIX}
+        WORKING_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}        
+        COMMENT "Installing shared library into local Maven repository ..." )
+
+add_custom_target ( mvninstall_static
+        COMMAND mvn install:install-file
+                -Dfile=${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
+                -DgroupId=net.wiltonwebtoolkit
+                -DartifactId=${PROJECT_NAME}
+                -Dversion=${${PROJECT_NAME}_STATICLIB_VERSION}
+                -Dclassifier=${${PROJECT_NAME}_CLASSIFIER}
+                -Dpackaging=${${PROJECT_NAME}_STATIC_SUFFIX}
+        WORKING_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}        
+        COMMENT "Installing static library into local Maven repository ..." )
+
+add_custom_target ( mvninstall_import
+        COMMAND mvn install:install-file
+                -Dfile=${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
+                -DgroupId=net.wiltonwebtoolkit
+                -DartifactId=${PROJECT_NAME}-import
+                -Dversion=${${PROJECT_NAME}_STATICLIB_VERSION}
+                -Dclassifier=${${PROJECT_NAME}_CLASSIFIER}
+                -Dpackaging=${${PROJECT_NAME}_STATIC_SUFFIX}
+        WORKING_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}        
+        COMMENT "Installing import library into local Maven repository ..." )
 
 # pkg-config
 set ( ${PROJECT_NAME}_PC_CFLAGS "-I${CMAKE_CURRENT_LIST_DIR}/include" )
