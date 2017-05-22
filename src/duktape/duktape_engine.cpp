@@ -87,19 +87,15 @@ duk_ret_t load_func(duk_context* ctx) {
         }
         return 1;
     } catch (const std::exception& e) {
-        duk_push_error_object(ctx, DUK_ERR_ERROR, TRACEMSG(e.what() + 
+        throw common::wilton_internal_exception(TRACEMSG(e.what() + 
                 "\nError loading script, path: [" + path + "]").c_str());
-        duk_throw(ctx);
-        return -1;
     } catch (...) {
-        duk_push_error_object(ctx, DUK_ERR_ERROR, TRACEMSG(
+        throw common::wilton_internal_exception(TRACEMSG(
                 "Error loading script, path: [" + path + "]").c_str());
-        duk_throw(ctx);
-        return -1;
     }    
 }
 
-duk_ret_t wiltoncall_func(duk_context* ctx) /* noexcept */ {
+duk_ret_t wiltoncall_func(duk_context* ctx) {
     size_t name_len;
     const char* name = duk_get_lstring(ctx, 0, std::addressof(name_len));
     if (nullptr == name) {
@@ -121,11 +117,9 @@ duk_ret_t wiltoncall_func(duk_context* ctx) /* noexcept */ {
         wilton_free(out);
         return 1;
     } else {
-        duk_push_error_object(ctx, DUK_ERR_ERROR, TRACEMSG(err +
-                "\n'wiltoncall' error for name: [" + name + "]").c_str());
+        auto msg = TRACEMSG(err + "\n'wiltoncall' error for name: [" + name + "]");
         wilton_free(err);
-        duk_throw(ctx);
-        //return -1;
+        throw common::wilton_internal_exception(msg);
     }
 }
 
