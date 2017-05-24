@@ -14,6 +14,7 @@
 #include "duktape.h"
 
 #include "staticlib/io.hpp"
+#include "staticlib/json.hpp"
 #include "staticlib/support.hpp"
 #include "staticlib/tinydir.hpp"
 #include "staticlib/pimpl/forward_macros.hpp"
@@ -57,6 +58,13 @@ std::string format_error(duk_context* ctx) {
     }
 }
 
+std::string read_file(const std::string& path) {
+    auto src = sl::tinydir::file_source(path);
+    auto sink = sl::io::string_sink();
+    sl::io::copy_all(src, sink);
+    return sink.get_string();
+}
+
 duk_ret_t load_func(duk_context* ctx) {
     std::string path = "";
     try {        
@@ -67,11 +75,9 @@ duk_ret_t load_func(duk_context* ctx) {
         }    
         path = std::string(path_ptr, path_len);
         // read file
-        auto src = sl::tinydir::file_source(path);
-        auto sink = sl::io::string_sink();
-        sl::io::copy_all(src, sink);
+        auto code = read_file(path);
         // compile source
-        duk_push_lstring(ctx, sink.get_string().c_str(), sink.get_string().length());
+        duk_push_lstring(ctx, code.c_str(), code.length());
         duk_push_lstring(ctx, path.c_str(), path.length());
         auto err = duk_pcompile(ctx, DUK_COMPILE_EVAL);
         if (DUK_EXEC_SUCCESS == err) {
@@ -130,6 +136,32 @@ void register_c_func(duk_context* ctx, const std::string& name, duk_c_function f
     duk_pop(ctx);
 }
 
+void check__scripts_dir(const std::string& path_to_scripts_dir) {
+    bool has_requirejs = false;
+    bool has_modules = false;
+    auto vec = sl::tinydir::list_directory(path_to_scripts_dir);
+    for (auto& el : vec) {
+        if ("requirejs" == el.filename()) {
+           has_requirejs = true; 
+        }
+        if ("modules" == el.filename()) {
+            has_modules = true;
+        }
+    }
+    if (!(has_requirejs && has_modules)) throw common::wilton_internal_exception(TRACEMSG(
+            "Invalid scripts directory specified," +
+            " it must contain 'requirejs' and 'modules' directories,"
+            " path: [" + path_to_scripts_dir + "]"));
+}
+
+void eval_js(duk_context* ctx, const std::string& code) {
+    auto err = duk_peval_lstring(ctx, code.c_str(), code.length());
+    if (DUK_EXEC_SUCCESS != err) {
+        throw common::wilton_internal_exception(TRACEMSG(format_error(ctx) +
+                "\nDuktape engine eval error"));
+    }
+}
+
 } // namespace
 
 class duktape_engine::impl : public sl::pimpl::object::impl {
@@ -144,26 +176,18 @@ public:
         auto def = sl::support::defer([ctx]() STATICLIB_NOEXCEPT {
             pop_stack(ctx);
         });
-        register_c_func(ctx, "load", load_func, 1);
-        register_c_func(ctx, "wiltoncall", wiltoncall_func, 2);
-        
-        // load require js
-        auto reqjs_path = path_to_scripts_dir + "/requirejs/";
-        auto modules_path = path_to_scripts_dir + "/modules/";
-        std::string script = std::string() + "(function() {" +
-                "   load('" + reqjs_path + "require.js');" +
-                "   load('" + reqjs_path + "loader.js');" +
-                "   load('" + reqjs_path + "runner.js');" +
-                "   requirejs.config({" +
-                "       waitSeconds: 30," +
-                "       baseUrl: '" + modules_path + "'" +
-                "   });" +
-                "}());";
-        auto err = duk_peval_lstring(ctx, script.c_str(), script.length());
-        if (DUK_EXEC_SUCCESS != err) {
-            throw common::wilton_internal_exception(TRACEMSG(format_error(ctx) + 
-                    "\nDuktape engine init error"));
-        }
+        register_c_func(ctx, "WILTON_load", load_func, 1);
+        register_c_func(ctx, "WILTON_wiltoncall", wiltoncall_func, 2);        
+        check__scripts_dir(path_to_scripts_dir);
+        eval_js(ctx, "WILTON_REQUIREJS_DIRECTORY = \"" + path_to_scripts_dir + "/requirejs/\"");
+        auto rcf = sl::json::dumps({
+            { "waitSeconds", 30 },
+            { "baseUrl", path_to_scripts_dir + "/modules/" }
+        });
+        std::replace(rcf.begin(), rcf.end(), '\n', ' ');
+        eval_js(ctx, "WILTON_REQUIREJS_CONFIG = '" + rcf + "'");
+        auto code = read_file(path_to_scripts_dir + "/requirejs/wilton-duktape.js");
+        eval_js(ctx, code);
     }
 
     std::string run_script(duktape_engine&, const std::string& callback_script_json) {
@@ -171,7 +195,7 @@ public:
         auto def = sl::support::defer([ctx]() STATICLIB_NOEXCEPT {
             pop_stack(ctx);
         });
-        duk_get_global_string(ctx, "runScript");
+        duk_get_global_string(ctx, "WILTON_run");
         duk_push_string(ctx, callback_script_json.c_str());
         auto err = duk_pcall(ctx, 1);
         if (DUK_EXEC_SUCCESS != err) {
