@@ -37,10 +37,9 @@ WILTON_EXPORT char* wiltoncall_remove(
         const char* call_name,
         int call_name_len);
 
-// todo: think about removing arguments
 WILTON_EXPORT char* wiltoncall_init(
-        const char* default_script_engine_name,
-        int default_script_engine_name_len);
+        const char* config_json,
+        int config_json_len);
 
 // to "override" (implement in client code) this function
 // compile with -DWILTON_DISABLE_DEFAULT_RUNSCRIPT

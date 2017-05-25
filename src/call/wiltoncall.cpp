@@ -18,41 +18,39 @@
 
 namespace { // anonymous
 
-namespace sc = staticlib::config;
-namespace su = staticlib::utils;
-namespace wc = wilton::common;
-
 wilton::call::wiltoncall_registry& static_registry() {
     static wilton::call::wiltoncall_registry registry;
     return registry;
 }
 
-const std::string& static_default_engine(const std::string& de = "") {
-    static std::string engine;
-    if (!de.empty()) {
-        engine = de;
-    }
-    return engine;
+} // namespace
+
+namespace wilton {
+namespace internal {
+
+const sl::json::value& static_wiltoncall_config(const std::string& cf_json) {
+    static sl::json::value cf = sl::json::loads(cf_json);
+    return cf;
 }
 
 } // namespace
+}
 
-char* wiltoncall_init(const char* default_script_engine_name, int default_script_engine_name_len) {
-    if (nullptr == default_script_engine_name) return sl::utils::alloc_copy(TRACEMSG("Null 'default_script_engine_name' parameter specified"));
-    if (!sl::support::is_uint16_positive(default_script_engine_name_len)) return sl::utils::alloc_copy(TRACEMSG(
-            "Invalid 'default_script_engine_name_len' parameter specified: [" + sl::support::to_string(default_script_engine_name_len) + "]"));
+char* wiltoncall_init(const char* config_json, int config_json_len) {
+    if (nullptr == config_json) return sl::utils::alloc_copy(TRACEMSG("Null 'default_script_engine_name' parameter specified"));
+    if (!sl::support::is_uint16_positive(config_json_len)) return sl::utils::alloc_copy(TRACEMSG(
+            "Invalid 'config_json_len' parameter specified: [" + sl::support::to_string(config_json_len) + "]"));
     
     try {
         // check called once
         bool the_false = false;
         static std::atomic<bool> initilized{false};
         if (!initilized.compare_exchange_strong(the_false, true)) {
-            throw wc::wilton_internal_exception(TRACEMSG("'wiltoncall' registry is already initialized"));
+            throw wilton::common::wilton_internal_exception(TRACEMSG("'wiltoncall' registry is already initialized"));
         }
         // set default engine
-        uint16_t len_u16 = static_cast<uint16_t> (default_script_engine_name_len);
-        auto engine_name_str = std::string(default_script_engine_name, len_u16);
-        static_default_engine(engine_name_str);
+        auto config_json_str = std::string(config_json, static_cast<uint16_t> (config_json_len));
+        wilton::internal::static_wiltoncall_config(config_json_str);
                 
         // registry
         auto& reg = static_registry();
@@ -164,13 +162,13 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
             if (nullptr != err) {
                 std::string msg = TRACEMSG(std::string(err));
                 wilton_free(err);
-                throw wc::wilton_internal_exception(msg);
+                throw wilton::common::wilton_internal_exception(msg);
             }
             if (nullptr == out) {
-                throw wc::wilton_internal_exception(TRACEMSG("Invalid 'null' result returned"));
+                throw wilton::common::wilton_internal_exception(TRACEMSG("Invalid 'null' result returned"));
             }
             if (!sl::support::is_uint32(out_len)){
-                throw wc::wilton_internal_exception(TRACEMSG(
+                throw wilton::common::wilton_internal_exception(TRACEMSG(
                     "Invalid result length value returned: [" + sl::support::to_string(out_len) + "]"));
             }
             return std::string(out, static_cast<uint32_t>(out_len));
@@ -200,20 +198,21 @@ char* wiltoncall_remove(const char* call_name, int call_name_len) {
 
 char* wiltoncall_runscript(const char* script_engine_name, int script_engine_name_len,
         const char* json_in, int json_in_len, char** json_out, int* json_out_len) {
+    static std::string default_engine = wilton::internal::static_wiltoncall_config()["defaultScriptEngine"]
+            .as_string("duktape");
     if (nullptr == script_engine_name) return sl::utils::alloc_copy(TRACEMSG("Null 'script_engine_name' parameter specified"));
     if (!sl::support::is_uint16(script_engine_name_len)) return sl::utils::alloc_copy(TRACEMSG(
             "Invalid 'script_engine_name_len' parameter specified: [" + sl::support::to_string(script_engine_name_len) + "]"));
+    auto engine = std::ref(sl::utils::empty_string());
     uint16_t script_engine_name_len_u16 = static_cast<uint16_t> (script_engine_name_len);
-    auto name = std::string(script_engine_name, script_engine_name_len_u16);
-    if ("" == name) {
-        name = static_default_engine();
-    }
-    if ("duktape" == name) {
+    auto specified_engine = std::string(script_engine_name, script_engine_name_len_u16);
+    engine = !specified_engine.empty() ? specified_engine : default_engine;
+    if ("duktape" == engine.get()) {
         return wiltoncall_runscript_duktape(json_in, json_in_len, json_out, json_out_len);
-    } else if ("jni" == name) {
+    } else if ("jni" == engine.get()) {
         return wiltoncall_runscript_jni(json_in, json_in_len, json_out, json_out_len);
     }
-    return sl::utils::alloc_copy(TRACEMSG("Unsupported engine: [" + name + "]"));
+    return sl::utils::alloc_copy(TRACEMSG("Unsupported engine: [" + engine.get() + "]"));
 }
 
 #endif // WILTON_DISABLE_DEFAULT_RUNSCRIPT

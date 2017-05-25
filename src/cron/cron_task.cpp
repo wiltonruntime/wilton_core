@@ -46,7 +46,7 @@ public:
     running(true) {
         worker = std::thread([this] {
             auto cleaner = sl::support::defer([]() STATICLIB_NOEXCEPT {
-                wilton::duktape::clean_thread_local(std::this_thread::get_id());
+                wilton::internal::clean_duktape_thread_local(std::this_thread::get_id());
             });
             while (running.load()) {
                 auto secs = cron.next<std::chrono::seconds>();

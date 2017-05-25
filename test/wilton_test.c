@@ -53,7 +53,17 @@ void test_duktape_fail() {
 }
 
 void test_wiltonjs() {
-    wiltoncall_init("duktape", strlen("duktape"));
+    const char* config = "{"
+    "  \"requireJsDirPath\": \"../test/js/requirejs\","
+    "  \"requireJsConfig\": {"
+    "    \"waitSeconds\": 30,"
+    "    \"baseUrl\": \"../test/js/modules\","
+    "    \"paths\": {"
+    "      \"wilton\": \"wilton\""
+    "    }"
+    "  }"
+    "}";
+    wiltoncall_init(config, strlen(config));
     const char* in = "{\"module\": \"tests/runtests\", \"func\": \"runTests\", \"args\": []}";
     char* out;
     int out_len;

@@ -84,10 +84,5 @@ if ( "${STATICLIB_ROOT_SOURCE_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}" )
     else ( )
         add_test ( wilton_test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/wilton_test )
     endif ( )
-    # JavaScript
-    add_custom_target ( ${PROJECT_NAME}_copyjs ALL
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_CURRENT_LIST_DIR}/js
-            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/js )
 endif ( )
 

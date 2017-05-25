@@ -80,7 +80,7 @@ public:
                     "Invalid 'documentRoot': [" + dr.to_json().dumps() + "]"));
         }
         server_ptr->get_scheduler().set_thread_stop_hook([](const std::thread::id& tid) STATICLIB_NOEXCEPT {
-            wilton::duktape::clean_thread_local(tid);
+            wilton::internal::clean_duktape_thread_local(tid);
         });
         server_ptr->start();
     }

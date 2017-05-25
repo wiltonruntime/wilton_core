@@ -10,6 +10,7 @@
 
 #include <string>
 
+#include "staticlib/json.hpp"
 #include "staticlib/pimpl.hpp"
 
 #include "common/wilton_internal_exception.hpp"
@@ -31,7 +32,7 @@ public:
      */
     PIMPL_CONSTRUCTOR(duktape_engine)
             
-    duktape_engine(const std::string& path_to_scripts_dir);
+    duktape_engine(const std::string& requirejs_dir_path, const sl::json::value& requirejs_config);
 
     std::string run_script(const std::string& callback_script_json);
 };

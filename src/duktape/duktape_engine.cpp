@@ -136,24 +136,6 @@ void register_c_func(duk_context* ctx, const std::string& name, duk_c_function f
     duk_pop(ctx);
 }
 
-void check__scripts_dir(const std::string& path_to_scripts_dir) {
-    bool has_requirejs = false;
-    bool has_modules = false;
-    auto vec = sl::tinydir::list_directory(path_to_scripts_dir);
-    for (auto& el : vec) {
-        if ("requirejs" == el.filename()) {
-           has_requirejs = true; 
-        }
-        if ("modules" == el.filename()) {
-            has_modules = true;
-        }
-    }
-    if (!(has_requirejs && has_modules)) throw common::wilton_internal_exception(TRACEMSG(
-            "Invalid scripts directory specified," +
-            " it must contain 'requirejs' and 'modules' directories,"
-            " path: [" + path_to_scripts_dir + "]"));
-}
-
 void eval_js(duk_context* ctx, const std::string& code) {
     auto err = duk_peval_lstring(ctx, code.c_str(), code.length());
     if (DUK_EXEC_SUCCESS != err) {
@@ -168,7 +150,7 @@ class duktape_engine::impl : public sl::pimpl::object::impl {
     std::unique_ptr<duk_context, std::function<void(duk_context*)>> dukctx;
     
 public:
-    impl(const std::string& path_to_scripts_dir) :
+    impl(const std::string& requirejs_dir_path, const sl::json::value& requirejs_config) :
     dukctx(duk_create_heap(nullptr, nullptr, nullptr, nullptr, fatal_handler), ctx_deleter) {
         auto ctx = dukctx.get();
         if (nullptr == ctx) throw common::wilton_internal_exception(TRACEMSG(
@@ -178,15 +160,11 @@ public:
         });
         register_c_func(ctx, "WILTON_load", load_func, 1);
         register_c_func(ctx, "WILTON_wiltoncall", wiltoncall_func, 2);        
-        check__scripts_dir(path_to_scripts_dir);
-        eval_js(ctx, "WILTON_REQUIREJS_DIRECTORY = \"" + path_to_scripts_dir + "/requirejs/\"");
-        auto rcf = sl::json::dumps({
-            { "waitSeconds", 30 },
-            { "baseUrl", path_to_scripts_dir + "/modules/" }
-        });
+        eval_js(ctx, "WILTON_REQUIREJS_DIRECTORY = \"" + requirejs_dir_path + "/\"");
+        auto rcf = requirejs_config.dumps();
         std::replace(rcf.begin(), rcf.end(), '\n', ' ');
         eval_js(ctx, "WILTON_REQUIREJS_CONFIG = '" + rcf + "'");
-        auto code = read_file(path_to_scripts_dir + "/requirejs/wilton-duktape.js");
+        auto code = read_file(requirejs_dir_path + "/wilton-duktape.js");
         eval_js(ctx, code);
     }
 
@@ -213,7 +191,7 @@ public:
     }    
 };
 
-PIMPL_FORWARD_CONSTRUCTOR(duktape_engine, (const std::string&), (), common::wilton_internal_exception)
+PIMPL_FORWARD_CONSTRUCTOR(duktape_engine, (const std::string&)(const sl::json::value&), (), common::wilton_internal_exception)
 PIMPL_FORWARD_METHOD(duktape_engine, std::string, run_script, (const std::string&), (), common::wilton_internal_exception)
 
 

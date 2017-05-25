@@ -161,9 +161,11 @@ std::string tcp_wait_for_connection(const std::string& data);
 
 // internal api
 
-namespace duktape {
+namespace internal {
 
-void clean_thread_local(const std::thread::id& tid);
+const sl::json::value& static_wiltoncall_config(const std::string& cf_json = "");
+
+void clean_duktape_thread_local(const std::thread::id& tid);
 
 } // namespace
 

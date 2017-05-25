@@ -29,7 +29,7 @@ char* wilton_thread_run(void* cb_ctx, void (*cb)(void* cb_ctx)) /* noexcept */ {
     try {
         auto th = std::thread([cb, cb_ctx]() {
             auto cleaner = sl::support::defer([]() STATICLIB_NOEXCEPT {
-                wilton::duktape::clean_thread_local(std::this_thread::get_id());
+                wilton::internal::clean_duktape_thread_local(std::this_thread::get_id());
             });
             try {
                 cb(cb_ctx);
