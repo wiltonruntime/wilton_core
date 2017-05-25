@@ -15,9 +15,10 @@
 
 #include "staticlib/io.hpp"
 #include "staticlib/json.hpp"
+#include "staticlib/pimpl/forward_macros.hpp"
 #include "staticlib/support.hpp"
 #include "staticlib/tinydir.hpp"
-#include "staticlib/pimpl/forward_macros.hpp"
+#include "staticlib/utils.hpp"
 
 #include "wilton/wiltoncall.h"
 
@@ -65,6 +66,29 @@ std::string read_file(const std::string& path) {
     return sink.get_string();
 }
 
+std::string read_main_from_package_json(const std::string& path) {
+    std::string pjpath = std::string(path) + "package.json";
+    auto src = sl::tinydir::file_source(pjpath);
+    auto pj = sl::json::load(src);
+    return pj["main"].as_string_nonempty_or_throw(pjpath);
+}
+
+std::string read_file_or_module(std::string& path) {
+    try {
+        return read_file(path);
+    } catch (const sl::tinydir::tinydir_exception&) {
+        if (sl::utils::ends_with(path, ".js")) {
+            path.resize(path.length() - 3);
+        }
+        if (!sl::utils::ends_with(path, "/")) {
+            path.push_back('/');
+        }
+        auto main = read_main_from_package_json(path);
+        path.append(main);
+        return read_file(path);
+    }
+}
+
 duk_ret_t load_func(duk_context* ctx) {
     std::string path = "";
     try {        
@@ -75,7 +99,7 @@ duk_ret_t load_func(duk_context* ctx) {
         }    
         path = std::string(path_ptr, path_len);
         // read file
-        auto code = read_file(path);
+        auto code = read_file_or_module(path);
         // compile source
         duk_push_lstring(ctx, code.c_str(), code.length());
         duk_push_lstring(ctx, path.c_str(), path.length());

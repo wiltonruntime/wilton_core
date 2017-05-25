@@ -52,24 +52,28 @@ void test_duktape_fail() {
     wilton_free(err);
 }
 
+void runScript(const char* in) {
+    char* out;
+    int out_len;
+    char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);
+    check_err(err);
+    wilton_free(out);
+}
+
 void test_wiltonjs() {
     const char* config = "{"
     "  \"requireJsDirPath\": \"../test/js/requirejs\","
     "  \"requireJsConfig\": {"
     "    \"waitSeconds\": 30,"
-    "    \"baseUrl\": \"../test/js/modules\","
-    "    \"paths\": {"
-    "      \"wilton\": \"wilton\""
-    "    }"
+    "    \"baseUrl\": \"../test/js/modules\""
     "  }"
     "}";
     wiltoncall_init(config, strlen(config));
-    const char* in = "{\"module\": \"tests/runtests\", \"func\": \"runTests\", \"args\": []}";
-    char* out;
-    int out_len;
-    char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);    
-    check_err(err);
-    wilton_free(out);
+    runScript("{\"module\": \"tests/runtests\", \"func\": \"runTests\", \"args\": []}");
+    runScript("{\"module\": \"inherits/test\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"assert/test\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"util/test/browser/inspect\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"util/test/browser/is\", \"func\": \"\", \"args\": []}");
 }
 
 int main() {
