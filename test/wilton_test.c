@@ -64,7 +64,7 @@ void test_wiltonjs() {
     const char* config = "{"
     "  \"requireJsDirPath\": \"../test/js/requirejs\","
     "  \"requireJsConfig\": {"
-    "    \"waitSeconds\": 30,"
+    "    \"waitSeconds\": 60,"
     "    \"baseUrl\": \"../test/js/modules\""
     "  }"
     "}";
@@ -74,6 +74,12 @@ void test_wiltonjs() {
     runScript("{\"module\": \"assert/test\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"util/test/browser/inspect\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"util/test/browser/is\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"underscore/test/arrays\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"underscore/test/chaining\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"underscore/test/collections\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"underscore/test/functions\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"underscore/test/objects\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"underscore/test/utility\", \"func\": \"\", \"args\": []}");
 }
 
 int main() {
