@@ -95,8 +95,27 @@ void test_wiltonjs() {
     runScript("{\"module\": \"minimist/test/stop_early\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"minimist/test/unknown\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"minimist/test/whitespace\", \"func\": \"\", \"args\": []}");
+//    following two are very slow
     runScript("{\"module\": \"validator/test/validators\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"validator/test/sanitizers\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"moment/wilton-sanity-test\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"bluebird/wilton-sanity-test\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"sprintf-js/test/test\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"sprintf-js/test/test_validation\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/base\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/childgroups\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/choices\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/conflict\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/constant\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/formatters\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/group\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/nargs\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/optionals\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/parents\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/positionals\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/prefix\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/sub_commands\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"argparse/test/suppress\", \"func\": \"\", \"args\": []}");
 }
 
 int main() {
