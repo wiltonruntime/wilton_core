@@ -70,7 +70,11 @@ std::string read_main_from_package_json(const std::string& path) {
     std::string pjpath = std::string(path) + "package.json";
     auto src = sl::tinydir::file_source(pjpath);
     auto pj = sl::json::load(src);
-    return pj["main"].as_string_nonempty_or_throw(pjpath);
+    auto main = pj["main"].as_string_nonempty_or_throw(pjpath);
+    if (!sl::utils::ends_with(main, ".js")) {
+        main.append(".js");
+    }
+    return main;
 }
 
 std::string read_file_or_module(std::string& path) {

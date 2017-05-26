@@ -80,6 +80,23 @@ void test_wiltonjs() {
     runScript("{\"module\": \"underscore/test/functions\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"underscore/test/objects\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"underscore/test/utility\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"extend/test/index\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/all_bool\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/bool\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/dash\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/default_bool\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/dotted\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/kv_short\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/long\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/num\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/parse\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/parse_modified\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/short\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/stop_early\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/unknown\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"minimist/test/whitespace\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"validator/test/validators\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"validator/test/sanitizers\", \"func\": \"\", \"args\": []}");
 }
 
 int main() {
