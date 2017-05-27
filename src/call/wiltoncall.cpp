@@ -106,6 +106,10 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         // thread
         reg.put("thread_run", wilton::thread::thread_run);
         reg.put("thread_sleep_millis", wilton::thread::thread_sleep_millis);
+        // fs
+        reg.put("fs_read_file", wilton::fs::fs_read_file);
+        reg.put("fs_write_file", wilton::fs::fs_write_file);
+        reg.put("fs_list_directory", wilton::fs::fs_list_directory);
         // misc
         reg.put("tcp_wait_for_connection", wilton::misc::tcp_wait_for_connection);
         

@@ -151,6 +151,16 @@ std::string thread_sleep_millis(const std::string& data);
 
 } // namespace
 
+namespace fs {
+
+std::string fs_read_file(const std::string& data);
+
+std::string fs_write_file(const std::string& data);
+
+std::string fs_list_directory(const std::string& data);
+
+} // namespace
+
 // misc
 namespace misc {
 
