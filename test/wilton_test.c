@@ -80,7 +80,7 @@ void test_wiltonjs() {
     runScript("{\"module\": \"underscore/test/functions\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"underscore/test/objects\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"underscore/test/utility\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"extend/test/index\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"extend/test/index\", \"func\": \"\", \"args\": []}"); 
     runScript("{\"module\": \"minimist/test/all_bool\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"minimist/test/bool\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"minimist/test/dash\", \"func\": \"\", \"args\": []}");
@@ -116,6 +116,27 @@ void test_wiltonjs() {
     runScript("{\"module\": \"argparse/test/prefix\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"argparse/test/sub_commands\", \"func\": \"\", \"args\": []}");
     runScript("{\"module\": \"argparse/test/suppress\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"ieee754/test/basic\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"base64-js/test/convert\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"base64-js/test/url-safe\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"is-buffer/test/basic\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/base64\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/basic\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/compare\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/constructor\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/from-string\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/is-buffer\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/methods\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/slice\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/static\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/to-string\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/write\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"buffer/test/write_infinity\", \"func\": \"\", \"args\": []}");    
+    runScript("{\"module\": \"iconv-lite/test/main-test\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"qs/test/index\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"node-url/test\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"events/tests/index\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"readable-stream/test/browser\", \"func\": \"\", \"args\": []}");
 }
 
 int main() {
