@@ -48,7 +48,7 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         if (!initilized.compare_exchange_strong(the_false, true)) {
             throw wilton::common::wilton_internal_exception(TRACEMSG("'wiltoncall' registry is already initialized"));
         }
-        // set default engine
+        // set static config
         auto config_json_str = std::string(config_json, static_cast<uint16_t> (config_json_len));
         wilton::internal::static_wiltoncall_config(config_json_str);
                 
@@ -110,6 +110,7 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("fs_read_file", wilton::fs::fs_read_file);
         reg.put("fs_write_file", wilton::fs::fs_write_file);
         reg.put("fs_list_directory", wilton::fs::fs_list_directory);
+        reg.put("fs_read_script_file_or_module", wilton::fs::fs_read_script_file_or_module);
         // misc
         reg.put("tcp_wait_for_connection", wilton::misc::tcp_wait_for_connection);
         

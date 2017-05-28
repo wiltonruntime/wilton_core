@@ -159,6 +159,8 @@ std::string fs_write_file(const std::string& data);
 
 std::string fs_list_directory(const std::string& data);
 
+std::string fs_read_script_file_or_module(const std::string& data);
+
 } // namespace
 
 // misc

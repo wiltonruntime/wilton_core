@@ -41,6 +41,21 @@ std::vector<std::string> list_directory(const std::string& path) {
     return ra.to_vector();
 }
 
+std::string read_main_from_package_json(const std::string& path) {
+    std::string pjpath = std::string(path) + "package.json";
+    try {
+        auto src = sl::tinydir::file_source(pjpath);
+        auto pj = sl::json::load(src);
+        auto main = pj["main"].as_string("index.js");
+        if (!sl::utils::ends_with(main, ".js")) {
+            main.append(".js");
+        }
+        return main;
+    } catch (const sl::tinydir::tinydir_exception&) {
+        return "index.js";
+    }
+}
+
 } // namespace
 
 
@@ -121,6 +136,23 @@ std::string fs_list_directory(const std::string& data) {
         return sl::json::dumps(ra.to_vector());
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
+    }
+}
+
+std::string fs_read_script_file_or_module(const std::string& path) {
+    try {
+        return read_file(path);
+    } catch (const sl::tinydir::tinydir_exception&) {
+        std::string tpath = path;
+        if (sl::utils::ends_with(tpath, ".js")) {
+            tpath.resize(tpath.length() - 3);
+        }
+        if (!sl::utils::ends_with(tpath, "/")) {
+            tpath.push_back('/');
+        }
+        auto main = read_main_from_package_json(tpath);
+        tpath.append(main);
+        return read_file(tpath);
     }
 }
 

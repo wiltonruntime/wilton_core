@@ -22,6 +22,7 @@
 
 #include "wilton/wiltoncall.h"
 
+#include "call/wiltoncall_internal.hpp"
 #include "common/wilton_internal_exception.hpp"
 
 namespace wilton {
@@ -63,38 +64,7 @@ std::string read_file(const std::string& path) {
     auto src = sl::tinydir::file_source(path);
     auto sink = sl::io::string_sink();
     sl::io::copy_all(src, sink);
-    return sink.get_string();
-}
-
-std::string read_main_from_package_json(const std::string& path) {
-    std::string pjpath = std::string(path) + "package.json";
-    try {
-        auto src = sl::tinydir::file_source(pjpath);
-        auto pj = sl::json::load(src);
-        auto main = pj["main"].as_string("index.js");
-        if (!sl::utils::ends_with(main, ".js")) {
-            main.append(".js");
-        }
-        return main;
-    } catch(const sl::tinydir::tinydir_exception&) {
-        return "index.js";
-    }
-}
-
-std::string read_file_or_module(std::string& path) {
-    try {
-        return read_file(path);
-    } catch (const sl::tinydir::tinydir_exception&) {
-        if (sl::utils::ends_with(path, ".js")) {
-            path.resize(path.length() - 3);
-        }
-        if (!sl::utils::ends_with(path, "/")) {
-            path.push_back('/');
-        }
-        auto main = read_main_from_package_json(path);
-        path.append(main);
-        return read_file(path);
-    }
+    return std::move(sink.get_string());
 }
 
 duk_ret_t load_func(duk_context* ctx) {
@@ -107,7 +77,7 @@ duk_ret_t load_func(duk_context* ctx) {
         }    
         path = std::string(path_ptr, path_len);
         // read file
-        auto code = read_file_or_module(path);
+        auto code = fs::fs_read_script_file_or_module(path);
         // compile source
         duk_push_lstring(ctx, code.c_str(), code.length());
         duk_push_lstring(ctx, path.c_str(), path.length());

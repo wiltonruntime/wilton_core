@@ -62,6 +62,7 @@ void runScript(const char* in) {
 
 void test_wiltonjs() {
     const char* config = "{"
+    "  \"defaultScriptEngine\": \"duktape\"," // optional, duktape is default
     "  \"requireJsDirPath\": \"../test/js/requirejs\","
     "  \"requireJsConfig\": {"
     "    \"waitSeconds\": 60,"
@@ -70,92 +71,8 @@ void test_wiltonjs() {
     "}";
     wiltoncall_init(config, strlen(config));
     runScript("{\"module\": \"tests/runtests\", \"func\": \"runTests\", \"args\": []}");
-    runScript("{\"module\": \"inherits/test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"assert/test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"util/test/browser/inspect\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"util/test/browser/is\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"underscore/test/arrays\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"underscore/test/chaining\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"underscore/test/collections\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"underscore/test/functions\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"underscore/test/objects\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"underscore/test/utility\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"extend/test/index\", \"func\": \"\", \"args\": []}"); 
-    runScript("{\"module\": \"minimist/test/all_bool\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/bool\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/dash\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/default_bool\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/dotted\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/kv_short\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/long\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/num\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/parse\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/parse_modified\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/short\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/stop_early\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/unknown\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"minimist/test/whitespace\", \"func\": \"\", \"args\": []}");
-////    following two are very slow
-    runScript("{\"module\": \"validator/test/validators\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"validator/test/sanitizers\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"moment/wilton-sanity-test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"bluebird/wilton-sanity-test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"sprintf-js/test/test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"sprintf-js/test/test_validation\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/base\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/childgroups\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/choices\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/conflict\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/constant\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/formatters\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/group\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/nargs\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/optionals\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/parents\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/positionals\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/prefix\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/sub_commands\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"argparse/test/suppress\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"ieee754/test/basic\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"base64-js/test/convert\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"base64-js/test/url-safe\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"is-buffer/test/basic\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/base64\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/basic\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/compare\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/constructor\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/from-string\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/is-buffer\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/methods\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/slice\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/static\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/to-string\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/write\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"buffer/test/write_infinity\", \"func\": \"\", \"args\": []}");    
-    runScript("{\"module\": \"iconv-lite/test/main-test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"qs/test/index\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"node-url/test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"events/tests/index\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"readable-stream/test/browser\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"domhandler/test/tests\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"entities/test/test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"htmlparser2/test/unicode\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"htmlparser2/test/api\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"boolbase/tests\", \"func\": \"\", \"args\": []}");
-//    slow:
-    runScript("{\"module\": \"nth-check/test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"domutils/test/tests/helpers\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"domutils/test/tests/legacy\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"domutils/test/tests/traversal\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"css-what/tests/test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"css-select/test/api\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"css-select/test/attributes\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"css-select/test/icontains\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"css-select/test/test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"dom-serializer/test\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"cheerio/test/cheerio\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"cheerio/test/parse\", \"func\": \"\", \"args\": []}");
-    runScript("{\"module\": \"cheerio/test/xml\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"tests/runNodeTests\", \"func\": \"\", \"args\": []}");
+    
 }
 
 int main() {
