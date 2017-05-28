@@ -35,7 +35,7 @@ void write_file(const std::string& path, const std::string& contents) {
 
 std::vector<std::string> list_directory(const std::string& path) {
     auto li = sl::tinydir::list_directory(path);
-    auto ra = sl::ranges::transform(li, [](const sl::tinydir::path& pa) {
+    auto ra = sl::ranges::transform(li, [](const sl::tinydir::path& pa) -> std::string {
         return pa.filename();
     });
     return ra.to_vector();

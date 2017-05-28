@@ -161,7 +161,7 @@ target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE
 target_compile_options ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_CFLAGS_OTHER} )
 if ( ${PROJECT_NAME}_SHARED )
     target_compile_definitions ( ${PROJECT_NAME} PRIVATE -DWILTON_SHARED )
-    target_link_libraries ( ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS_PC_LIBRARIES} )
+    target_link_libraries ( ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS_PC_STATIC_LIBRARIES} )
 endif ( )
 
 # maven install
