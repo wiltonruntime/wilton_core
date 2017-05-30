@@ -72,8 +72,8 @@ void test_wiltonjs() {
     "  }"
     "}";
     wiltoncall_init(config, strlen(config));
-    runScript("{\"module\": \"tests/runtests\", \"func\": \"runTests\", \"args\": []}");
-    runScript("{\"module\": \"tests/runNodeTests\", \"func\": \"\", \"args\": []}");
+    runScript("{\"module\": \"runWiltonTests\", \"func\": \"runTests\", \"args\": []}");
+    runScript("{\"module\": \"runNodeTests\", \"func\": \"\", \"args\": []}");
     
 }
 

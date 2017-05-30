@@ -1,9 +1,6 @@
 [submodule "test/js/requirejs"]
 	path = test/js/requirejs
 	url = https://github.com/wilton-web-toolkit/wilton-require.js.git
-[submodule "test/js/modules/tests"]
-	path = test/js/modules/tests
-	url = https://github.com/wilton-web-toolkit/wilton-tests.js.git
 [submodule "test/js/modules/wilton"]
 	path = test/js/modules/wilton
 	url = https://github.com/wilton-web-toolkit/wilton.js.git
