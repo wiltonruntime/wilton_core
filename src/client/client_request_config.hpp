@@ -54,6 +54,10 @@ public:
                 options.abort_on_connect_error = fi.as_bool_or_throw(name);
             } else if ("abortOnResponseError" == name) {
                 options.abort_on_response_error = fi.as_bool_or_throw(name);
+            } else if ("maxNumberOfResponseHeaders" == name) {
+                options.max_number_of_response_headers = fi.as_uint16_positive_or_throw(name);
+            } else if ("consumerThreadWakeupTimeoutMillis" == name) {
+                options.consumer_thread_wakeup_timeout_millis = fi.as_uint16_positive_or_throw(name);
             } else if ("forceHttp10" == name) {
                 options.force_http_10 = fi.as_bool_or_throw(name);
             } else if ("noprogress" == name) {
@@ -69,13 +73,15 @@ public:
             } else if ("tcpKeepalive" == name) {
                 options.tcp_keepalive = fi.as_bool_or_throw(name);
             } else if ("tcpKeepidleSecs" == name) {
-                options.tcp_keepidle_secs = fi.as_uint32_or_throw(name);
+                options.tcp_keepidle_secs = fi.as_uint32_positive_or_throw(name);
             } else if ("tcpKeepintvlSecs" == name) {
-                options.tcp_keepintvl_secs = fi.as_uint32_or_throw(name);
+                options.tcp_keepintvl_secs = fi.as_uint32_positive_or_throw(name);
             } else if ("connecttimeoutMillis" == name) {
-                options.connecttimeout_millis = fi.as_uint32_or_throw(name);
+                options.connecttimeout_millis = fi.as_uint32_positive_or_throw(name);
+            } else if ("timeoutMillis" == name) {
+                options.timeout_millis = fi.as_uint32_positive_or_throw(name);
             } else if ("buffersizeBytes" == name) {
-                options.buffersize_bytes = fi.as_uint32_or_throw(name);
+                options.buffersize_bytes = fi.as_uint32_positive_or_throw(name);
             } else if ("acceptEncoding" == name) {
                 options.accept_encoding = fi.as_string_nonempty_or_throw(name);
             } else if ("followlocation" == name) {
@@ -85,9 +91,9 @@ public:
             } else if ("useragent" == name) {
                 options.useragent = fi.as_string_nonempty_or_throw(name);
             } else if ("maxSentSpeedLargeBytesPerSecond" == name) {
-                options.max_sent_speed_large_bytes_per_second = fi.as_uint32_or_throw(name);
+                options.max_sent_speed_large_bytes_per_second = fi.as_uint32_positive_or_throw(name);
             } else if ("maxRecvSpeedLargeBytesPerSecond" == name) {
-                options.max_recv_speed_large_bytes_per_second = fi.as_uint32_or_throw(name);
+                options.max_recv_speed_large_bytes_per_second = fi.as_uint32_positive_or_throw(name);
             } else if ("sslcertFilename" == name) {
                 options.sslcert_filename = fi.as_string_nonempty_or_throw(name);
             } else if ("sslcertype" == name) {
@@ -128,6 +134,8 @@ public:
             {"method", options.method},
             {"abortOnConnectError", options.abort_on_connect_error},
             {"abortOnResponseError", options.abort_on_response_error},
+            {"maxNumberOfResponseHeaders", options.max_number_of_response_headers},
+            {"consumerThreadWakeupTimeoutMillis", options.consumer_thread_wakeup_timeout_millis},
             {"forceHttp10", options.force_http_10},
             {"noprogress", options.noprogress},
             {"nosignal", options.nosignal},
@@ -138,6 +146,7 @@ public:
             {"tcpKeepidleSecs", options.tcp_keepidle_secs},
             {"tcpKeepintvlSecs", options.tcp_keepintvl_secs},
             {"connecttimeoutMillis", options.connecttimeout_millis},
+            {"timeoutMillis", options.timeout_millis},
             {"buffersizeBytes", options.buffersize_bytes},
             {"acceptEncoding", options.accept_encoding},
             {"followlocation", options.followlocation},

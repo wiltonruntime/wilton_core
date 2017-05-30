@@ -77,7 +77,7 @@ public:
             return fun(data);
         } catch (const std::exception& e) {
             throw common::wilton_internal_exception(TRACEMSG(e.what() + 
-                    "\nwiltoncall error for function: [" + name + "]"));
+                    "\n'wiltoncall' error for function: [" + name + "]"));
         }
     }
 

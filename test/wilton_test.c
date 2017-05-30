@@ -65,7 +65,9 @@ void test_wiltonjs() {
     "  \"defaultScriptEngine\": \"duktape\"," // optional, duktape is default
     "  \"requireJsDirPath\": \"../test/js/requirejs\","
     "  \"requireJsConfig\": {"
-    "    \"waitSeconds\": 60,"
+    "    \"waitSeconds\": 0,"
+    "    \"enforceDefine\": true,"
+    "    \"nodeIdCompat\": true,"
     "    \"baseUrl\": \"../test/js/modules\""
     "  }"
     "}";

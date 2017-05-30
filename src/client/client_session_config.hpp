@@ -44,13 +44,18 @@ public:
         for (size_t i = 0; i < vec.size(); i++) {
             const sl::json::field& fi = vec[i];
             auto& name = fi.name();
-            // todo: more options
-            if ("maxHostConnections" == name) {
-                this->options.max_host_connections = fi.as_uint32_or_throw(name);
+            if ("requestQueueMaxSize" == name) {
+                this->options.requests_queue_max_size = fi.as_uint32_positive_or_throw(name);
+            } else if ("fdsetTimeoutMillis" == name) {
+                this->options.fdset_timeout_millis = fi.as_uint32_positive_or_throw(name);
+            } else if ("allRequestsPausedTimeoutMillis" == name) {
+                this->options.all_requests_paused_timeout_millis = fi.as_uint32_positive_or_throw(name);
+            } else if ("maxHostConnections" == name) {
+                this->options.max_host_connections = fi.as_uint32_positive_or_throw(name);
             } else if ("maxTotalConnections" == name) {
-                this->options.max_total_connections = fi.as_uint32_or_throw(name);
+                this->options.max_total_connections = fi.as_uint32_positive_or_throw(name);
             } else if ("maxconnects" == name) {
-                this->options.maxconnects = fi.as_uint32_or_throw(name);
+                this->options.maxconnects = fi.as_uint32_positive_or_throw(name);
             } else {
                 throw common::wilton_internal_exception(TRACEMSG("Unknown 'ClientSession' field: [" + name + "]"));
             }
@@ -59,6 +64,9 @@ public:
 
     sl::json::value to_json() const {
         return {
+            { "requestQueueMaxSize", options.requests_queue_max_size },
+            { "fdsetTimeoutMillis", options.fdset_timeout_millis },
+            { "allRequestsPausedTimeoutMillis", options.all_requests_paused_timeout_millis },
             { "maxHostConnections", options.max_host_connections },
             { "maxTotalConnections", options.max_total_connections },
             { "maxconnects", options.maxconnects }

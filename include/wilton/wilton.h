@@ -292,6 +292,9 @@ typedef struct wilton_HttpClient wilton_HttpClient;
 
 /*
  {
+    "requestQueueMaxSize": uint32_t,
+    "fdsetTimeoutMillis": uint32_t,
+    "allRequestsPausedTimeoutMillis": uint32_t,
     // https://curl.haxx.se/libcurl/c/CURLMOPT_MAX_HOST_CONNECTIONS.html
     "maxHostConnections": uint32_t,
     // https://curl.haxx.se/libcurl/c/CURLMOPT_MAX_TOTAL_CONNECTIONS.html
@@ -319,8 +322,8 @@ WILTON_EXPORT char* wilton_HttpClient_close(
     "method": "GET|POST|PUT|DELETE",
     "abortOnConnectError": true,
     "abortOnResponseError": true,
-    "readTimeoutMillis": uint32_t,
-    "fdsetTimeoutMillis": uint32_t,
+    "maxNumberOfResponseHeaders": uit16_t,
+    "consumerThreadWakeupTimeoutMillis": uit16_t,
 
 // general behavior options
 
@@ -347,6 +350,8 @@ WILTON_EXPORT char* wilton_HttpClient_close(
     "tcpKeepintvlSecs": uint32_t,
     // https://curl.haxx.se/libcurl/c/CURLOPT_CONNECTTIMEOUT_MS.html
     "connecttimeoutMillis": uint32_t,
+    // https://curl.haxx.se/libcurl/c/CURLOPT_TIMEOUT_MS.html
+    "timeoutMillis": uint32_t,
 
 // HTTP options
 
