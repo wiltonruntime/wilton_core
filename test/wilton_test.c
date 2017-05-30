@@ -63,12 +63,12 @@ void runScript(const char* in) {
 void test_wiltonjs() {
     const char* config = "{"
     "  \"defaultScriptEngine\": \"duktape\"," // optional, duktape is default
-    "  \"requireJsDirPath\": \"../test/js/requirejs\","
+    "  \"requireJsDirPath\": \"../../wilton-requirejs\","
     "  \"requireJsConfig\": {"
     "    \"waitSeconds\": 0,"
     "    \"enforceDefine\": true,"
     "    \"nodeIdCompat\": true,"
-    "    \"baseUrl\": \"../test/js/modules\""
+    "    \"baseUrl\": \"../../wilton_modules\""
     "  }"
     "}";
     wiltoncall_init(config, strlen(config));

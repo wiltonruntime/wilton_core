@@ -1,3 +1,0 @@
-[submodule "test/js/requirejs"]
-	path = test/js/requirejs
-	url = https://github.com/wilton-iot/wilton-require.js.git
