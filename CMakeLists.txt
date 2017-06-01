@@ -16,7 +16,7 @@ cmake_minimum_required ( VERSION 2.8.12 )
 
 # project
 project ( wilton CXX )
-set ( ${PROJECT_NAME}_STATICLIB_VERSION 0.8.0 )
+set ( ${PROJECT_NAME}_STATICLIB_VERSION 0.8.0 CACHE INTERNAL "" )
 set ( ${PROJECT_NAME}_DESCRIPTION "Wilton Web Toolkit library" )
 set ( ${PROJECT_NAME}_URL https://github.com/wilton-web-toolkit/libwilton )
 include ( ${CMAKE_CURRENT_LIST_DIR}/resources/macros.cmake )
@@ -39,7 +39,7 @@ if ( STATICLIB_USE_DEPLIBS_CACHE )
 endif ( )
 
 #options
-option ( ${PROJECT_NAME}_SHARED "Build shared library instead of a static one" OFF )
+option ( ${PROJECT_NAME}_SHARED "Build shared library instead of a static one" ON )
 if ( NOT DEFINED STATICLIB_DEPS )
     set ( STATICLIB_DEPS ${CMAKE_CURRENT_LIST_DIR}/../../staticlibs/ CACHE INTERNAL "" )    
 endif ( )
@@ -186,7 +186,7 @@ string ( SUBSTRING ${CMAKE_STATIC_LIBRARY_SUFFIX} 1 -1 ${PROJECT_NAME}_STATIC_SU
 add_custom_target ( mvninstall_shared
         COMMAND mvn install:install-file
                 -Dfile=${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}
-                -DgroupId=net.wiltonwebtoolkit
+                -DgroupId=net.wiltontoolkit
                 -DartifactId=${PROJECT_NAME}
                 -Dversion=${${PROJECT_NAME}_STATICLIB_VERSION}
                 -Dclassifier=${${PROJECT_NAME}_CLASSIFIER}
@@ -197,7 +197,7 @@ add_custom_target ( mvninstall_shared
 add_custom_target ( mvninstall_import
         COMMAND mvn install:install-file
                 -Dfile=${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
-                -DgroupId=net.wiltonwebtoolkit
+                -DgroupId=net.wiltontoolkit
                 -DartifactId=${PROJECT_NAME}
                 -Dversion=${${PROJECT_NAME}_STATICLIB_VERSION}
                 -Dclassifier=${${PROJECT_NAME}_CLASSIFIER}
@@ -214,8 +214,6 @@ set ( ${PROJECT_NAME}_PC_LIBS "-L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} -l${PROJECT_N
 if ( CMAKE_SYSTEM_NAME STREQUAL "Linux" )
     set ( ${PROJECT_NAME}_PC_LIBS "${${PROJECT_NAME}_PC_LIBS} -lpthread" )
 endif ( )
-if ( NOT ${PROJECT_NAME}_SHARED )
-    wilton_list_to_string ( ${PROJECT_NAME}_PC_REQUIRES_PRIVATE "" ${PROJECT_NAME}_DEPS )
-endif ( )
+wilton_list_to_string ( ${PROJECT_NAME}_PC_REQUIRES_PRIVATE "" ${PROJECT_NAME}_DEPS )
 configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/pkg-config.in 
         ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/${PROJECT_NAME}.pc )

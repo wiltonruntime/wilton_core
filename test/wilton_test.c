@@ -68,7 +68,7 @@ void test_wiltonjs() {
     "    \"waitSeconds\": 0,"
     "    \"enforceDefine\": true,"
     "    \"nodeIdCompat\": true,"
-    "    \"baseUrl\": \"../../wilton_modules\""
+    "    \"baseUrl\": \"../../modules\""
     "  }"
     "}";
     wiltoncall_init(config, strlen(config));

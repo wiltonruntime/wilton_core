@@ -63,18 +63,18 @@ staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_orm )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_http )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_mustache )
+
 add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../libwilton ${CMAKE_BINARY_DIR}/libwilton )
-set ( ${PROJECT_NAME}_DEPS_PUBLIC wilton )
-staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PUBLIC_PC REQUIRED ${PROJECT_NAME}_DEPS_PUBLIC )
+set ( ${PROJECT_NAME}_DEPS wilton )
+staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
 # tests
 if ( "${STATICLIB_ROOT_SOURCE_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}" )    
     # C
     enable_testing ( )
     add_executable ( wilton_test ${CMAKE_CURRENT_LIST_DIR}/wilton_test.c )
-    target_link_libraries ( wilton_test 
-        ${${PROJECT_NAME}_DEPS_PUBLIC_PC_LIBRARIES} )
-    target_include_directories ( wilton_test BEFORE PRIVATE ${${PROJECT_NAME}_DEPS_PUBLIC_PC_INCLUDE_DIRS} )
+    target_link_libraries ( wilton_test ${${PROJECT_NAME}_DEPS_PC_LIBRARIES} )
+    target_include_directories ( wilton_test BEFORE PRIVATE ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
     target_compile_options ( wilton_test PRIVATE ${${PROJECT_NAME}_DEPS_PC_CFLAGS_OTHER} ) 
     set_target_properties ( wilton_test PROPERTIES FOLDER "test" )
     if ( DEFINED CMAKE_MEMORYCHECK_COMMAND )
