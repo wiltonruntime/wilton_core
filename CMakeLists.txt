@@ -286,7 +286,16 @@ if ( ${PROJECT_NAME}_SHARED )
                 staticlib_winservice
                 staticlib_utils )
     endif ( )
+
+    add_custom_target ( ${PROJECT_NAME}_cli_rename ALL
+            COMMAND ${CMAKE_COMMAND} -E rename
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}_cli${CMAKE_EXECUTABLE_SUFFIX}
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}
+            DEPENDS ${PROJECT_NAME}_cli )
+
 endif ( )
+
+
 
 # maven install
 if ( ${PROJECT_NAME}_TOOLCHAIN MATCHES "android_armeabi_[^_]+" )
