@@ -78,35 +78,37 @@ endif ( )
 if ( NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY )
     set ( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
 endif ( )
-if ( NOT DEFINED STATICLIB_TOOLCHAIN )
-    if ( NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" ) # system dependencies implied on Linux
-        wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_asio )
-        wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_zlib )
-        wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
-        wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
-        wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_openssl )
-        wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
-        wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_sqlite )
-    endif ( )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_soci )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_duktape )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_concurrent )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_jni )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_endian )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pion )    
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_json )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_orm )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_http )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_mustache )
+if ( NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" ) # system dependencies implied on Linux
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_asio )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_zlib )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_openssl )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_sqlite )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_popt )
+endif ( )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_soci )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_duktape )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_concurrent )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_jni )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_endian )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pion )    
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_json )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_orm )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_http )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
+wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_mustache )
+if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
+    wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_winservice )
 endif ( )
 
 # dependencies
@@ -126,6 +128,7 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_mustache
         staticlib_tinydir
         staticlib_pimpl
+        popt
         jansson
         log4cplus
         sqlite3
@@ -134,10 +137,99 @@ set ( ${PROJECT_NAME}_DEPS
         libcurl
         openssl
         zlib )
+if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
+    list ( APPEND ${PROJECT_NAME}_DEPS staticlib_winservice )
+endif ( )
 wilton_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
 # build steps
-file ( GLOB_RECURSE ${PROJECT_NAME}_SRC ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp )
+set ( ${PROJECT_NAME}_SRC )
+
+# core
+# call
+set ( ${PROJECT_NAME}_SRC_CALL
+        ${CMAKE_CURRENT_LIST_DIR}/src/call/wiltoncall.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_CALL} )
+# common
+set ( ${PROJECT_NAME}_SRC_COMMON 
+        ${CMAKE_CURRENT_LIST_DIR}/src/common/utils.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_COMMON} )
+
+# engines
+# duktape
+set ( ${PROJECT_NAME}_SRC_DUKTAPE
+        ${CMAKE_CURRENT_LIST_DIR}/src/duktape/duktape_engine.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/duktape/wiltoncall_duktape.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_DUKTAPE} )
+# jni
+set ( ${PROJECT_NAME}_SRC_JNI
+        ${CMAKE_CURRENT_LIST_DIR}/src/jni/jni_utils.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/jni/wiltoncall_jni.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_JNI} )
+
+# modules
+# client
+set ( ${PROJECT_NAME}_SRC_CLIENT 
+        ${CMAKE_CURRENT_LIST_DIR}/src/client/wilton_client.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/client/wiltoncall_client.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_CLIENT} )
+# cron
+set ( ${PROJECT_NAME}_SRC_CRON
+        ${CMAKE_CURRENT_LIST_DIR}/src/cron/cron_task.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/cron/wilton_cron.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/cron/wiltoncall_cron.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_CRON} )
+# db
+set ( ${PROJECT_NAME}_SRC_DB 
+        ${CMAKE_CURRENT_LIST_DIR}/src/db/wilton_db.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/db/wiltoncall_db.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_DB} )
+# fs
+set ( ${PROJECT_NAME}_SRC_FS
+        ${CMAKE_CURRENT_LIST_DIR}/src/fs/wiltoncall_fs.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_FS} )
+# logging
+set ( ${PROJECT_NAME}_SRC_LOGGING
+        ${CMAKE_CURRENT_LIST_DIR}/src/logging/wilton_logger.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/logging/wilton_logging.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/logging/wiltoncall_logging.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_LOGGING} )
+# misc
+set ( ${PROJECT_NAME}_SRC_MISC
+        ${CMAKE_CURRENT_LIST_DIR}/src/misc/tcp_connect_checker.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/misc/wilton_misc.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/misc/wiltoncall_misc.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_MISC} )
+# mustache
+set ( ${PROJECT_NAME}_SRC_MUSTACHE
+        ${CMAKE_CURRENT_LIST_DIR}/src/mustache/wilton_mustache.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/mustache/wiltoncall_mustache.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_MUSTACHE} )
+# mutex
+set ( ${PROJECT_NAME}_SRC_MUTEX
+        ${CMAKE_CURRENT_LIST_DIR}/src/mutex/waitable_mutex.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/mutex/wilton_mutex.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/mutex/wiltoncall_mutex.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_MUTEX} )
+# server
+set ( ${PROJECT_NAME}_SRC_SERVER
+        ${CMAKE_CURRENT_LIST_DIR}/src/server/request.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/server/response_writer.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/server/server.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/server/wilton_server.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/server/wiltoncall_server.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_SERVER} )
+# shared
+set ( ${PROJECT_NAME}_SRC_SHARED 
+        ${CMAKE_CURRENT_LIST_DIR}/src/shared/wilton_shared.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/shared/wiltoncall_shared.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_SHARED} )
+# thread
+set ( ${PROJECT_NAME}_SRC_THREAD
+        ${CMAKE_CURRENT_LIST_DIR}/src/thread/wilton_thread.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/thread/wiltoncall_thread.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_THREAD} )
+
 set ( ${PROJECT_NAME}_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/wilton/wilton.h )
 file ( GLOB_RECURSE ${PROJECT_NAME}_HEADERS_PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src/*.hpp )
 if ( ${PROJECT_NAME}_SHARED )
@@ -162,6 +254,34 @@ target_compile_options ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_CFLAG
 if ( ${PROJECT_NAME}_SHARED )
     target_compile_definitions ( ${PROJECT_NAME} PRIVATE -DWILTON_SHARED )
     target_link_libraries ( ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS_PC_STATIC_LIBRARIES} )
+endif ( )
+
+# launchers
+if ( ${PROJECT_NAME}_SHARED )
+    add_executable ( ${PROJECT_NAME}_cli
+            ${CMAKE_CURRENT_LIST_DIR}/src/launcher/cli.cpp )
+    target_include_directories ( ${PROJECT_NAME}_cli BEFORE PRIVATE
+            ${CMAKE_CURRENT_LIST_DIR}/include
+            ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
+    target_compile_definitions ( ${PROJECT_NAME}_cli PRIVATE -DWILTON_SHARED -DWILTON_SHARED_IMPORT )
+    target_link_libraries ( ${PROJECT_NAME}_cli 
+            ${PROJECT_NAME} 
+            staticlib_json
+            staticlib_tinydir
+            staticlib_utils )
+
+    if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
+        add_executable ( ${PROJECT_NAME}_winservice
+                ${CMAKE_CURRENT_LIST_DIR}/src/launcher/winservice.cpp )
+        target_include_directories ( ${PROJECT_NAME}_cli BEFORE PRIVATE
+                ${CMAKE_CURRENT_LIST_DIR}/include
+                ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
+        target_compile_definitions ( ${PROJECT_NAME}_winservice PRIVATE -DWILTON_SHARED -DWILTON_SHARED_IMPORT )
+        target_link_libraries ( ${PROJECT_NAME}_winservice 
+                ${PROJECT_NAME}
+                staticlib_winservice
+                staticlib_utils )
+    endif ( )
 endif ( )
 
 # maven install
