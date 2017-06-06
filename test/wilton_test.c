@@ -20,6 +20,7 @@ void hello(void* ctx, wilton_Request* req) {
 void check_err(char* err) {
     if (NULL != err) {
         puts(err);
+        wilton_free(err);
         exit(1);
     }
 }
@@ -77,7 +78,7 @@ void test_wiltonjs() {
     const char* config = wilton_config();
     wiltoncall_init(config, strlen(config));
     runScript("{\"module\": \"runWiltonTests\", \"func\": \"main\", \"args\": []}");
-    runScript("{\"module\": \"runNodeTests\", \"func\": \"\", \"args\": []}");
+//    runScript("{\"module\": \"runNodeTests\", \"func\": \"\", \"args\": []}");
     
 }
 

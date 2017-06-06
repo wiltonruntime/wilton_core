@@ -146,6 +146,31 @@ void eval_js(duk_context* ctx, const std::string& code) {
     }
 }
 
+std::string format_duktape_error(duk_context* ctx) {
+    static std::string cpperr = " caught invalid c++ std::exception";
+    static std::string anon = "at [anon]";
+    static std::string reqjs = "/require.js:";
+    auto msg = format_error(ctx);
+    sl::utils::replace_all(msg, cpperr, "");
+    
+    auto src = sl::io::make_buffered_source(sl::io::string_source(msg));
+    auto res = std::string();
+    std::string line = "";
+    bool first = true;
+    while(!(line = src.read_line()).empty()) {
+        if (std::string::npos == line.find(anon) ||
+                std::string::npos == line.find(reqjs)) {
+            if (first) {
+                first = false;
+            } else {
+                res.append("\n");
+            }
+            res.append(line);
+        }
+    }
+    return res;
+}
+
 } // namespace
 
 class duktape_engine::impl : public sl::pimpl::object::impl {
@@ -178,9 +203,8 @@ public:
         duk_get_global_string(ctx, "WILTON_run");
         duk_push_string(ctx, callback_script_json.c_str());
         auto err = duk_pcall(ctx, 1);
-        if (DUK_EXEC_SUCCESS != err) {
-            throw common::wilton_internal_exception(TRACEMSG(format_error(ctx) + 
-                    "\nError running script: [" + callback_script_json + "]"));
+        if (DUK_EXEC_SUCCESS != err) {                        
+            throw common::wilton_internal_exception(TRACEMSG(format_duktape_error(ctx)));
         }
         if (DUK_TYPE_STRING == duk_get_type(ctx, -1)) {
             size_t len;
