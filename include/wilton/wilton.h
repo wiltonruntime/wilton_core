@@ -564,6 +564,9 @@ WILTON_EXPORT char* wilton_thread_sleep_millis(
 
 // misc
 
+WILTON_EXPORT char* wilton_alloc(
+        int size_bytes);
+
 WILTON_EXPORT void wilton_free(
         char* errmsg);
 

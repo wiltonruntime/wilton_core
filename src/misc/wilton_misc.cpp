@@ -14,13 +14,12 @@
 #include "staticlib/utils.hpp"
 #include "tcp_connect_checker.hpp"
 
-namespace { // anonymous
-
-namespace sc = staticlib::config;
-namespace su = staticlib::utils;
-namespace wm = wilton::misc;
-
-} // namespace
+char* wilton_alloc(int size_bytes) /* noexcept */ {
+    if (!sl::support::is_uint32_positive(size_bytes)) {
+        return nullptr;
+    }
+    return reinterpret_cast<char*>(std::malloc(static_cast<size_t>(size_bytes)));
+}
 
 void wilton_free(char* errmsg) /* noexcept */ {
     std::free(errmsg);
@@ -41,7 +40,7 @@ char* wilton_tcp_wait_for_connection(const char* ip_addr, int ip_addr_len,
         uint16_t tcp_port_u16 = static_cast<uint16_t> (tcp_port);
         uint32_t timeout_millis_u32 = static_cast<uint32_t> (timeout_millis);
         std::chrono::milliseconds timeout{timeout_millis_u32};
-        std::string err = wm::tcp_connect_checker::wait_for_connection(timeout, ip_addr_str, tcp_port_u16);
+        std::string err = wilton::misc::tcp_connect_checker::wait_for_connection(timeout, ip_addr_str, tcp_port_u16);
         if (err.empty()) {
             return nullptr;
         } else {
