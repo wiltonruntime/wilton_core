@@ -90,6 +90,7 @@ void test_dyload() {
     int out_len = 0;
     char* err = wiltoncall(name, strlen(name), data, strlen(data), &out, &out_len);
     if (NULL != err) {
+        puts(err);
         wilton_free(err);
     }
     if (out_len > 0) {
@@ -100,8 +101,8 @@ void test_dyload() {
 int main() {
 //    test_server();
 //    test_duktape_fail();
-//    test_wiltonjs();
-    test_dyload();
+    test_wiltonjs();
+//    test_dyload();
 
     return 0;
 }

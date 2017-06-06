@@ -7,6 +7,9 @@
 
 #include <stdio.h>
 
+#ifdef _WIN32
+__declspec(dllexport)
+#endif
 char* wilton_module_init() {
     puts("Hi from wilton_module_init!");
     return NULL;

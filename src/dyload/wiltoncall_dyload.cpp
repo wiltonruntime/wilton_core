@@ -5,14 +5,12 @@
  * Created on June 6, 2017, 7:26 PM
  */
 
+#include "staticlib/config.hpp"
+
 #ifdef STATICLIB_WINDOWS
-
 #include "dyload/dyload_windows.hpp"
-
 #else // !STATICLIB_WINDOWS
-
 #include "dyload/dyload_posix.hpp"
-
 #endif // STATICLIB_WINDOWS
 
 #include "call/wiltoncall_internal.hpp"
@@ -41,7 +39,7 @@ std::string dyload_shared_library(const std::string& data) {
             "Required parameter 'path' not specified"));
     const std::string& path = rpath.get();
     // call 
-    std::string abspath = [&path, absolute] {
+    std::string abspath = [&path, absolute] () -> std::string {
         if (absolute) {
             return path;
         }
