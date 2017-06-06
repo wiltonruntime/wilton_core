@@ -163,6 +163,14 @@ std::string fs_read_script_file_or_module(const std::string& data);
 
 } // namespace
 
+// dyload
+
+namespace dyload {
+
+std::string dyload_shared_library(const std::string& data);
+
+} // namespace
+
 // misc
 namespace misc {
 

@@ -55,6 +55,8 @@ if ( "${STATICLIB_ROOT_SOURCE_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}" )
     else ( )
         add_test ( wilton_test ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/wilton_test )
     endif ( )
+    # module
+    add_library ( wilton_test_module SHARED ${CMAKE_CURRENT_LIST_DIR}/wilton_test_module.c )
 endif ( )
 
 # test dir structure

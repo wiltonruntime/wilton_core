@@ -60,8 +60,8 @@ void runScript(const char* in) {
     wilton_free(out);
 }
 
-void test_wiltonjs() {
-    const char* config = "{"
+const char* wilton_config() {
+    return "{"
     "  \"defaultScriptEngine\": \"duktape\"," // optional, duktape is default
     "  \"requireJsDirPath\": \"../../wilton-requirejs\","
     "  \"requireJsConfig\": {"
@@ -71,16 +71,37 @@ void test_wiltonjs() {
     "    \"baseUrl\": \"../../modules\""
     "  }"
     "}";
+}
+
+void test_wiltonjs() {
+    const char* config = wilton_config();
     wiltoncall_init(config, strlen(config));
     runScript("{\"module\": \"runWiltonTests\", \"func\": \"main\", \"args\": []}");
     runScript("{\"module\": \"runNodeTests\", \"func\": \"\", \"args\": []}");
     
 }
 
+void test_dyload() {
+    const char* config = wilton_config();
+    wiltoncall_init(config, strlen(config));
+    const char* name = "dyload_shared_library";
+    const char* data = "{\"path\": \"libwilton_test_module.so\"}";
+    char* out = NULL;
+    int out_len = 0;
+    char* err = wiltoncall(name, strlen(name), data, strlen(data), &out, &out_len);
+    if (NULL != err) {
+        wilton_free(err);
+    }
+    if (out_len > 0) {
+        wilton_free(out);
+    }
+}
+
 int main() {
 //    test_server();
 //    test_duktape_fail();
-    test_wiltonjs();
+//    test_wiltonjs();
+    test_dyload();
 
     return 0;
 }

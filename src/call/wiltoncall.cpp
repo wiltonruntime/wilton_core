@@ -111,6 +111,8 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("fs_write_file", wilton::fs::fs_write_file);
         reg.put("fs_list_directory", wilton::fs::fs_list_directory);
         reg.put("fs_read_script_file_or_module", wilton::fs::fs_read_script_file_or_module);
+        // dyload
+        reg.put("dyload_shared_library", wilton::dyload::dyload_shared_library);
         // misc
         reg.put("tcp_wait_for_connection", wilton::misc::tcp_wait_for_connection);
         
