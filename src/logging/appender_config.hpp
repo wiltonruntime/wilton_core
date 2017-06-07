@@ -8,6 +8,7 @@
 #ifndef WILTON_LOGGING_APPENDER_CONFIG_HPP
 #define	WILTON_LOGGING_APPENDER_CONFIG_HPP
 
+#include <cstdint>
 #include <string>
 
 #include "staticlib/config.hpp"
@@ -25,6 +26,8 @@ public:
     std::string filePath = "";
     std::string layout = "%d{%Y-%m-%d %H:%M:%S,%q} [%-5p %-5.5t %-20.20c] %m%n";
     std::string thresholdLevel = "TRACE";
+    bool useLockFile = false;
+    uint16_t maxBackupIndex = 16;
 
     appender_config(const appender_config&) = delete;
 
@@ -34,13 +37,17 @@ public:
     appenderType(std::move(other.appenderType)),
     filePath(std::move(other.filePath)),
     layout(std::move(other.layout)),
-    thresholdLevel(std::move(other.thresholdLevel)) { }
+    thresholdLevel(std::move(other.thresholdLevel)),
+    useLockFile(useLockFile),
+    maxBackupIndex(maxBackupIndex) { }
 
     appender_config& operator=(appender_config&& other) {
         this->appenderType = std::move(other.appenderType);
         this->filePath = std::move(other.filePath);
         this->layout = std::move(other.layout);
         this->thresholdLevel = std::move(other.thresholdLevel);
+        this->useLockFile = other.useLockFile;
+        this->maxBackupIndex = other.maxBackupIndex;
         return *this;
     }
 
@@ -57,6 +64,10 @@ public:
                 this->layout = fi.as_string_nonempty_or_throw(name);
             } else if ("thresholdLevel" == name) {
                 this->thresholdLevel = fi.as_string_nonempty_or_throw(name);
+            } else if ("useLockFile" == name) {
+                this->useLockFile = fi.as_bool_or_throw(name);
+            } else if ("maxBackupIndex" == name) {
+                this->maxBackupIndex = fi.as_uint16_positive_or_throw(name);                
             } else {
                 throw common::wilton_internal_exception(TRACEMSG("Unknown 'logging.appenders' field: [" + name + "]"));
             }
@@ -71,7 +82,9 @@ public:
             {"appenderType", appenderType},
             {"filePath", filePath},
             {"layout", layout},
-            {"thresholdLevel", thresholdLevel}
+            {"thresholdLevel", thresholdLevel},
+            {"useLockFile", useLockFile},
+            {"maxBackupIndex", maxBackupIndex}
         };
     }
 

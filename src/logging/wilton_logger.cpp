@@ -106,7 +106,13 @@ private:
         } else if ("FILE" == conf.appenderType) {
             return new log4cplus::FileAppender(resolve_file_path(conf.filePath));
         } else if ("DAILY_ROLLING_FILE" == conf.appenderType) {
-            return new log4cplus::DailyRollingFileAppender(resolve_file_path(conf.filePath));
+            auto props = log4cplus::helpers::Properties();
+            props.setProperty("File", resolve_file_path(conf.filePath));
+            props.setProperty("MaxBackupIndex", sl::support::to_string(conf.maxBackupIndex));
+            if (conf.useLockFile) {
+                props.setProperty("UseLockFile", "true");
+            }
+            return new log4cplus::DailyRollingFileAppender(props);
         } else {
             throw common::wilton_internal_exception(TRACEMSG(
                     "Invalid 'logging.appender.appenderType': [" + conf.appenderType + "]"));
