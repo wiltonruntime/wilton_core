@@ -14,6 +14,7 @@
 #include "log4cplus/consoleappender.h"
 #include "log4cplus/nullappender.h"
 #include "log4cplus/fileappender.h"
+#include "log4cplus/helpers/property.h"
 
 #include "staticlib/pimpl/forward_macros.hpp"
 #include "staticlib/utils.hpp"
@@ -108,7 +109,8 @@ private:
         } else if ("DAILY_ROLLING_FILE" == conf.appenderType) {
             auto props = log4cplus::helpers::Properties();
             props.setProperty("File", resolve_file_path(conf.filePath));
-            props.setProperty("MaxBackupIndex", sl::support::to_string(conf.maxBackupIndex));
+            props.setProperty("Schedule", "DAILY");
+            //props.setProperty("MaxBackupIndex", sl::support::to_string(conf.maxBackupIndex));
             if (conf.useLockFile) {
                 props.setProperty("UseLockFile", "true");
             }
