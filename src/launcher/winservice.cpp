@@ -51,7 +51,7 @@ wilton::launcher::winservice_config load_config(const std::string& exedir, char*
         auto src = sl::io::replacer_source<sl::tinydir::file_source>(
                 sl::tinydir::file_source(path), values, onerr, "${", "}");
         auto json = sl::json::load(src);
-        return wilton::launcher::winservice_config(json["winservice"]);
+        return wilton::launcher::winservice_config(std::move(json));
     } catch (const std::exception& e) {
         throw wilton::launcher::winservice_exception(TRACEMSG(e.what() + 
                 "\nError loading config file, path: [" + path + "]"));
@@ -77,15 +77,14 @@ void init_wilton(const std::string& exedir) {
     }
 }
 
-void run_script(const std::string& func, const std::vector<std::string>& args) {
+void run_script(const std::string& func, const wilton::launcher::winservice_config& conf) {
     std::string in = sl::json::dumps({
         { "module", "index"},
         { "func", func},
-        { "args", [&args] {
-                auto ra = sl::ranges::transform(args, [](const std::string& ar) {
-                    return sl::json::value(ar);
-                });
-                return ra.to_vector();
+        { "args", [&conf] {
+                auto vec = std::vector<sl::json::value>();
+                vec.emplace_back(conf.json_config.clone());
+                return vec;
             } ()},
     });
     char* out = nullptr;
@@ -131,16 +130,15 @@ void stop(const wilton::launcher::winservice_config& conf) {
     sl::winservice::stop_service(conf.service_name);
 }
 
-void start_service_and_wait(const wilton::launcher::winservice_config& conf,
-        const std::vector<std::string>& arguments) {
+void start_service_and_wait(const wilton::launcher::winservice_config& conf) {
     std::cout << "Starting service with config: [" + conf.to_json().dumps() + "]" << std::endl;
-    auto args = std::make_shared<std::vector<std::string>>(arguments);
+    auto cf = std::make_shared<wilton::launcher::winservice_config>(conf.clone());
     sl::winservice::start_service_and_wait(conf.service_name,
-    [args] {
-        run_script("start", *args);
+    [cf] {
+        run_script("start", *cf);
     },
-    [args] {
-        run_script("stop", *args);
+    [cf] {
+        run_script("stop", *cf);
         std::cout << "Stopping service ..." << std::endl;
     },
     [](const std::string& msg) {
@@ -181,9 +179,9 @@ int main(int argc, char** argv) {
         } else if (opts.stop) {
             stop(conf);
         } else if (opts.direct) {
-            run_script("start", opts.args);
+            run_script("start", conf);
         } else { // SCM call            
-            start_service_and_wait(conf, opts.args);
+            start_service_and_wait(conf);
         }
 
         return 0;

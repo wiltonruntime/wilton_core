@@ -69,6 +69,15 @@ public:
             }
         }
 
+        { // check unneeded args
+            if (args.size() > 0) {
+                parse_error.append("invalid arguments specified:");
+                for (auto& st : args) {
+                    parse_error.append(" ");
+                    parse_error.append(st);
+                }
+            }
+        }
     }
 
     ~winservice_options() {

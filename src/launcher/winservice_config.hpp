@@ -20,6 +20,7 @@ namespace launcher {
 
 class winservice_config {
 public:
+    sl::json::value json_config;
     std::string service_name;
     std::string display_name;
     std::string user;
@@ -30,12 +31,14 @@ public:
     winservice_config& operator=(const winservice_config&) = delete;
 
     winservice_config(winservice_config&& other) :
+    json_config(std::move(other.json_config)),
     service_name(std::move(other.service_name)),
     display_name(std::move(other.display_name)),
     user(std::move(other.user)),
     password(std::move(other.password)) { }
 
     winservice_config& operator=(winservice_config&& other) {
+        this->json_config = std::move(other.json_config);
         this->service_name = std::move(other.service_name);
         this->display_name = std::move(other.display_name);
         this->user = std::move(other.user);
@@ -45,8 +48,9 @@ public:
 
     winservice_config() { }
 
-    winservice_config(const sl::json::value& json) {
-        for (const sl::json::field& fi : json.as_object()) {
+    winservice_config(sl::json::value&& json) :
+    json_config(std::move(json)) {
+        for (const sl::json::field& fi : json_config["winservice"].as_object()) {
             auto& name = fi.name();
             if ("serviceName" == name) {
                 this->service_name = fi.as_string_nonempty_or_throw(name);
@@ -75,6 +79,16 @@ public:
             { "user", user },
             { "password", "***" }
         };
+    }
+
+    winservice_config clone() const {
+        auto res = winservice_config();
+        res.json_config = json_config.clone();
+        res.service_name = std::string(service_name.data(), service_name.length());
+        res.display_name = std::string(display_name.data(), display_name.length());
+        res.user = std::string(user.data(), user.length());
+        res.password = std::string(password.data(), password.length());
+        return res;
     }
 };
 
