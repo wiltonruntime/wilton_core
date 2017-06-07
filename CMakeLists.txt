@@ -277,7 +277,8 @@ if ( ${PROJECT_NAME}_SHARED )
     if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
         add_executable ( ${PROJECT_NAME}_winservice
                 ${CMAKE_CURRENT_LIST_DIR}/src/launcher/winservice.cpp )
-        target_include_directories ( ${PROJECT_NAME}_cli BEFORE PRIVATE
+        target_include_directories ( ${PROJECT_NAME}_winservice BEFORE PRIVATE
+                ${CMAKE_CURRENT_LIST_DIR}/src/launcher
                 ${CMAKE_CURRENT_LIST_DIR}/include
                 ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
         target_compile_definitions ( ${PROJECT_NAME}_winservice PRIVATE -DWILTON_SHARED -DWILTON_SHARED_IMPORT )
@@ -288,7 +289,7 @@ if ( ${PROJECT_NAME}_SHARED )
     endif ( )
 
     add_custom_target ( ${PROJECT_NAME}_cli_rename ALL
-            COMMAND ${CMAKE_COMMAND} -E rename
+            COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}_cli${CMAKE_EXECUTABLE_SUFFIX}
             ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}${CMAKE_EXECUTABLE_SUFFIX}
             DEPENDS ${PROJECT_NAME}_cli )

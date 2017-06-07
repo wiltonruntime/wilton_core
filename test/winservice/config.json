@@ -1,0 +1,8 @@
+{
+    "winservice": {
+        "serviceName": "wilton_test_service",
+        "displayName": "Wilton Test Service",
+        "user": "Administrator",
+        "password": "P@ssword"
+    }
+}

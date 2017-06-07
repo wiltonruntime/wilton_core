@@ -13,12 +13,13 @@
 
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
+#include "winservice_exception.hpp"
 
 namespace wilton {
 namespace launcher {
 
 class winservice_config {
+public:
     std::string service_name;
     std::string display_name;
     std::string user;
@@ -56,23 +57,23 @@ class winservice_config {
             } else if ("password" == name) {
                 this->password = fi.as_string_or_throw(name);
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'winservice' field: [" + name + "]"));
+                throw winservice_exception(TRACEMSG("Unknown 'winservice' field: [" + name + "]"));
             }
         }
-        if (0 == service_name.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == service_name.length()) throw winservice_exception(TRACEMSG(
                 "Invalid 'winservice.serviceName' field: []"));
-        if (0 == display_name.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == display_name.length()) throw winservice_exception(TRACEMSG(
                 "Invalid 'winservice.displayName' field: []"));
-        if (0 == user.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == user.length()) throw winservice_exception(TRACEMSG(
                 "Invalid 'winservice.user' field: []"));        
     }
 
-    sl::json::field to_json() const {
+    sl::json::value to_json() const {
         return {
             { "serviceName", service_name },
             { "displayName", display_name },
             { "user", user },
-            { "password", password }
+            { "password", "***" }
         };
     }
 };

@@ -13,14 +13,19 @@
 
 #include <popt.h>
 
+#include "staticlib/io.hpp"
 #include "staticlib/json.hpp"
 #include "staticlib/ranges.hpp"
+#include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
+#include "staticlib/winservice.hpp"
 
-#include "common/wilton_internal_exception.hpp"
+#include "wilton/wilton.h"
+#include "wilton/wiltoncall.h"
 
-#include "launcher/winservice_config.hpp"
-#include "launcher/winservice_options.hpp"
+#include "winservice_config.hpp"
+#include "winservice_exception.hpp"
+#include "winservice_options.hpp"
 
 namespace { //anonymous
 
@@ -28,22 +33,29 @@ std::string current_exedir() {
     auto exepath = sl::utils::current_executable_path();
     auto exedir = sl::utils::strip_filename(exepath);
     std::replace(exedir.begin(), exedir.end(), '\\', '/');
+    return exedir;
 }
 
 wilton::launcher::winservice_config load_config(const std::string& exedir, char* cpath) {
-    auto path = [cpath] {
+    auto path = [&exedir, cpath] {
         if (nullptr != cpath) {
             return std::string(cpath);
         }
         return exedir + "config.json";
     }();
-    auto fi = sl::tinydir::file_source(path);
     std::map<std::string, std::string> values = {{"appdir", exedir}};
     auto onerr = [](const std::string & err) {
-        throw common::wilton_internal_exception(TRACEMSG(err));
+        throw wilton::launcher::winservice_exception(TRACEMSG(err));
     };
-    auto src = sl::io::replacer_source<sl::io::string_source>(fi, values, onerr, "${", "}");
-    return sl::json::load(src);
+    try {
+        auto src = sl::io::replacer_source<sl::tinydir::file_source>(
+                sl::tinydir::file_source(path), values, onerr, "${", "}");
+        auto json = sl::json::load(src);
+        return wilton::launcher::winservice_config(json["winservice"]);
+    } catch (const std::exception& e) {
+        throw wilton::launcher::winservice_exception(TRACEMSG(e.what() + 
+                "\nError loading config file, path: [" + path + "]"));
+    }
 }
 
 void init_wilton(const std::string& exedir) {
@@ -61,7 +73,7 @@ void init_wilton(const std::string& exedir) {
     if (nullptr != err) {
         auto msg = TRACEMSG(err);
         wilton_free(err);
-        throw common::wilton_internal_exception(msg);
+        throw wilton::launcher::winservice_exception(msg);
     }
 }
 
@@ -69,7 +81,7 @@ void run_script(const std::string& func, const std::vector<std::string>& args) {
     std::string in = sl::json::dumps({
         { "module", "index"},
         { "func", func},
-        { "args", [&opts] {
+        { "args", [&args] {
                 auto ra = sl::ranges::transform(args, [](const std::string& ar) {
                     return sl::json::value(ar);
                 });
@@ -82,31 +94,33 @@ void run_script(const std::string& func, const std::vector<std::string>& args) {
     if (nullptr != err) {
         auto msg = TRACEMSG(err);
         wilton_free(err);
-        throw common::wilton_internal_exception(msg);
+        throw wilton::launcher::winservice_exception(msg);
     }
     if (nullptr != out) {
         auto res = std::string(out, static_cast<uint32_t> (out_len));
         wilton_free(out);
-        std::cout << res << std::endl;
+        if (out_len > 0) {
+            std::cout << res << std::endl;
+        }
     }
 }
 
 void install(const wilton::launcher::winservice_config& conf) {
     std::cout << "Installing service with config: [" + conf.to_json().dumps() + "]" << std::endl;
     if (!sl::utils::current_process_elevated()) {
-        throw common::wilton_internal_exception(TRACEMSG(
+        throw wilton::launcher::winservice_exception(TRACEMSG(
             "Service install error, must be run under elevated (Administrator) account"));
     }
     sl::utils::ensure_has_logon_as_service(conf.user);
     sl::winservice::install_service(conf.service_name, conf.display_name,
-            ".\\" + conf.account, conf.password);
+            ".\\" + conf.user, conf.password);
     sl::winservice::start_service(conf.service_name);
 }
 
 void uninstall(const wilton::launcher::winservice_config& conf) {
     std::cout << "Uninstalling service with config: [" + conf.to_json().dumps() + "]" << std::endl;
     if (!sl::utils::current_process_elevated()) {
-        throw common::wilton_internal_exception(TRACEMSG(
+        throw wilton::launcher::winservice_exception(TRACEMSG(
             "Service uninstall error, must be run under elevated (Administrator) account"));
     }
     sl::winservice::uninstall_service(conf.service_name);
@@ -120,7 +134,7 @@ void stop(const wilton::launcher::winservice_config& conf) {
 void start_service_and_wait(const wilton::launcher::winservice_config& conf,
         const std::vector<std::string>& arguments) {
     std::cout << "Starting service with config: [" + conf.to_json().dumps() + "]" << std::endl;
-    auto args = std::make_shared<std::vector<std::string>>(args);
+    auto args = std::make_shared<std::vector<std::string>>(arguments);
     sl::winservice::start_service_and_wait(conf.service_name,
     [args] {
         run_script("start", *args);
@@ -130,7 +144,7 @@ void start_service_and_wait(const wilton::launcher::winservice_config& conf,
         std::cout << "Stopping service ..." << std::endl;
     },
     [](const std::string& msg) {
-        std::err << msg << std::endl;
+        std::cerr << msg << std::endl;
     });
     std::cout << "Service stopped" << std::endl;
 }
