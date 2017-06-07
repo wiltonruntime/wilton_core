@@ -146,12 +146,14 @@ void eval_js(duk_context* ctx, const std::string& code) {
     }
 }
 
-std::string format_duktape_error(duk_context* ctx) {
-    static std::string cpperr = " caught invalid c++ std::exception";
+std::string format_stacktrace(duk_context* ctx) {
+    static std::string prefix = "Error: caught invalid c++ std::exception '";
+    static std::string postfix = "' (perhaps thrown by user code)";
     static std::string anon = "at [anon]";
     static std::string reqjs = "/require.js:";
     auto msg = format_error(ctx);
-    sl::utils::replace_all(msg, cpperr, "");
+    sl::utils::replace_all(msg, prefix, "");
+    sl::utils::replace_all(msg, postfix, "");
     
     auto src = sl::io::make_buffered_source(sl::io::string_source(msg));
     auto res = std::string();
@@ -204,7 +206,7 @@ public:
         duk_push_string(ctx, callback_script_json.c_str());
         auto err = duk_pcall(ctx, 1);
         if (DUK_EXEC_SUCCESS != err) {                        
-            throw common::wilton_internal_exception(TRACEMSG(format_duktape_error(ctx)));
+            throw common::wilton_internal_exception(TRACEMSG(format_stacktrace(ctx)));
         }
         if (DUK_TYPE_STRING == duk_get_type(ctx, -1)) {
             size_t len;

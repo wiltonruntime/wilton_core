@@ -142,7 +142,7 @@ std::string fs_list_directory(const std::string& data) {
 std::string fs_read_script_file_or_module(const std::string& path) {
     try {
         return read_file(path);
-    } catch (const sl::tinydir::tinydir_exception&) {
+    } catch (const sl::tinydir::tinydir_exception& epath) {
         std::string tpath = path;
         if (sl::utils::ends_with(tpath, ".js")) {
             tpath.resize(tpath.length() - 3);
@@ -152,7 +152,11 @@ std::string fs_read_script_file_or_module(const std::string& path) {
         }
         auto main = read_main_from_package_json(tpath);
         tpath.append(main);
-        return read_file(tpath);
+        try {
+            return read_file(tpath);
+        } catch (const sl::tinydir::tinydir_exception& etpath) {
+            throw common::wilton_internal_exception(TRACEMSG(epath.what() + "\n" + etpath.what()));
+        }
     }
 }
 
