@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
         auto& index = argvec.at(1);
         auto indexpath = sl::tinydir::path(index);
         if (!indexpath.exists()) {
-            std::cerr << "Error: specifier script file not found: [" + index + "]" << std::endl;
+            std::cerr << "Error: specified script file not found: [" + index + "]" << std::endl;
             return 1;
         }
         auto modulesdir = sl::utils::strip_filename(index);
