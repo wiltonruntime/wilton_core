@@ -45,7 +45,7 @@ std::string shared_put(sl::io::span<const char> data) {
     if (nullptr != out) {
         return common::wrap_wilton_output(out, out_len);
     }
-    return "";
+    return "{}";
 }
 
 std::string shared_get(sl::io::span<const char> data) {
@@ -74,7 +74,7 @@ std::string shared_get(sl::io::span<const char> data) {
     if (nullptr != out) {
         return common::wrap_wilton_output(out, out_len);
     }
-    return "";
+    return "{}";
 }
 
 std::string shared_wait_change(sl::io::span<const char> data) {
@@ -116,7 +116,7 @@ std::string shared_wait_change(sl::io::span<const char> data) {
     if (nullptr != out) {
         return common::wrap_wilton_output(out, out_len);
     }
-    return "";
+    return "{}";
 }
 
 std::string shared_remove(sl::io::span<const char> data) {
@@ -145,7 +145,7 @@ std::string shared_remove(sl::io::span<const char> data) {
     if (nullptr != out) {
         return common::wrap_wilton_output(out, out_len);
     }
-    return "";
+    return "{}";
 }
 
 } // namespace
