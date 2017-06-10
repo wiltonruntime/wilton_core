@@ -209,12 +209,6 @@ set ( ${PROJECT_NAME}_SRC_MUSTACHE
         ${CMAKE_CURRENT_LIST_DIR}/src/mustache/wilton_mustache.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/mustache/wiltoncall_mustache.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_MUSTACHE} )
-# mutex
-set ( ${PROJECT_NAME}_SRC_MUTEX
-        ${CMAKE_CURRENT_LIST_DIR}/src/mutex/waitable_mutex.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/mutex/wilton_mutex.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/mutex/wiltoncall_mutex.cpp )
-list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_MUTEX} )
 # server
 set ( ${PROJECT_NAME}_SRC_SERVER
         ${CMAKE_CURRENT_LIST_DIR}/src/server/request.cpp

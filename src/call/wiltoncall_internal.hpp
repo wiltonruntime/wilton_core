@@ -112,23 +112,6 @@ std::string cron_stop(const std::string& data);
 
 } // namespace
 
-// Mutex
-namespace mutex {
-
-std::string mutex_create(const std::string& data);
-
-std::string mutex_lock(const std::string& data);
-
-std::string mutex_unlock(const std::string& data);
-
-std::string mutex_wait(const std::string& data);
-
-std::string mutex_notify_all(const std::string& data);
-
-std::string mutex_destroy(const std::string& data);
-
-} // namespace
-
 // shared
 namespace shared {
 
