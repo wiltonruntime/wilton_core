@@ -34,13 +34,18 @@ std::string shared_put(const std::string& data) {
             "Required parameter 'value' not specified"));
     const std::string& value = rvalue.get();
     // call wilton
+    char* out;
+    int out_len;
     char* err = wilton_shared_put(key.c_str(), static_cast<int>(key.length()),
-            value.c_str(), static_cast<int>(value.length()));
+            value.c_str(), static_cast<int>(value.length()),
+            std::addressof(out), std::addressof(out_len));
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return "{}";
-
+    if (nullptr != out) {
+        return common::wrap_wilton_output(out, out_len);
+    }
+    return "";
 }
 
 std::string shared_get(const std::string& data) {
@@ -66,10 +71,10 @@ std::string shared_get(const std::string& data) {
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    if (nullptr == out) {
-        return ""; // invalid json, should be checked by caller
+    if (nullptr != out) {
+        return common::wrap_wilton_output(out, out_len);
     }
-    return common::wrap_wilton_output(out, out_len);
+    return "";
 }
 
 std::string shared_wait_change(const std::string& data) {
@@ -108,10 +113,10 @@ std::string shared_wait_change(const std::string& data) {
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    if (nullptr == out) {
-        return ""; // invalid json, should be checked by caller
+    if (nullptr != out) {
+        return common::wrap_wilton_output(out, out_len);
     }
-    return common::wrap_wilton_output(out, out_len);
+    return "";
 }
 
 std::string shared_remove(const std::string& data) {
@@ -130,11 +135,17 @@ std::string shared_remove(const std::string& data) {
             "Required parameter 'key' not specified"));
     const std::string& key = rkey.get();
     // call wilton
-    char* err = wilton_shared_remove(key.c_str(), static_cast<int>(key.length()));
+    char* out;
+    int out_len;
+    char* err = wilton_shared_remove(key.c_str(), static_cast<int>(key.length()),
+            std::addressof(out), std::addressof(out_len));
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return "{}";
+    if (nullptr != out) {
+        return common::wrap_wilton_output(out, out_len);
+    }
+    return "";
 }
 
 } // namespace

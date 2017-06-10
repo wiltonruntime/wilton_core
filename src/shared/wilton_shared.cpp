@@ -19,27 +19,24 @@
 
 namespace { // anonymous
 
-namespace sc = staticlib::config;
-namespace su = staticlib::utils;
-
-class Value {
+class shared_entry {
     std::string value;
     std::shared_ptr<std::condition_variable> cv;
 
 public:
-    Value(std::string&& value) :
+    shared_entry(std::string&& value) :
     value(std::move(value)),
     cv(std::shared_ptr<std::condition_variable>(new std::condition_variable())) { }
     
-    Value(const Value&) = delete;
+    shared_entry(const shared_entry&) = delete;
     
-    Value& operator=(const Value&) = delete;
+    shared_entry& operator=(const shared_entry&) = delete;
     
-    Value(Value&& other) :
+    shared_entry(shared_entry&& other) :
     value(std::move(other.value)),
     cv(std::move(other.cv)) { }
     
-    Value& operator=(Value&&) = delete;
+    shared_entry& operator=(shared_entry&&) = delete;
     
     const std::string& get_value() const {
         return value;
@@ -59,14 +56,15 @@ std::mutex& static_mutex() {
     return mutex;
 }
 
-std::unordered_map<std::string, Value>& static_map() {
-    static std::unordered_map<std::string, Value> map;
+std::unordered_map<std::string, shared_entry>& static_map() {
+    static std::unordered_map<std::string, shared_entry> map;
     return map;
 }
 
 } // namespace
 
-char* wilton_shared_put(const char* key, int key_len, const char* value, int value_len) /* noexcept */ {
+char* wilton_shared_put(const char* key, int key_len, const char* value, int value_len,
+        char** prev_value_out, int* prev_value_out_len) /* noexcept */ {
     if (nullptr == key) return sl::utils::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
     if (!sl::support::is_uint16_positive(key_len)) return sl::utils::alloc_copy(TRACEMSG(
             "Invalid 'key_len' parameter specified: [" + sl::support::to_string(key_len) + "]"));
@@ -83,10 +81,15 @@ char* wilton_shared_put(const char* key, int key_len, const char* value, int val
         std::lock_guard<std::mutex> guard{static_mutex()};
         auto it = static_map().find(key_str);
         if (static_map().end() != it) {
+            *prev_value_out = sl::utils::alloc_copy(it->second.get_value());
+            *prev_value_out_len = static_cast<int> (it->second.get_value().length());
             it->second.get_cv_ref().notify_all();
             static_map().erase(key_str);
+        } else {
+            *prev_value_out = nullptr;
+            *prev_value_out_len = -1;
         }
-        static_map().emplace(std::move(key_str), Value(std::move(value_str)));
+        static_map().emplace(std::move(key_str), shared_entry(std::move(value_str)));
         return nullptr;
     } catch (const std::exception& e) {
         return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -179,7 +182,7 @@ char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len
     }
 }
 
-char* wilton_shared_remove(const char* key, int key_len) /* noexcept */ {
+char* wilton_shared_remove(const char* key, int key_len, char** value_out, int* value_out_len) /* noexcept */ {
     if (nullptr == key) return sl::utils::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
     if (!sl::support::is_uint16_positive(key_len)) return sl::utils::alloc_copy(TRACEMSG(
             "Invalid 'key_len' parameter specified: [" + sl::support::to_string(key_len) + "]"));
@@ -191,8 +194,13 @@ char* wilton_shared_remove(const char* key, int key_len) /* noexcept */ {
         std::lock_guard<std::mutex> guard{static_mutex()};
         auto it = static_map().find(key_str);
         if (static_map().end() != it) {
+            *value_out = sl::utils::alloc_copy(it->second.get_value());
+            *value_out_len = static_cast<int> (it->second.get_value().length());
             it->second.get_cv_ref().notify_all();
             static_map().erase(key_str);
+        } else {
+            *value_out = nullptr;
+            *value_out_len = -1;
         }
         return nullptr;
     } catch (const std::exception& e) {

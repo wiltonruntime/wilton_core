@@ -529,7 +529,9 @@ WILTON_EXPORT char* wilton_shared_put(
         const char* key,
         int key_len,
         const char* value,
-        int value_len);
+        int value_len,
+        char** prev_value_out,
+        int* prev_value_out_len);
 
 WILTON_EXPORT char* wilton_shared_get(
         const char* key,
@@ -548,7 +550,9 @@ WILTON_EXPORT char* wilton_shared_wait_change(
 
 WILTON_EXPORT char* wilton_shared_remove(
         const char* key,
-        int key_len);
+        int key_len,
+        char** value_out,
+        int* value_out_len);
 
 
 // thread
