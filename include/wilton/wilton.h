@@ -243,47 +243,6 @@ WILTON_EXPORT char* wilton_render_mustache_file(
         char** output_text_out,
         int* output_text_len_out);
 
-// DB
-
-struct wilton_DBConnection;
-typedef struct wilton_DBConnection wilton_DBConnection;
-
-struct wilton_DBTransaction;
-typedef struct wilton_DBTransaction wilton_DBTransaction;
-
-WILTON_EXPORT char* wilton_DBConnection_open(
-        wilton_DBConnection** conn_out,
-        const char* conn_url,
-        int conn_url_len);
-
-WILTON_EXPORT char* wilton_DBConnection_query(
-        wilton_DBConnection* conn,
-        const char* sql_text,
-        int sql_text_len,
-        const char* params_json,
-        int params_json_len,
-        char** result_set_out,
-        int* result_set_len_out);
-
-WILTON_EXPORT char* wilton_DBConnection_execute(
-        wilton_DBConnection* conn,
-        const char* sql_text,
-        int sql_text_len,
-        const char* params_json,
-        int params_json_len);
-
-WILTON_EXPORT char* wilton_DBConnection_close(
-        wilton_DBConnection* conn);
-
-WILTON_EXPORT char* wilton_DBTransaction_start(
-        wilton_DBConnection* conn,
-        wilton_DBTransaction** tran_out);
-
-WILTON_EXPORT char* wilton_DBTransaction_commit(
-        wilton_DBTransaction* tran);
-
-WILTON_EXPORT char* wilton_DBTransaction_rollback(
-        wilton_DBTransaction* tran);
 
 // HttpClient
 

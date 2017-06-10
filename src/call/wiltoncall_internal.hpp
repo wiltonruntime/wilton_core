@@ -71,25 +71,6 @@ std::string mustache_render_file(const std::string& data);
 
 } // namespace
 
-// DB
-namespace db {
-
-std::string db_connection_open(const std::string& data);
-
-std::string db_connection_query(const std::string& data);
-
-std::string db_connection_execute(const std::string& data);
-
-std::string db_connection_close(const std::string& data);
-
-std::string db_transaction_start(const std::string& data);
-
-std::string db_transaction_commit(const std::string& data);
-
-std::string db_transaction_rollback(const std::string& data);
-
-} // namespace
-
 // HttpClient
 namespace client {
 

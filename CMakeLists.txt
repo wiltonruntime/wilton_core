@@ -85,10 +85,8 @@ if ( NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" ) # system dependencies implied o
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_openssl )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
-    wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_sqlite )
     wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_popt )
 endif ( )
-wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_soci )
 wilton_add_subdirectory ( ${STATICLIB_DEPS}/external_duktape )
 wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
 wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )
@@ -103,7 +101,6 @@ wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_json )
 wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
 wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
 wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
-wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_orm )
 wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_http )
 wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
 wilton_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_mustache )
@@ -121,7 +118,6 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_pion
         staticlib_json
         staticlib_unzip
-        staticlib_orm 
         staticlib_http
         staticlib_utils
         staticlib_cron
@@ -131,8 +127,6 @@ set ( ${PROJECT_NAME}_DEPS
         popt
         jansson
         log4cplus
-        sqlite3
-        soci
         duktape
         libcurl
         openssl
@@ -183,11 +177,6 @@ set ( ${PROJECT_NAME}_SRC_CRON
         ${CMAKE_CURRENT_LIST_DIR}/src/cron/wilton_cron.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/cron/wiltoncall_cron.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_CRON} )
-# db
-set ( ${PROJECT_NAME}_SRC_DB 
-        ${CMAKE_CURRENT_LIST_DIR}/src/db/wilton_db.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/db/wiltoncall_db.cpp )
-list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_DB} )
 # fs
 set ( ${PROJECT_NAME}_SRC_FS
         ${CMAKE_CURRENT_LIST_DIR}/src/fs/wiltoncall_fs.cpp )
