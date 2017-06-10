@@ -77,7 +77,7 @@ duk_ret_t load_func(duk_context* ctx) {
         }    
         path = std::string(path_ptr, path_len);
         // read file
-        auto code = fs::fs_read_script_file_or_module(path);
+        auto code = fs::fs_read_script_file_or_module({path.c_str(), path.length()});
         // compile source
         duk_push_lstring(ctx, code.c_str(), code.length());
         duk_push_lstring(ctx, path.c_str(), path.length());

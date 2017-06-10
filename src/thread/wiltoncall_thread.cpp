@@ -15,9 +15,9 @@
 namespace wilton {
 namespace thread {
 
-std::string thread_run(const std::string& data) {
+std::string thread_run(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     auto rcallback = std::ref(sl::json::null_value_ref());
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
@@ -57,9 +57,9 @@ std::string thread_run(const std::string& data) {
     return "{}";
 }
 
-std::string thread_sleep_millis(const std::string& data) {
+std::string thread_sleep_millis(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t millis = -1;
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();

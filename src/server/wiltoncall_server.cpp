@@ -196,9 +196,8 @@ std::vector<wilton_HttpPath*> wrap_paths(std::vector<std::unique_ptr<wilton_Http
 
 } // namespace
 
-std::string server_create(const std::string& data) {
-    sl::json::value json = sl::json::loads(data);
-    auto conf_in = sl::json::loads(data);
+std::string server_create(sl::io::span<const char> data) {
+    auto conf_in = sl::json::load(data);
     auto views = extract_and_delete_views(conf_in);
     auto conf = conf_in.dumps();
     server_ctx ctx;
@@ -215,9 +214,9 @@ std::string server_create(const std::string& data) {
     });
 }
 
-std::string server_stop(const std::string& data) {
+std::string server_stop(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
@@ -242,9 +241,9 @@ std::string server_stop(const std::string& data) {
     return "{}";
 }
 
-std::string request_get_metadata(const std::string& data) {
+std::string request_get_metadata(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
@@ -272,9 +271,9 @@ std::string request_get_metadata(const std::string& data) {
     return common::wrap_wilton_output(out, out_len);
 }
 
-std::string request_get_data(const std::string& data) {
+std::string request_get_data(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
@@ -300,9 +299,9 @@ std::string request_get_data(const std::string& data) {
     return common::wrap_wilton_output(out, out_len);
 }
 
-std::string request_get_data_filename(const std::string& data) {
+std::string request_get_data_filename(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
@@ -328,9 +327,9 @@ std::string request_get_data_filename(const std::string& data) {
     return common::wrap_wilton_output(out, out_len);
 }
 
-std::string request_set_response_metadata(const std::string& data) {
+std::string request_set_response_metadata(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     std::string metadata = sl::utils::empty_string();
     for (const sl::json::field& fi : json.as_object()) {
@@ -358,9 +357,9 @@ std::string request_set_response_metadata(const std::string& data) {
     return "{}";
 }
 
-std::string request_send_response(const std::string& data) {
+std::string request_send_response(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     auto rdata = std::ref(sl::utils::empty_string());
     for (const sl::json::field& fi : json.as_object()) {
@@ -387,9 +386,9 @@ std::string request_send_response(const std::string& data) {
     return "{}";
 }
 
-std::string request_send_temp_file(const std::string& data) {
+std::string request_send_temp_file(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     std::string file = sl::utils::empty_string();
     for (const sl::json::field& fi : json.as_object()) {
@@ -423,9 +422,9 @@ std::string request_send_temp_file(const std::string& data) {
     return "{}";
 }
 
-std::string request_send_mustache(const std::string& data) {
+std::string request_send_mustache(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     auto rfile = std::ref(sl::utils::empty_string());
     std::string values = sl::utils::empty_string();
@@ -461,9 +460,9 @@ std::string request_send_mustache(const std::string& data) {
     return "{}";
 }
 
-std::string request_send_later(const std::string& data) {
+std::string request_send_later(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
@@ -490,9 +489,9 @@ std::string request_send_later(const std::string& data) {
     });
 }
 
-std::string request_send_with_response_writer(const std::string& data) {
+std::string request_send_with_response_writer(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     auto rdata = std::ref(sl::utils::empty_string());
     for (const sl::json::field& fi : json.as_object()) {

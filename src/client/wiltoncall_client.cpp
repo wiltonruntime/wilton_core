@@ -21,9 +21,9 @@ common::handle_registry<wilton_HttpClient>& static_registry() {
 
 } // namespace
 
-std::string httpclient_create(const std::string& data) {
+std::string httpclient_create(sl::io::span<const char> data) {
     wilton_HttpClient* http;
-    char* err = wilton_HttpClient_create(std::addressof(http), data.c_str(), static_cast<int>(data.length()));
+    char* err = wilton_HttpClient_create(std::addressof(http), data.data(), static_cast<int>(data.size()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_registry().put(http);
     return sl::json::dumps({
@@ -31,9 +31,9 @@ std::string httpclient_create(const std::string& data) {
     });
 }
 
-std::string httpclient_close(const std::string& data) {
+std::string httpclient_close(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
@@ -58,9 +58,9 @@ std::string httpclient_close(const std::string& data) {
     return "{}";
 }
 
-std::string httpclient_execute(const std::string& data) {
+std::string httpclient_execute(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     auto rurl = std::ref(sl::utils::empty_string());
     auto rdata = std::ref(sl::utils::empty_string());
@@ -101,9 +101,9 @@ std::string httpclient_execute(const std::string& data) {
     return common::wrap_wilton_output(out, out_len);
 }
 
-std::string httpclient_send_temp_file(const std::string& data) {
+std::string httpclient_send_temp_file(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     auto rurl = std::ref(sl::utils::empty_string());
     auto rfile = std::ref(sl::utils::empty_string());

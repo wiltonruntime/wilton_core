@@ -12,9 +12,9 @@
 namespace wilton {
 namespace shared {
 
-std::string shared_put(const std::string& data) {
+std::string shared_put(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     auto rkey = std::ref(sl::utils::empty_string());
     auto rvalue = std::ref(sl::utils::empty_string());
     for (const sl::json::field& fi : json.as_object()) {
@@ -48,9 +48,9 @@ std::string shared_put(const std::string& data) {
     return "";
 }
 
-std::string shared_get(const std::string& data) {
+std::string shared_get(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     auto rkey = std::ref(sl::utils::empty_string());
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
@@ -77,9 +77,9 @@ std::string shared_get(const std::string& data) {
     return "";
 }
 
-std::string shared_wait_change(const std::string& data) {
+std::string shared_wait_change(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t timeout_millis = -1;
     auto rkey = std::ref(sl::utils::empty_string());
     auto rcvalue = std::ref(sl::utils::empty_string());
@@ -119,9 +119,9 @@ std::string shared_wait_change(const std::string& data) {
     return "";
 }
 
-std::string shared_remove(const std::string& data) {
+std::string shared_remove(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     auto rkey = std::ref(sl::utils::empty_string());
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();

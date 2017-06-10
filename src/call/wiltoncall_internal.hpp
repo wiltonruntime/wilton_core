@@ -14,6 +14,7 @@
 
 #include "staticlib/utils.hpp"
 #include "staticlib/json.hpp"
+#include "staticlib/io.hpp"
 
 #include "wilton/wiltoncall.h"
 
@@ -25,105 +26,105 @@ namespace wilton {
 // Server
 namespace server {
 
-std::string server_create(const std::string& data);
+std::string server_create(sl::io::span<const char> data);
 
-std::string server_stop(const std::string& data);
+std::string server_stop(sl::io::span<const char> data);
 
-std::string request_get_metadata(const std::string& data);
+std::string request_get_metadata(sl::io::span<const char> data);
 
-std::string request_get_data(const std::string& data);
+std::string request_get_data(sl::io::span<const char> data);
 
-std::string request_get_data_filename(const std::string& data);
+std::string request_get_data_filename(sl::io::span<const char> data);
 
-std::string request_set_response_metadata(const std::string& data);
+std::string request_set_response_metadata(sl::io::span<const char> data);
 
-std::string request_send_response(const std::string& data);
+std::string request_send_response(sl::io::span<const char> data);
 
-std::string request_send_temp_file(const std::string& data);
+std::string request_send_temp_file(sl::io::span<const char> data);
 
-std::string request_send_mustache(const std::string& data);
+std::string request_send_mustache(sl::io::span<const char> data);
 
-std::string request_send_later(const std::string& data);
+std::string request_send_later(sl::io::span<const char> data);
 
-std::string request_send_with_response_writer(const std::string& data);
+std::string request_send_with_response_writer(sl::io::span<const char> data);
 
 } // namespace
 
 // Logger
 namespace logging {
 
-std::string logging_initialize(const std::string& data);
+std::string logging_initialize(sl::io::span<const char> data);
 
-std::string logging_log(const std::string& data);
+std::string logging_log(sl::io::span<const char> data);
 
-std::string logging_is_level_enabled(const std::string& data);
+std::string logging_is_level_enabled(sl::io::span<const char> data);
 
-std::string logging_shutdown(const std::string& data);
+std::string logging_shutdown(sl::io::span<const char> data);
 
 } // namespace
 
 // Mustache
 namespace mustache {
 
-std::string mustache_render(const std::string& data);
+std::string mustache_render(sl::io::span<const char> data);
 
-std::string mustache_render_file(const std::string& data);
+std::string mustache_render_file(sl::io::span<const char> data);
 
 } // namespace
 
 // HttpClient
 namespace client {
 
-std::string httpclient_create(const std::string& data);
+std::string httpclient_create(sl::io::span<const char> data);
 
-std::string httpclient_close(const std::string& data);
+std::string httpclient_close(sl::io::span<const char> data);
 
-std::string httpclient_execute(const std::string& data);
+std::string httpclient_execute(sl::io::span<const char> data);
 
-std::string httpclient_send_temp_file(const std::string& data);
+std::string httpclient_send_temp_file(sl::io::span<const char> data);
 
 } // namespace
 
 // Cron
 namespace cron {
 
-std::string cron_start(const std::string& data);
+std::string cron_start(sl::io::span<const char> data);
 
-std::string cron_stop(const std::string& data);
+std::string cron_stop(sl::io::span<const char> data);
 
 } // namespace
 
 // shared
 namespace shared {
 
-std::string shared_put(const std::string& data);
+std::string shared_put(sl::io::span<const char> data);
 
-std::string shared_get(const std::string& data);
+std::string shared_get(sl::io::span<const char> data);
 
-std::string shared_wait_change(const std::string& data);
+std::string shared_wait_change(sl::io::span<const char> data);
 
-std::string shared_remove(const std::string& data);
+std::string shared_remove(sl::io::span<const char> data);
 
 } // namespace
 
 // thread
 namespace thread {
 
-std::string thread_run(const std::string& data);
+std::string thread_run(sl::io::span<const char> data);
 
-std::string thread_sleep_millis(const std::string& data);
+std::string thread_sleep_millis(sl::io::span<const char> data);
 
 } // namespace
 
 namespace fs {
 
-std::string fs_read_file(const std::string& data);
+std::string fs_read_file(sl::io::span<const char> data);
 
-std::string fs_write_file(const std::string& data);
+std::string fs_write_file(sl::io::span<const char> data);
 
-std::string fs_list_directory(const std::string& data);
+std::string fs_list_directory(sl::io::span<const char> data);
 
-std::string fs_read_script_file_or_module(const std::string& data);
+std::string fs_read_script_file_or_module(sl::io::span<const char> data);
 
 } // namespace
 
@@ -131,14 +132,14 @@ std::string fs_read_script_file_or_module(const std::string& data);
 
 namespace dyload {
 
-std::string dyload_shared_library(const std::string& data);
+std::string dyload_shared_library(sl::io::span<const char> data);
 
 } // namespace
 
 // misc
 namespace misc {
 
-std::string tcp_wait_for_connection(const std::string& data);
+std::string tcp_wait_for_connection(sl::io::span<const char> data);
     
 } // namespace
 

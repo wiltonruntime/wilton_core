@@ -12,9 +12,9 @@
 namespace wilton {
 namespace misc {
 
-std::string tcp_wait_for_connection(const std::string& data) {
+std::string tcp_wait_for_connection(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t timeout = -1;
     auto rip = std::ref(sl::utils::empty_string());
     int64_t port = -1;

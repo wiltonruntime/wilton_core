@@ -40,9 +40,6 @@ endif ( )
 
 #options
 option ( ${PROJECT_NAME}_SHARED "Build shared library instead of a static one" ON )
-if ( NOT DEFINED STATICLIB_DEPS )
-    set ( STATICLIB_DEPS ${CMAKE_CURRENT_LIST_DIR}/../../staticlibs/ CACHE INTERNAL "" )    
-endif ( )
 
 # dep options
 set ( staticlib_pion_USE_LOG4CPLUS ON CACHE BOOL "Use log4cplus lib for logging" )
@@ -56,6 +53,9 @@ if ( ${PROJECT_NAME}_ENABLE_DOCS )
 endif ( )
 
 # standalone build
+if ( NOT DEFINED STATICLIB_DEPS )
+    set ( STATICLIB_DEPS ${CMAKE_CURRENT_LIST_DIR}/../../staticlibs/ CACHE INTERNAL "" )    
+endif ( )
 if ( NOT DEFINED STATICLIB_TOOLCHAIN )
     if ( NOT DEFINED ${PROJECT_NAME}_TOOLCHAIN )
         if ( WIN32 )

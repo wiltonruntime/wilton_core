@@ -20,9 +20,9 @@
 namespace wilton {
 namespace dyload {
 
-std::string dyload_shared_library(const std::string& data) {
+std::string dyload_shared_library(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
     bool absolute = false;
     for (const sl::json::field& fi : json.as_object()) {

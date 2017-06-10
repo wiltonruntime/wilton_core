@@ -124,7 +124,6 @@ char* wilton_HttpPath_destroy(wilton_HttpPath* path) {
     return nullptr;
 }
 
-// TODO: fixme json copy
 char* wilton_Server_create /* noexcept */ (wilton_Server** server_out, const char* conf_json,
         int conf_json_len, wilton_HttpPath** paths, int paths_len) /* noexcept */ {
     if (nullptr == server_out) return sl::utils::alloc_copy(TRACEMSG("Null 'server_out' parameter specified"));    
@@ -135,9 +134,7 @@ char* wilton_Server_create /* noexcept */ (wilton_Server** server_out, const cha
     if (!sl::support::is_uint16_positive(paths_len)) return sl::utils::alloc_copy(TRACEMSG(
             "Invalid 'paths_len' parameter specified: [" + sl::support::to_string(paths_len) + "]"));
     try {
-        uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
-        std::string conf_str{conf_json, conf_json_len_u32};                
-        sl::json::value json = sl::json::loads(conf_str);
+        sl::json::value json = sl::json::load({conf_json, conf_json_len});
         uint16_t paths_len_u16 = static_cast<uint16_t>(paths_len);
         auto pathsvec = wrap_paths(paths, paths_len_u16);
         wilton::server::server server{std::move(json), std::move(pathsvec)};
@@ -160,7 +157,6 @@ char* wilton_Server_stop(wilton_Server* server) /* noexcept */ {
     }
 }
 
-// TODO: fixme json copy
 char* wilton_Request_get_request_metadata(wilton_Request* request, char** metadata_json_out,
         int* metadata_json_len_out) /* noexcept */ {
     if (nullptr == request) return sl::utils::alloc_copy(TRACEMSG("Null 'server' parameter specified"));
@@ -178,7 +174,6 @@ char* wilton_Request_get_request_metadata(wilton_Request* request, char** metada
     }
 }
 
-// TODO: think about copy
 char* wilton_Request_get_request_data(wilton_Request* request, char** data_out,
         int* data_len_out) /* noexcept */ {
     if (nullptr == request) return sl::utils::alloc_copy(TRACEMSG("Null 'request' parameter specified"));
@@ -217,9 +212,7 @@ char* wilton_Request_set_response_metadata(wilton_Request* request,
     if (!sl::support::is_uint32_positive(metadata_json_len)) return sl::utils::alloc_copy(TRACEMSG(
             "Invalid 'metadata_json_len' parameter specified: [" + sl::support::to_string(metadata_json_len) + "]"));
     try {
-        uint32_t metadata_json_len_u32 = static_cast<uint32_t> (metadata_json_len);
-        std::string metadata{metadata_json, metadata_json_len_u32};
-        sl::json::value json = sl::json::loads(metadata);
+        sl::json::value json = sl::json::load({metadata_json, metadata_json_len});
         wilton::serverconf::response_metadata rm{json};
         request->impl().set_response_metadata(std::move(rm));
         return nullptr;

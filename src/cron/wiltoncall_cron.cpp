@@ -27,9 +27,9 @@ common::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>>& 
 
 } // namespace
 
-std::string cron_start(const std::string& data) {
+std::string cron_start(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     auto rcallback = std::ref(sl::json::null_value_ref());
     auto rexpr = std::ref(sl::utils::empty_string());
     for (const sl::json::field& fi : json.as_object()) {
@@ -76,9 +76,9 @@ std::string cron_start(const std::string& data) {
     });
 }
 
-std::string cron_stop(const std::string& data) {
+std::string cron_stop(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     int64_t handle = -1;
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();

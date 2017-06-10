@@ -16,7 +16,6 @@
 #include "staticlib/json.hpp"
 #include "staticlib/utils.hpp"
 
-// todo: stream json
 char* wilton_render_mustache /* noexcept */ (
         const char* template_text,
         int template_text_len,
@@ -35,9 +34,7 @@ char* wilton_render_mustache /* noexcept */ (
     try {
         uint32_t template_text_len_u32 = static_cast<uint32_t> (template_text_len);
         std::string template_text_str{template_text, template_text_len_u32};
-        uint32_t values_json_len_u32 = static_cast<uint32_t> (values_json_len);
-        std::string values_json_str{values_json, values_json_len_u32};
-        sl::json::value json = sl::json::loads(values_json_str);
+        sl::json::value json = sl::json::load({values_json, values_json_len});
         const std::string res = sl::mustache::render_string(template_text_str, json);
         *output_text_out = sl::utils::alloc_copy(res);
         *output_text_len_out = static_cast<int>(res.length());
@@ -47,7 +44,6 @@ char* wilton_render_mustache /* noexcept */ (
     }
 }
 
-// todo: copies
 WILTON_EXPORT char* wilton_render_mustache_file /* noexcept */ (
         const char* template_file_path,
         int template_file_path_len,
@@ -66,9 +62,7 @@ WILTON_EXPORT char* wilton_render_mustache_file /* noexcept */ (
     try {
         uint16_t template_file_path_len_u16 = static_cast<uint16_t> (template_file_path_len);
         std::string template_file_path_str{template_file_path, template_file_path_len_u16};
-        uint32_t values_json_len_u32 = static_cast<uint32_t> (values_json_len);
-        std::string values_json_str{values_json, values_json_len_u32};
-        sl::json::value json = sl::json::loads(values_json_str);
+        sl::json::value json = sl::json::load({values_json, values_json_len});
         auto mp = sl::mustache::source(template_file_path_str, std::move(json));
         auto sink = sl::io::string_sink();
         sl::io::copy_all(mp, sink);

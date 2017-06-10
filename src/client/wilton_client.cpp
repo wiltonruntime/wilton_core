@@ -67,8 +67,6 @@ char* wilton_HttpClient_close(
     }
 }
 
-// todo: json copying
-// todo: data copying
 char* wilton_HttpClient_execute(
         wilton_HttpClient* http,
         const char* url,
@@ -91,16 +89,14 @@ char* wilton_HttpClient_execute(
         std::string url_str{url, static_cast<uint32_t> (url_len)};
         sl::json::value opts_json{};
         if (request_metadata_len > 0) {
-            std::string meta_str{request_metadata_json, static_cast<uint32_t> (request_metadata_len)};
-            opts_json = sl::json::loads(meta_str);
+            opts_json = sl::json::load({request_metadata_json, request_metadata_len});
         }
         wilton::client::client_request_config opts{std::move(opts_json)};
         std::array<char, 4096> buf;
         sl::io::string_sink sink{};
         sl::json::value resp_json{};
         if (request_data_len > 0) {
-            std::string data_str{request_data, static_cast<uint32_t> (request_data_len)};
-            sl::io::string_source data_src{std::move(data_str)};
+            auto data_src = sl::io::array_source(request_data, static_cast<uint32_t> (request_data_len));
             // POST will be used by default for this API call
             sl::http::resource resp = http->impl().open_url(url_str, std::move(data_src), opts.options);            
             sl::io::copy_all(resp, sink, buf);

@@ -8,11 +8,13 @@
 #ifndef WILTON_CALL_WILTONCALL_REGISTRY_HPP
 #define	WILTON_CALL_WILTONCALL_REGISTRY_HPP
 
+#include <cstdint>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 
 #include "staticlib/json.hpp"
+#include "staticlib/io.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 
@@ -21,7 +23,7 @@ namespace call {
 
 namespace { // anonymous
 
-using fun_type = std::function<std::string(const std::string&)>;
+using fun_type = std::function<std::string(sl::io::span<const char> data)>;
 using map_type = std::unordered_map<std::string, fun_type>;
 
 } // namespace
@@ -55,13 +57,13 @@ public:
         }
     }
     
-    std::string invoke(const std::string& name, const std::string& data) {
+    std::string invoke(const std::string& name, sl::io::span<const char> data) {
         if (name.empty()) {
             throw common::wilton_internal_exception(TRACEMSG("Invalid empty wilton_function name specified"));
         }
         try {
             // get function
-            fun_type fun = [](const std::string&) {
+            fun_type fun = [](sl::io::span<const char>) {
                 return std::string();
             };
             {

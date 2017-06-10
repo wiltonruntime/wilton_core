@@ -34,7 +34,6 @@ char* wilton_logger_initialize(
     }
 }
 
-// todo: fixme message copy
 char* wilton_logger_log(
         const char* level_name,
         int level_name_len,

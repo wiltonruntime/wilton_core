@@ -72,14 +72,6 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("logging_log", wilton::logging::logging_log);
         reg.put("logging_is_level_enabled", wilton::logging::logging_is_level_enabled);
         reg.put("logging_shutdown", wilton::logging::logging_shutdown);
-        // db
-//        reg.put("db_connection_open", wilton::db::db_connection_open);
-//        reg.put("db_connection_query", wilton::db::db_connection_query);
-//        reg.put("db_connection_execute", wilton::db::db_connection_execute);
-//        reg.put("db_connection_close", wilton::db::db_connection_close);
-//        reg.put("db_transaction_start", wilton::db::db_transaction_start);
-//        reg.put("db_transaction_commit", wilton::db::db_transaction_commit);
-//        reg.put("db_transaction_rollback", wilton::db::db_transaction_rollback);
         // mustache
         reg.put("mustache_render", wilton::mustache::mustache_render);
         reg.put("mustache_render_file", wilton::mustache::mustache_render_file);
@@ -127,19 +119,18 @@ char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, 
     if (nullptr == json_out) return sl::utils::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
     if (nullptr == json_out_len) return sl::utils::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
     std::string call_name_str = "";
-    std::string json_in_str = "";
+    uint32_t json_in_len_u32 = static_cast<uint32_t> (json_in_len);
     try {
         uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
         call_name_str = std::string(call_name, call_name_len_u16);
-        uint32_t json_in_len_u32 = static_cast<uint32_t> (json_in_len);
-        json_in_str = std::string(json_in, json_in_len_u32);
-        std::string out = static_registry().invoke(call_name_str, json_in_str);
+        std::string out = static_registry().invoke(call_name_str, {json_in, json_in_len_u32});
         *json_out = sl::utils::alloc_copy(out);
         *json_out_len = static_cast<int>(out.length());
         return nullptr;
     } catch (const std::exception& e) {
         return sl::utils::alloc_copy(TRACEMSG(e.what() + 
-                "\n'wiltoncall' error for name: [" + call_name_str + "], data: [" + json_in_str + "]"));
+                "\n'wiltoncall' error for name: [" + call_name_str + "]," +
+                " data: [" + std::string(json_in, json_in_len_u32) + "]"));
     }
 }
 
@@ -153,11 +144,10 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
     try {
         uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
         std::string call_name_str{call_name, call_name_len_u16};
-        // todo: consider different signature to prevent data coping
-        auto fun = [call_ctx, call_cb](const std::string& data) {
+        auto fun = [call_ctx, call_cb](sl::io::span<const char> data) {
             char* out = nullptr;
             int out_len = 0;
-            auto err = call_cb(call_ctx, data.c_str(), static_cast<int>(data.length()), 
+            auto err = call_cb(call_ctx, data.data(), static_cast<int>(data.size()), 
                     std::addressof(out), std::addressof(out_len));
             if (nullptr != err) {
                 std::string msg = TRACEMSG(std::string(err));

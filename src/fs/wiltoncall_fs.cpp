@@ -59,9 +59,9 @@ std::string read_main_from_package_json(const std::string& path) {
 } // namespace
 
 
-std::string fs_read_file(const std::string& data) {
+std::string fs_read_file(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
@@ -82,9 +82,9 @@ std::string fs_read_file(const std::string& data) {
     }
 }
 
-std::string fs_write_file(const std::string& data) {
+std::string fs_write_file(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
     auto rcontents = std::ref(sl::utils::empty_string());
     for (const sl::json::field& fi : json.as_object()) {
@@ -112,9 +112,9 @@ std::string fs_write_file(const std::string& data) {
     }
 }
 
-std::string fs_list_directory(const std::string& data) {
+std::string fs_list_directory(sl::io::span<const char> data) {
     // json parse
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
@@ -139,7 +139,8 @@ std::string fs_list_directory(const std::string& data) {
     }
 }
 
-std::string fs_read_script_file_or_module(const std::string& path) {
+std::string fs_read_script_file_or_module(sl::io::span<const char> data) {
+    auto path = std::string(data.data(), data.size());
     try {
         return read_file(path);
     } catch (const sl::tinydir::tinydir_exception& epath) {

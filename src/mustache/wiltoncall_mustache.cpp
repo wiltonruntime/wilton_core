@@ -12,9 +12,9 @@
 namespace wilton {
 namespace mustache {
 
-std::string mustache_render(const std::string& data) {
+std::string mustache_render(sl::io::span<const char> data) {
     // parse json
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     auto rtemplate = std::ref(sl::utils::empty_string());
     std::string values = sl::utils::empty_string();
     for (const sl::json::field& fi : json.as_object()) {
@@ -42,9 +42,9 @@ std::string mustache_render(const std::string& data) {
     return common::wrap_wilton_output(out, out_len);
 }
 
-std::string mustache_render_file(const std::string& data) {
+std::string mustache_render_file(sl::io::span<const char> data) {
     // parse json
-    sl::json::value json = sl::json::loads(data);
+    auto json = sl::json::load(data);
     auto rfile = std::ref(sl::utils::empty_string());
     std::string values = sl::utils::empty_string();
     for (const sl::json::field& fi : json.as_object()) {
