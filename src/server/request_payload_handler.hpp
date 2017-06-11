@@ -57,11 +57,18 @@ class request_payload_handler {
         std::string filename;
         std::unique_ptr<sl::tinydir::file_sink> file;
         payload_state state = payload_state::memory;
-        sl::utils::random_string_generator rng;
+        std::unique_ptr<sl::utils::random_string_generator> rng;
 
     public:        
         payload_data(const serverconf::request_payload_config& conf) :
         conf(conf.clone()) { }
+      
+        sl::utils::random_string_generator& randomgen() {
+            if (nullptr == rng.get()) {
+                rng.reset(new sl::utils::random_string_generator());
+            }
+            return *rng;
+        }
         
         payload_data(const payload_data&) = delete;
         payload_data& operator=(const payload_data&) = delete;
@@ -148,7 +155,7 @@ private:
     
     std::string gen_filename() {
         return data->conf.tmpDirPath + "/" + sl::support::to_string(data->counter++) + "_" +
-                data->rng.generate(data->conf.tmpFilenameLength);
+                data->randomgen().generate(data->conf.tmpFilenameLength);
     }
     
     void close_file_writer() {

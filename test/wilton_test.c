@@ -25,20 +25,54 @@ void check_err(char* err) {
     }
 }
 
+const char* wilton_config() {
+    return "{"
+    "  \"defaultScriptEngine\": \"duktape\"," // optional, duktape is default
+    "  \"requireJsDirPath\": \"../../wilton-requirejs\","
+    "  \"requireJsConfig\": {"
+    "    \"waitSeconds\": 0,"
+    "    \"enforceDefine\": true,"
+    "    \"nodeIdCompat\": true,"
+    "    \"baseUrl\": \"../../modules\""
+    "  }"
+    "}";
+}
+
+const char* logging_config() {
+    return "{"
+    "  \"appenders\": [{"
+    "    \"appenderType\" : \"CONSOLE\","
+    "    \"thresholdLevel\" : \"WARN\""
+    "  }],"
+    "  \"loggers\": [{"
+    "    \"name\": \"staticlib\","
+    "    \"level\": \"WARN\""            
+    "  }]"            
+    "}";
+}
+
+void init_logging() {
+    const char* lconf = logging_config();
+    char* lerr = wilton_logger_initialize(lconf, strlen(lconf));
+    check_err(lerr);
+}
+
 void test_server() {
+    init_logging();
+    
     char* err;
     wilton_Server* server;
     const char* server_conf = "{\"tcpPort\": 8080}";
 
     wilton_HttpPath* path;
-    err = wilton_HttpPath_create(&path, "GET", (int) strlen("GET"), "/", (int) strlen("/"), NULL, hello);
+    err = wilton_HttpPath_create(&path, "GET", (int) strlen("GET"), "/hello", (int) strlen("/hello"), NULL, hello);
     check_err(err);
 
     err = wilton_Server_create(&server, server_conf, (int) strlen(server_conf), &path, 1);
     check_err(err);
     wilton_HttpPath_destroy(path);
 
-    //getchar();
+    sleep(20);
 
     err = wilton_Server_stop(server);
     check_err(err);
@@ -61,23 +95,11 @@ void runScript(const char* in) {
     wilton_free(out);
 }
 
-const char* wilton_config() {
-    return "{"
-    "  \"defaultScriptEngine\": \"duktape\"," // optional, duktape is default
-    "  \"requireJsDirPath\": \"../../wilton-requirejs\","
-    "  \"requireJsConfig\": {"
-    "    \"waitSeconds\": 0,"
-    "    \"enforceDefine\": true,"
-    "    \"nodeIdCompat\": true,"
-    "    \"baseUrl\": \"../../modules\""
-    "  }"
-    "}";
-}
-
 void test_wiltonjs() {
+    init_logging();
     const char* config = wilton_config();
     wiltoncall_init(config, strlen(config));
-    runScript("{\"module\": \"runWiltonTests\", \"func\": \"main\", \"args\": []}");
+    runScript("{\"module\": \"hello\", \"func\": \"main\", \"args\": []}");
 //    runScript("{\"module\": \"runNodeTests\", \"func\": \"\", \"args\": []}");
     
 }
