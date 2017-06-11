@@ -86,7 +86,7 @@ sl::support::optional<sl::io::span<char>> httpclient_execute(sl::io::span<const 
     const std::string& url = rurl.get();
     const std::string& request_data = rdata.get();
     // get handle
-    wilton_HttpClient* http = static_registry().remove(handle);
+    wilton_HttpClient* http = static_registry().peek(handle);
     if (nullptr == http) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'httpclientHandle' parameter specified"));
     // call wilton
@@ -96,7 +96,6 @@ sl::support::optional<sl::io::span<char>> httpclient_execute(sl::io::span<const 
             request_data.c_str(), static_cast<int>(request_data.length()), 
             metadata.c_str(), static_cast<int>(metadata.length()),
             std::addressof(out), std::addressof(out_len));
-    static_registry().put(http);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return common::into_span(out, out_len);
 }
@@ -131,7 +130,7 @@ sl::support::optional<sl::io::span<char>> httpclient_send_temp_file(sl::io::span
     const std::string& url = rurl.get();
     const std::string& file_path = rfile.get();
     // get handle
-    wilton_HttpClient* http = static_registry().remove(handle);
+    wilton_HttpClient* http = static_registry().peek(handle);
     if (nullptr == http) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'httpclientHandle' parameter specified"));
     // call wilton
@@ -147,7 +146,6 @@ sl::support::optional<sl::io::span<char>> httpclient_send_temp_file(sl::io::span
                 std::remove(filePath_passed->c_str());
                 delete filePath_passed;
             });
-    static_registry().put(http);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     return common::into_span(out, out_len);
 }
