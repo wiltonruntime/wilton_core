@@ -12,7 +12,7 @@
 namespace wilton {
 namespace misc {
 
-std::string tcp_wait_for_connection(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> tcp_wait_for_connection(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t timeout = -1;
@@ -43,7 +43,7 @@ std::string tcp_wait_for_connection(sl::io::span<const char> data) {
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return "{}";
+    return common::empty_span();
 }
 
 } // namespace

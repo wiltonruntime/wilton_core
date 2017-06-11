@@ -12,7 +12,7 @@
 namespace wilton {
 namespace mustache {
 
-std::string mustache_render(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> mustache_render(sl::io::span<const char> data) {
     // parse json
     auto json = sl::json::load(data);
     auto rtemplate = std::ref(sl::utils::empty_string());
@@ -34,15 +34,15 @@ std::string mustache_render(sl::io::span<const char> data) {
         values = "{}";
     }
     // call wilton
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     char* err = wilton_render_mustache(templade.c_str(), static_cast<int>(templade.length()),
             values.c_str(), static_cast<int>(values.length()), std::addressof(out), std::addressof(out_len));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::wrap_wilton_output(out, out_len);
+    return common::into_span(out, out_len);
 }
 
-std::string mustache_render_file(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> mustache_render_file(sl::io::span<const char> data) {
     // parse json
     auto json = sl::json::load(data);
     auto rfile = std::ref(sl::utils::empty_string());
@@ -64,12 +64,12 @@ std::string mustache_render_file(sl::io::span<const char> data) {
         values = "{}";
     }
     // call wilton
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     char* err = wilton_render_mustache_file(file.c_str(), static_cast<int>(file.length()),
             values.c_str(), static_cast<int>(values.length()), std::addressof(out), std::addressof(out_len));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::wrap_wilton_output(out, out_len);
+    return common::into_span(out, out_len);
 }
 
 } // namespace

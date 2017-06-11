@@ -12,7 +12,7 @@
 namespace wilton {
 namespace shared {
 
-std::string shared_put(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> shared_put(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rkey = std::ref(sl::utils::empty_string());
@@ -34,21 +34,18 @@ std::string shared_put(sl::io::span<const char> data) {
             "Required parameter 'value' not specified"));
     const std::string& value = rvalue.get();
     // call wilton
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     char* err = wilton_shared_put(key.c_str(), static_cast<int>(key.length()),
             value.c_str(), static_cast<int>(value.length()),
             std::addressof(out), std::addressof(out_len));
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    if (nullptr != out) {
-        return common::wrap_wilton_output(out, out_len);
-    }
-    return "{}";
+    return common::into_span(out, out_len);
 }
 
-std::string shared_get(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> shared_get(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rkey = std::ref(sl::utils::empty_string());
@@ -64,20 +61,17 @@ std::string shared_get(sl::io::span<const char> data) {
             "Required parameter 'key' not specified"));
     const std::string& key = rkey.get();
     // call wilton
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     char* err = wilton_shared_get(key.c_str(), static_cast<int>(key.length()),
             std::addressof(out), std::addressof(out_len));
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    if (nullptr != out) {
-        return common::wrap_wilton_output(out, out_len);
-    }
-    return "{}";
+    return common::into_span(out, out_len);
 }
 
-std::string shared_wait_change(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> shared_wait_change(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t timeout_millis = -1;
@@ -104,8 +98,8 @@ std::string shared_wait_change(sl::io::span<const char> data) {
             "Required parameter 'currentValue' not specified"));
     const std::string& cvalue = rcvalue.get();
     // call wilton
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     char* err = wilton_shared_wait_change(static_cast<int> (timeout_millis),
             key.c_str(), static_cast<int>(key.length()),
             cvalue.c_str(), static_cast<int>(cvalue.length()),
@@ -113,13 +107,10 @@ std::string shared_wait_change(sl::io::span<const char> data) {
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    if (nullptr != out) {
-        return common::wrap_wilton_output(out, out_len);
-    }
-    return "{}";
+    return common::into_span(out, out_len);
 }
 
-std::string shared_remove(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> shared_remove(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rkey = std::ref(sl::utils::empty_string());
@@ -135,17 +126,14 @@ std::string shared_remove(sl::io::span<const char> data) {
             "Required parameter 'key' not specified"));
     const std::string& key = rkey.get();
     // call wilton
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     char* err = wilton_shared_remove(key.c_str(), static_cast<int>(key.length()),
             std::addressof(out), std::addressof(out_len));
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    if (nullptr != out) {
-        return common::wrap_wilton_output(out, out_len);
-    }
-    return "{}";
+    return common::into_span(out, out_len);
 }
 
 } // namespace

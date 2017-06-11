@@ -15,7 +15,9 @@
 
 #include "staticlib/json.hpp"
 #include "staticlib/io.hpp"
+#include "staticlib/support.hpp"
 
+#include "common/utils.hpp"
 #include "common/wilton_internal_exception.hpp"
 
 namespace wilton {
@@ -23,7 +25,7 @@ namespace call {
 
 namespace { // anonymous
 
-using fun_type = std::function<std::string(sl::io::span<const char> data)>;
+using fun_type = std::function<sl::support::optional<sl::io::span<char>>(sl::io::span<const char> data)>;
 using map_type = std::unordered_map<std::string, fun_type>;
 
 } // namespace
@@ -57,14 +59,14 @@ public:
         }
     }
     
-    std::string invoke(const std::string& name, sl::io::span<const char> data) {
+    sl::support::optional<sl::io::span<char>> invoke(const std::string& name, sl::io::span<const char> data) {
         if (name.empty()) {
             throw common::wilton_internal_exception(TRACEMSG("Invalid empty wilton_function name specified"));
         }
         try {
             // get function
             fun_type fun = [](sl::io::span<const char>) {
-                return std::string();
+                return common::empty_span();
             };
             {
                 std::lock_guard<std::mutex> guard{mutex};

@@ -20,7 +20,7 @@
 namespace wilton {
 namespace dyload {
 
-std::string dyload_shared_library(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> dyload_shared_library(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -53,7 +53,7 @@ std::string dyload_shared_library(sl::io::span<const char> data) {
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return "{}";
+    return common::empty_span();
 }
 
 } // namespace

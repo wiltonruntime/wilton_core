@@ -46,16 +46,16 @@ void test_server() {
 
 void test_duktape_fail() {
     const char* in = "{\"module\": \"tests/hello_duktapeX\", \"func\": \"hello\", \"args\": []}";
-    char* out;
-    int out_len;
+    char* out = NULL;
+    int out_len = 0;
     char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);
     puts(err);
     wilton_free(err);
 }
 
 void runScript(const char* in) {
-    char* out;
-    int out_len;
+    char* out = NULL;
+    int out_len = 0;
     char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);
     check_err(err);
     wilton_free(out);

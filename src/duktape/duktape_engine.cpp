@@ -78,8 +78,13 @@ duk_ret_t load_func(duk_context* ctx) {
         path = std::string(path_ptr, path_len);
         // read file
         auto code = fs::fs_read_script_file_or_module({path.c_str(), path.length()});
+        if (!code) {
+            throw common::wilton_internal_exception(TRACEMSG(
+                    "\nInvalid empty source code loaded, path: [" + path + "]").c_str());
+        }
         // compile source
-        duk_push_lstring(ctx, code.c_str(), code.length());
+        duk_push_lstring(ctx, code.value().data(), code.value().size());
+        wilton_free(code.value().data());
         duk_push_lstring(ctx, path.c_str(), path.length());
         auto err = duk_pcompile(ctx, DUK_COMPILE_EVAL);
         if (DUK_EXEC_SUCCESS == err) {
@@ -116,13 +121,17 @@ duk_ret_t wiltoncall_func(duk_context* ctx) {
         input = "";
         input_len = 0;
     }
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     auto err = wiltoncall(name, static_cast<int> (name_len), input, static_cast<int> (input_len),
             std::addressof(out), std::addressof(out_len));
     if (nullptr == err) {
-        duk_push_lstring(ctx, out, out_len);
-        wilton_free(out);
+        if (nullptr != out) {
+            duk_push_lstring(ctx, out, out_len);
+            wilton_free(out);
+        } else {
+            duk_push_null(ctx);
+        }
         return 1;
     } else {
         auto msg = TRACEMSG(err + "\n'wiltoncall' error for name: [" + name + "]");

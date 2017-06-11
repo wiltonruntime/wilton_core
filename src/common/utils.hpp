@@ -24,12 +24,17 @@ namespace common {
 
 void throw_wilton_error(char* err, const std::string& msg);
 
-std::string wrap_wilton_output(char* out, int out_len);
-
 void check_json_callback_script(const sl::json::field& field);
 
 void dump_error(const std::string& directory, const std::string& msg);
 
+sl::support::optional<sl::io::span<char>> empty_span();
+
+sl::support::optional<sl::io::span<char>> into_span(const sl::json::value& val);
+
+sl::support::optional<sl::io::span<char>> into_span(char* buf, int buf_len);
+
+sl::support::optional<sl::io::span<char>> into_span(const std::string& st);
 
 template<typename T>
 class handle_registry {

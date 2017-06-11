@@ -23,12 +23,6 @@ void throw_wilton_error(char* err, const std::string& msg) {
     throw wilton_internal_exception(msg);
 }
 
-std::string wrap_wilton_output(char* out, int out_len) {
-    std::string res{out, static_cast<std::string::size_type> (out_len)};
-    wilton_free(out);
-    return res;
-}
-
 void check_json_callback_script(const sl::json::field& field) {
     if (sl::json::type::object != field.json_type()) {
         throw common::wilton_internal_exception(TRACEMSG("Invalid '" + field.name() + "' field,"
@@ -96,6 +90,29 @@ void dump_error(const std::string& directory, const std::string& msg) {
     } catch (...) {
         // give up
     }
+}
+
+sl::support::optional<sl::io::span<char>> empty_span() {
+    return sl::support::optional<sl::io::span<char>>();
+}
+
+sl::support::optional<sl::io::span<char>> into_span(const sl::json::value& val) {
+    // todo: think about manually growing releasable sink
+    auto st = val.dumps();
+    return into_span(st);
+}
+
+sl::support::optional<sl::io::span<char>> into_span(char* buf, int buf_len) {
+    if (nullptr != buf) {
+        return sl::support::make_optional(sl::io::make_span(buf, buf_len));
+    } else {
+        return empty_span();
+    }
+}
+
+sl::support::optional<sl::io::span<char>> into_span(const std::string& st) {
+    auto buf = sl::utils::alloc_copy(st);
+    return sl::support::make_optional(sl::io::make_span(buf, st.length()));
 }
 
 } //namespace

@@ -21,17 +21,17 @@ common::handle_registry<wilton_HttpClient>& static_registry() {
 
 } // namespace
 
-std::string httpclient_create(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> httpclient_create(sl::io::span<const char> data) {
     wilton_HttpClient* http;
     char* err = wilton_HttpClient_create(std::addressof(http), data.data(), static_cast<int>(data.size()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_registry().put(http);
-    return sl::json::dumps({
+    return common::into_span({
         { "httpclientHandle", handle}
     });
 }
 
-std::string httpclient_close(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> httpclient_close(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -55,10 +55,10 @@ std::string httpclient_close(sl::io::span<const char> data) {
         static_registry().put(http);
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return "{}";
+    return common::empty_span();
 }
 
-std::string httpclient_execute(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> httpclient_execute(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -90,18 +90,18 @@ std::string httpclient_execute(sl::io::span<const char> data) {
     if (nullptr == http) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'httpclientHandle' parameter specified"));
     // call wilton
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     char* err = wilton_HttpClient_execute(http, url.c_str(), static_cast<int>(url.length()),
             request_data.c_str(), static_cast<int>(request_data.length()), 
             metadata.c_str(), static_cast<int>(metadata.length()),
             std::addressof(out), std::addressof(out_len));
     static_registry().put(http);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::wrap_wilton_output(out, out_len);
+    return common::into_span(out, out_len);
 }
 
-std::string httpclient_send_temp_file(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> httpclient_send_temp_file(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -135,8 +135,8 @@ std::string httpclient_send_temp_file(sl::io::span<const char> data) {
     if (nullptr == http) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'httpclientHandle' parameter specified"));
     // call wilton
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     char* err = wilton_HttpClient_send_file(http, url.c_str(), static_cast<int>(url.length()),
             file_path.c_str(), static_cast<int>(file_path.length()), 
             metadata.c_str(), static_cast<int>(metadata.length()),
@@ -149,7 +149,7 @@ std::string httpclient_send_temp_file(sl::io::span<const char> data) {
             });
     static_registry().put(http);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::wrap_wilton_output(out, out_len);
+    return common::into_span(out, out_len);
 }
 
 } // namespace

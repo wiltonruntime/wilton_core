@@ -59,7 +59,7 @@ std::string read_main_from_package_json(const std::string& path) {
 } // namespace
 
 
-std::string fs_read_file(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> fs_read_file(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -76,13 +76,13 @@ std::string fs_read_file(sl::io::span<const char> data) {
     const std::string& path = rpath.get();
     // call 
     try {
-        return read_file(path);
+        return common::into_span(read_file(path));
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-std::string fs_write_file(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -106,13 +106,13 @@ std::string fs_write_file(sl::io::span<const char> data) {
     // call 
     try {
         write_file(path, contents);
-        return "{}";
+        return common::empty_span();
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-std::string fs_list_directory(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> fs_list_directory(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -133,16 +133,16 @@ std::string fs_list_directory(sl::io::span<const char> data) {
         auto ra = sl::ranges::transform(vec, [](const std::string& st) {
             return sl::json::value(st);
         });
-        return sl::json::dumps(ra.to_vector());
+        return common::into_span(ra.to_vector());
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-std::string fs_read_script_file_or_module(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> fs_read_script_file_or_module(sl::io::span<const char> data) {
     auto path = std::string(data.data(), data.size());
     try {
-        return read_file(path);
+        return common::into_span(read_file(path));
     } catch (const sl::tinydir::tinydir_exception& epath) {
         std::string tpath = path;
         if (sl::utils::ends_with(tpath, ".js")) {
@@ -154,7 +154,7 @@ std::string fs_read_script_file_or_module(sl::io::span<const char> data) {
         auto main = read_main_from_package_json(tpath);
         tpath.append(main);
         try {
-            return read_file(tpath);
+            return common::into_span(read_file(tpath));
         } catch (const sl::tinydir::tinydir_exception& etpath) {
             throw common::wilton_internal_exception(TRACEMSG(epath.what() + "\n" + etpath.what()));
         }

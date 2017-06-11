@@ -15,7 +15,7 @@
 namespace wilton {
 namespace thread {
 
-std::string thread_run(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> thread_run(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rcallback = std::ref(sl::json::null_value_ref());
@@ -40,8 +40,8 @@ std::string thread_run(sl::io::span<const char> data) {
                 sl::json::value cb_json = sl::json::loads(*sptr);
                 std::string engine = cb_json["engine"].as_string();
                 // output will be ignored
-                char* out;
-                int out_len;
+                char* out = nullptr;
+                int out_len = 0;
                 auto err = wiltoncall_runscript(engine.c_str(), engine.length(),
                         sptr->c_str(), static_cast<int>(sptr->length()),
                         std::addressof(out), std::addressof(out_len));
@@ -50,14 +50,17 @@ std::string thread_run(sl::io::span<const char> data) {
                     log_error("wilton.thread", TRACEMSG(err));
                     wilton_free(err);
                 }
+                if (nullptr != out) {
+                    wilton_free(out);
+                }
             });
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return "{}";
+    return common::empty_span();
 }
 
-std::string thread_sleep_millis(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> thread_sleep_millis(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t millis = -1;
@@ -76,7 +79,7 @@ std::string thread_sleep_millis(sl::io::span<const char> data) {
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return "{}";
+    return common::empty_span();
 }
 
 

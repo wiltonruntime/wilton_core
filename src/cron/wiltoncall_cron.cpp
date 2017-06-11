@@ -27,7 +27,7 @@ common::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>>& 
 
 } // namespace
 
-std::string cron_start(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> cron_start(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rcallback = std::ref(sl::json::null_value_ref());
@@ -59,8 +59,8 @@ std::string cron_start(sl::io::span<const char> data) {
                 sl::json::value cb_json = sl::json::loads(*str);
                 std::string engine = cb_json["engine"].as_string();
                 // output will be ignored
-                char* out;
-                int out_len;
+                char* out = nullptr;
+                int out_len = 0;
                 auto err = wiltoncall_runscript(engine.c_str(), engine.length(), 
                         str->c_str(), static_cast<int> (str->length()),
                         std::addressof(out), std::addressof(out_len));
@@ -71,12 +71,12 @@ std::string cron_start(sl::io::span<const char> data) {
             });
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_registry().put(cron, std::unique_ptr<std::string>(str_to_pass));
-    return sl::json::dumps({
+    return common::into_span({
         { "cronHandle", handle}
     });
 }
 
-std::string cron_stop(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> cron_stop(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -100,7 +100,7 @@ std::string cron_stop(sl::io::span<const char> data) {
         static_registry().put(pa.first, std::move(pa.second));
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return "{}";
+    return common::empty_span();
 }
 
 } // namespace

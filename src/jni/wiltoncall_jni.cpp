@@ -220,15 +220,20 @@ JNIEXPORT jstring JNICALL WILTON_JNI_FUNCTION(wiltoncall)
     }
     std::string name_string = wj::jstring_to_str(env, name);
     std::string data_string = wj::jstring_to_str(env, data);
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     auto err = wiltoncall(name_string.c_str(), static_cast<int>(name_string.length()), 
             data_string.c_str(), static_cast<int>(data_string.length()),
             std::addressof(out), std::addressof(out_len));
     if (nullptr == err) {
-        jstring res = env->NewStringUTF(out);
-        wilton_free(out);
-        return res;
+        if (nullptr != out) {
+            // todo: fixme for non-NUL terminated
+            jstring res = env->NewStringUTF(out);
+            wilton_free(out);
+            return res;
+        } else {
+            return nullptr;
+        }
     } else {
         env->ThrowNew(static_jni_ctx().wiltonExceptionClass.get(), TRACEMSG(err + 
                 "\n'wiltoncall' error for name: [" + name_string + "]").c_str());
@@ -255,10 +260,14 @@ char* wiltoncall_runscript_jni(const char* json_in, int json_in_len, char** json
         env->DeleteLocalRef(json_ustr);
         jthrowable exc = env->ExceptionOccurred();
         if (nullptr == exc) {
-            std::string res_str = nullptr != res ?
-            wj::jstring_to_str(env, static_cast<jstring> (res)) : "";
-            *json_out = sl::utils::alloc_copy(res_str.c_str());
-            *json_out_len = static_cast<int>(res_str.length());
+            if (nullptr !=  res) {
+                std::string res_str = wj::jstring_to_str(env, static_cast<jstring> (res));
+                *json_out = sl::utils::alloc_copy(res_str.c_str());
+                *json_out_len = static_cast<int> (res_str.length());
+            } else {
+                *json_out = nullptr;
+                *json_out_len = -1;
+            }
             return nullptr;
         } else {
             env->ExceptionClear();

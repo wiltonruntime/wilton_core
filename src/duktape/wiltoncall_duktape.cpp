@@ -67,8 +67,13 @@ char* wiltoncall_runscript_duktape(const char* json_in, int json_in_len, char** 
         auto json = std::string(json_in, json_in_len_u32);
         auto en = thread_local_engine(requirejs_dir_path, requirejs_config);
         auto res = en->run_script(json);
-        *json_out = sl::utils::alloc_copy(res);
-        *json_out_len = res.length();
+        if(!res.empty()) {
+            *json_out = sl::utils::alloc_copy(res);
+            *json_out_len = res.length();
+        } else {
+            *json_out = nullptr;
+            *json_out_len = 0;
+        }
         return nullptr;
     } catch (const std::exception& e) {
         return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -78,6 +83,7 @@ char* wiltoncall_runscript_duktape(const char* json_in, int json_in_len, char** 
 namespace wilton {
 namespace internal {
 
+// race condition with registry destructor is here
 void clean_duktape_thread_local(const std::thread::id& tid) {
     std::lock_guard<std::mutex> guard{static_engines_mutex()};
     auto& map = static_engines();

@@ -123,9 +123,14 @@ char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, 
     try {
         uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
         call_name_str = std::string(call_name, call_name_len_u16);
-        std::string out = static_registry().invoke(call_name_str, {json_in, json_in_len_u32});
-        *json_out = sl::utils::alloc_copy(out);
-        *json_out_len = static_cast<int>(out.length());
+        auto out = static_registry().invoke(call_name_str, {json_in, json_in_len_u32});
+        if (out) {
+            *json_out = out.value().data();
+            *json_out_len = static_cast<int>(out.value().size());
+        } else {
+            *json_out = nullptr;
+            *json_out_len = 0;
+        }
         return nullptr;
     } catch (const std::exception& e) {
         return sl::utils::alloc_copy(TRACEMSG(e.what() + 
@@ -144,7 +149,7 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
     try {
         uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
         std::string call_name_str{call_name, call_name_len_u16};
-        auto fun = [call_ctx, call_cb](sl::io::span<const char> data) {
+        auto fun = [call_ctx, call_cb](sl::io::span<const char> data) -> sl::support::optional<sl::io::span<char>> {
             char* out = nullptr;
             int out_len = 0;
             auto err = call_cb(call_ctx, data.data(), static_cast<int>(data.size()), 
@@ -154,14 +159,14 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
                 wilton_free(err);
                 throw wilton::common::wilton_internal_exception(msg);
             }
-            if (nullptr == out) {
-                throw wilton::common::wilton_internal_exception(TRACEMSG("Invalid 'null' result returned"));
+            if (nullptr != out) {
+                if (!sl::support::is_uint32_positive(out_len)) {
+                    throw wilton::common::wilton_internal_exception(TRACEMSG(
+                            "Invalid result length value returned: [" + sl::support::to_string(out_len) + "]"));
+                }
+                return sl::support::make_optional(sl::io::make_span(out, out_len));
             }
-            if (!sl::support::is_uint32(out_len)){
-                throw wilton::common::wilton_internal_exception(TRACEMSG(
-                    "Invalid result length value returned: [" + sl::support::to_string(out_len) + "]"));
-            }
-            return std::string(out, static_cast<uint32_t>(out_len));
+            return wilton::common::empty_span();
         };
         static_registry().put(call_name_str, fun);
         return nullptr;

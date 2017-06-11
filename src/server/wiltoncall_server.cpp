@@ -165,8 +165,8 @@ std::vector<std::unique_ptr<wilton_HttpPath, http_path_deleter>> create_paths(
                     std::string params_str = params.dumps();
                     std::string engine = params["engine"].as_string();
                     // output will be ignored
-                    char* out;
-                    int out_len;
+                    char* out = nullptr;
+                    int out_len = 0;
                     auto err = wiltoncall_runscript(engine.c_str(), engine.length(), 
                             params_str.c_str(), static_cast<int> (params_str.length()),
                             std::addressof(out), std::addressof(out_len));
@@ -196,7 +196,7 @@ std::vector<wilton_HttpPath*> wrap_paths(std::vector<std::unique_ptr<wilton_Http
 
 } // namespace
 
-std::string server_create(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> server_create(sl::io::span<const char> data) {
     auto conf_in = sl::json::load(data);
     auto views = extract_and_delete_views(conf_in);
     auto conf = conf_in.dumps();
@@ -209,12 +209,12 @@ std::string server_create(sl::io::span<const char> data) {
             paths_pass.data(), static_cast<int>(paths_pass.size()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_server_registry().put(server, std::move(ctx));
-    return sl::json::dumps({
+    return common::into_span({
         { "serverHandle", handle}
     });
 }
 
-std::string server_stop(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> server_stop(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -238,10 +238,10 @@ std::string server_stop(sl::io::span<const char> data) {
         static_server_registry().put(pa.first, std::move(pa.second));
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return "{}";
+    return common::empty_span();
 }
 
-std::string request_get_metadata(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> request_get_metadata(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -260,18 +260,18 @@ std::string request_get_metadata(sl::io::span<const char> data) {
     if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     char* err = wilton_Request_get_request_metadata(request,
             std::addressof(out), std::addressof(out_len));
     static_request_registry().put(request);
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return common::wrap_wilton_output(out, out_len);
+    return common::into_span(out, out_len);
 }
 
-std::string request_get_data(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> request_get_data(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -290,16 +290,16 @@ std::string request_get_data(sl::io::span<const char> data) {
     if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     char* err = wilton_Request_get_request_data(request,
             std::addressof(out), std::addressof(out_len));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::wrap_wilton_output(out, out_len);
+    return common::into_span(out, out_len);
 }
 
-std::string request_get_data_filename(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> request_get_data_filename(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -318,16 +318,16 @@ std::string request_get_data_filename(sl::io::span<const char> data) {
     if (nullptr == request) throw common::wilton_internal_exception(TRACEMSG(
             "Invalid 'requestHandle' parameter specified"));
     // call wilton
-    char* out;
-    int out_len;
+    char* out = nullptr;
+    int out_len = 0;
     char* err = wilton_Request_get_request_data_filename(request,
             std::addressof(out), std::addressof(out_len));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::wrap_wilton_output(out, out_len);
+    return common::into_span(out, out_len);
 }
 
-std::string request_set_response_metadata(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> request_set_response_metadata(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -354,10 +354,10 @@ std::string request_set_response_metadata(sl::io::span<const char> data) {
     char* err = wilton_Request_set_response_metadata(request, metadata.c_str(), static_cast<int>(metadata.length()));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return "{}";
+    return common::empty_span();
 }
 
-std::string request_send_response(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> request_send_response(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -383,10 +383,10 @@ std::string request_send_response(sl::io::span<const char> data) {
     char* err = wilton_Request_send_response(request, request_data.c_str(), static_cast<int>(request_data.length()));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return "{}";
+    return common::empty_span();
 }
 
-std::string request_send_temp_file(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> request_send_temp_file(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -419,10 +419,10 @@ std::string request_send_temp_file(sl::io::span<const char> data) {
             });
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return "{}";
+    return common::empty_span();
 }
 
-std::string request_send_mustache(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> request_send_mustache(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -457,10 +457,10 @@ std::string request_send_mustache(sl::io::span<const char> data) {
             values.c_str(), static_cast<int>(values.length()));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return "{}";
+    return common::empty_span();
 }
 
-std::string request_send_later(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> request_send_later(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -484,12 +484,12 @@ std::string request_send_later(sl::io::span<const char> data) {
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t rwhandle = static_response_writer_registry().put(writer);
-    return sl::json::dumps({
+    return common::into_span({
         { "responseWriterHandle", rwhandle}
     });
 }
 
-std::string request_send_with_response_writer(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> request_send_with_response_writer(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t handle = -1;
@@ -514,7 +514,7 @@ std::string request_send_with_response_writer(sl::io::span<const char> data) {
     // call wilton
     char* err = wilton_ResponseWriter_send(writer, request_data.c_str(), static_cast<int>(request_data.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return "{}";
+    return common::empty_span();
 }
 
 } // namespace

@@ -88,7 +88,7 @@ void run_script(const std::string& func, const wilton::launcher::winservice_conf
             } ()},
     });
     char* out = nullptr;
-    int out_len;
+    int out_len = 0;
     auto err = wiltoncall_runscript_duktape(in.c_str(), in.length(), std::addressof(out), std::addressof(out_len));
     if (nullptr != err) {
         auto msg = TRACEMSG(err);
