@@ -99,7 +99,7 @@ void test_wiltonjs() {
     init_logging();
     const char* config = wilton_config();
     wiltoncall_init(config, strlen(config));
-    runScript("{\"module\": \"hello\", \"func\": \"main\", \"args\": []}");
+    runScript("{\"module\": \"runWiltonTests\", \"func\": \"main\", \"args\": []}");
 //    runScript("{\"module\": \"runNodeTests\", \"func\": \"\", \"args\": []}");
     
 }

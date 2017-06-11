@@ -227,7 +227,7 @@ JNIEXPORT jstring JNICALL WILTON_JNI_FUNCTION(wiltoncall)
             std::addressof(out), std::addressof(out_len));
     if (nullptr == err) {
         if (nullptr != out) {
-            // todo: fixme for non-NUL terminated
+            // todo: prepare NUL-teminated MUTF-8 before passing
             jstring res = env->NewStringUTF(out);
             wilton_free(out);
             return res;

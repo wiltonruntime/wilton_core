@@ -97,9 +97,9 @@ sl::support::optional<sl::io::span<char>> empty_span() {
 }
 
 sl::support::optional<sl::io::span<char>> into_span(const sl::json::value& val) {
-    // todo: think about manually growing releasable sink
-    auto st = val.dumps();
-    return into_span(st);
+    auto sink = sl::io::array_sink();
+    val.dump(sink);
+    return sl::support::make_optional(sink.release());
 }
 
 sl::support::optional<sl::io::span<char>> into_span(char* buf, int buf_len) {
