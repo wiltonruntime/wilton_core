@@ -76,7 +76,7 @@ sl::support::optional<sl::io::span<char>> fs_read_file(sl::io::span<const char> 
     const std::string& path = rpath.get();
     // call 
     try {
-        return common::into_span(read_file(path));
+        return support::into_span(read_file(path));
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
@@ -106,7 +106,7 @@ sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char>
     // call 
     try {
         write_file(path, contents);
-        return common::empty_span();
+        return support::empty_span();
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
@@ -133,7 +133,7 @@ sl::support::optional<sl::io::span<char>> fs_list_directory(sl::io::span<const c
         auto ra = sl::ranges::transform(vec, [](const std::string& st) {
             return sl::json::value(st);
         });
-        return common::into_span(ra.to_vector());
+        return support::into_span(ra.to_vector());
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
@@ -142,7 +142,7 @@ sl::support::optional<sl::io::span<char>> fs_list_directory(sl::io::span<const c
 sl::support::optional<sl::io::span<char>> fs_read_script_file_or_module(sl::io::span<const char> data) {
     auto path = std::string(data.data(), data.size());
     try {
-        return common::into_span(read_file(path));
+        return support::into_span(read_file(path));
     } catch (const sl::tinydir::tinydir_exception& epath) {
         std::string tpath = path;
         if (sl::utils::ends_with(tpath, ".js")) {
@@ -154,7 +154,7 @@ sl::support::optional<sl::io::span<char>> fs_read_script_file_or_module(sl::io::
         auto main = read_main_from_package_json(tpath);
         tpath.append(main);
         try {
-            return common::into_span(read_file(tpath));
+            return support::into_span(read_file(tpath));
         } catch (const sl::tinydir::tinydir_exception& etpath) {
             throw common::wilton_internal_exception(TRACEMSG(epath.what() + "\n" + etpath.what()));
         }

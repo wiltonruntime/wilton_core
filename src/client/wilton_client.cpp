@@ -17,6 +17,8 @@
 #include "staticlib/utils.hpp"
 #include "staticlib/tinydir.hpp"
 
+#include "wilton/support/alloc_copy.hpp"
+
 #include "client/client_response.hpp"
 #include "client/client_request_config.hpp"
 #include "client/client_session_config.hpp"
@@ -38,9 +40,9 @@ char* wilton_HttpClient_create(
         wilton_HttpClient** http_out,
         const char* conf_json,
         int conf_json_len) {
-    if (nullptr == http_out) return sl::utils::alloc_copy(TRACEMSG("Null 'http_out' parameter specified"));
-    if (nullptr == conf_json) return sl::utils::alloc_copy(TRACEMSG("Null 'conf_json' parameter specified"));
-    if (!sl::support::is_uint32_positive(conf_json_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == http_out) return wilton::support::alloc_copy(TRACEMSG("Null 'http_out' parameter specified"));
+    if (nullptr == conf_json) return wilton::support::alloc_copy(TRACEMSG("Null 'conf_json' parameter specified"));
+    if (!sl::support::is_uint32_positive(conf_json_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'conf_json_len' parameter specified: [" + sl::support::to_string(conf_json_len) + "]"));
     try {
         uint32_t conf_json_len_u32 = static_cast<uint32_t> (conf_json_len);
@@ -52,18 +54,18 @@ char* wilton_HttpClient_create(
         *http_out = http_ptr;
         return nullptr;
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 char* wilton_HttpClient_close(
         wilton_HttpClient* http) {
-    if (nullptr == http) return sl::utils::alloc_copy(TRACEMSG("Null 'http' parameter specified"));
+    if (nullptr == http) return wilton::support::alloc_copy(TRACEMSG("Null 'http' parameter specified"));
     try {
         delete http;
         return nullptr;
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
@@ -77,13 +79,13 @@ char* wilton_HttpClient_execute(
         int request_metadata_len,
         char** response_data_out,
         int* response_data_len_out) {
-    if (nullptr == http) return sl::utils::alloc_copy(TRACEMSG("Null 'http' parameter specified"));    
-    if (nullptr == url) return sl::utils::alloc_copy(TRACEMSG("Null 'url' parameter specified"));
-    if (!sl::support::is_uint32_positive(url_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == http) return wilton::support::alloc_copy(TRACEMSG("Null 'http' parameter specified"));    
+    if (nullptr == url) return wilton::support::alloc_copy(TRACEMSG("Null 'url' parameter specified"));
+    if (!sl::support::is_uint32_positive(url_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'url_len' parameter specified: [" + sl::support::to_string(url_len) + "]"));
-    if (!sl::support::is_uint32(request_data_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (!sl::support::is_uint32(request_data_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'request_data_len' parameter specified: [" + sl::support::to_string(request_data_len) + "]"));
-    if (!sl::support::is_uint32(request_metadata_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (!sl::support::is_uint32(request_metadata_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'request_metadata_len' parameter specified: [" + sl::support::to_string(request_metadata_len) + "]"));
     try {
         std::string url_str{url, static_cast<uint32_t> (url_len)};
@@ -108,11 +110,11 @@ char* wilton_HttpClient_execute(
             resp_json = wilton::client::client_response::to_json(std::move(sink.get_string()), resp, resp.get_info());
         }
         std::string resp_complete = resp_json.dumps();
-        *response_data_out = sl::utils::alloc_copy(resp_complete);
+        *response_data_out = wilton::support::alloc_copy(resp_complete);
         *response_data_len_out = static_cast<int>(resp_complete.length());
         return nullptr;
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }    
 }
 
@@ -130,14 +132,14 @@ char* wilton_HttpClient_send_file(
         void (*finalizer_cb)(
                 void* finalizer_ctx,
                 int sent_successfully)) {
-    if (nullptr == http) return sl::utils::alloc_copy(TRACEMSG("Null 'http' parameter specified"));
-    if (nullptr == url) return sl::utils::alloc_copy(TRACEMSG("Null 'url' parameter specified"));
-    if (!sl::support::is_uint32_positive(url_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == http) return wilton::support::alloc_copy(TRACEMSG("Null 'http' parameter specified"));
+    if (nullptr == url) return wilton::support::alloc_copy(TRACEMSG("Null 'url' parameter specified"));
+    if (!sl::support::is_uint32_positive(url_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'url_len' parameter specified: [" + sl::support::to_string(url_len) + "]"));
-    if (nullptr == file_path) return sl::utils::alloc_copy(TRACEMSG("Null 'file_path' parameter specified"));
-    if (!sl::support::is_uint16_positive(file_path_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == file_path) return wilton::support::alloc_copy(TRACEMSG("Null 'file_path' parameter specified"));
+    if (!sl::support::is_uint16_positive(file_path_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'file_path_len' parameter specified: [" + sl::support::to_string(file_path_len) + "]"));
-    if (!sl::support::is_uint32(request_metadata_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (!sl::support::is_uint32(request_metadata_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'request_metadata_len' parameter specified: [" + sl::support::to_string(request_metadata_len) + "]"));
     try {
         std::string url_str{url, static_cast<uint32_t> (url_len)};
@@ -159,13 +161,13 @@ char* wilton_HttpClient_send_file(
         if (nullptr != finalizer_cb) {
             finalizer_cb(finalizer_ctx, 1);
         }
-        *response_data_out = sl::utils::alloc_copy(resp_complete);
+        *response_data_out = wilton::support::alloc_copy(resp_complete);
         *response_data_len_out = static_cast<int>(resp_complete.length());
         return nullptr;
     } catch (const std::exception& e) {
         if (nullptr != finalizer_cb) {
             finalizer_cb(finalizer_ctx, 0);
         }
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }   
 }

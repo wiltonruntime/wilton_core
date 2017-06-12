@@ -53,7 +53,7 @@ sl::support::optional<sl::io::span<char>> dyload_shared_library(sl::io::span<con
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return common::empty_span();
+    return support::empty_span();
 }
 
 } // namespace

@@ -20,8 +20,8 @@ namespace cron {
 
 namespace { //anonymous
 
-common::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>>& static_registry() {
-    static common::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>> registry;
+support::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>>& static_registry() {
+    static support::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>> registry;
     return registry;
 }
 
@@ -71,7 +71,7 @@ sl::support::optional<sl::io::span<char>> cron_start(sl::io::span<const char> da
             });
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_registry().put(cron, std::unique_ptr<std::string>(str_to_pass));
-    return common::into_span({
+    return support::into_span({
         { "cronHandle", handle}
     });
 }
@@ -100,7 +100,7 @@ sl::support::optional<sl::io::span<char>> cron_stop(sl::io::span<const char> dat
         static_registry().put(pa.first, std::move(pa.second));
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return common::empty_span();
+    return support::empty_span();
 }
 
 } // namespace

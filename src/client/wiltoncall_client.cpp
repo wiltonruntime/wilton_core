@@ -14,8 +14,8 @@ namespace client {
 
 namespace { //anonymous
 
-common::handle_registry<wilton_HttpClient>& static_registry() {
-    static common::handle_registry<wilton_HttpClient> registry;
+support::handle_registry<wilton_HttpClient>& static_registry() {
+    static support::handle_registry<wilton_HttpClient> registry;
     return registry;
 }
 
@@ -26,7 +26,7 @@ sl::support::optional<sl::io::span<char>> httpclient_create(sl::io::span<const c
     char* err = wilton_HttpClient_create(std::addressof(http), data.data(), static_cast<int>(data.size()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_registry().put(http);
-    return common::into_span({
+    return support::into_span({
         { "httpclientHandle", handle}
     });
 }
@@ -55,7 +55,7 @@ sl::support::optional<sl::io::span<char>> httpclient_close(sl::io::span<const ch
         static_registry().put(http);
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return common::empty_span();
+    return support::empty_span();
 }
 
 sl::support::optional<sl::io::span<char>> httpclient_execute(sl::io::span<const char> data) {
@@ -97,7 +97,7 @@ sl::support::optional<sl::io::span<char>> httpclient_execute(sl::io::span<const 
             metadata.c_str(), static_cast<int>(metadata.length()),
             std::addressof(out), std::addressof(out_len));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::into_span(out, out_len);
+    return support::into_span(out, out_len);
 }
 
 sl::support::optional<sl::io::span<char>> httpclient_send_temp_file(sl::io::span<const char> data) {
@@ -147,7 +147,7 @@ sl::support::optional<sl::io::span<char>> httpclient_send_temp_file(sl::io::span
                 delete filePath_passed;
             });
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::into_span(out, out_len);
+    return support::into_span(out, out_len);
 }
 
 } // namespace

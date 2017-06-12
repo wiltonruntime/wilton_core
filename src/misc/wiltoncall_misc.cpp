@@ -43,7 +43,7 @@ sl::support::optional<sl::io::span<char>> tcp_wait_for_connection(sl::io::span<c
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return common::empty_span();
+    return support::empty_span();
 }
 
 } // namespace

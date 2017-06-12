@@ -12,6 +12,9 @@
 
 #include "staticlib/config.hpp"
 #include "staticlib/utils.hpp"
+
+#include "wilton/support/alloc_copy.hpp"
+
 #include "tcp_connect_checker.hpp"
 
 char* wilton_alloc(int size_bytes) /* noexcept */ {
@@ -21,18 +24,18 @@ char* wilton_alloc(int size_bytes) /* noexcept */ {
     return reinterpret_cast<char*>(std::malloc(static_cast<size_t>(size_bytes)));
 }
 
-void wilton_free(char* errmsg) /* noexcept */ {
-    std::free(errmsg);
+void wilton_free(char* buffer) /* noexcept */ {
+    std::free(buffer);
 }
 
 char* wilton_tcp_wait_for_connection(const char* ip_addr, int ip_addr_len, 
         int tcp_port, int timeout_millis) /* noexcept */ {
-    if (nullptr == ip_addr) return sl::utils::alloc_copy(TRACEMSG("Null 'ip_addr' parameter specified"));
-    if (!sl::support::is_uint32(ip_addr_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == ip_addr) return wilton::support::alloc_copy(TRACEMSG("Null 'ip_addr' parameter specified"));
+    if (!sl::support::is_uint32(ip_addr_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'ip_addr_len' parameter specified: [" + sl::support::to_string(ip_addr_len) + "]"));
-    if (!sl::support::is_uint16_positive(tcp_port)) return sl::utils::alloc_copy(TRACEMSG(
+    if (!sl::support::is_uint16_positive(tcp_port)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'tcp_port' parameter specified: [" + sl::support::to_string(tcp_port) + "]"));
-    if (!sl::support::is_uint32_positive(timeout_millis)) return sl::utils::alloc_copy(TRACEMSG(
+    if (!sl::support::is_uint32_positive(timeout_millis)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'timeout_millis' parameter specified: [" + sl::support::to_string(timeout_millis) + "]"));
     try {
         uint32_t ip_addr_len_u32 = static_cast<uint32_t> (ip_addr_len);
@@ -44,9 +47,9 @@ char* wilton_tcp_wait_for_connection(const char* ip_addr, int ip_addr_len,
         if (err.empty()) {
             return nullptr;
         } else {
-            return sl::utils::alloc_copy(err);
+            return wilton::support::alloc_copy(err);
         }
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }

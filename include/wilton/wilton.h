@@ -503,7 +503,7 @@ WILTON_EXPORT char* wilton_alloc(
         int size_bytes);
 
 WILTON_EXPORT void wilton_free(
-        char* errmsg);
+        char* buffer);
 
 WILTON_EXPORT char* wilton_tcp_wait_for_connection(
         const char* ip_addr,

@@ -18,6 +18,9 @@
 #include "staticlib/utils.hpp"
 
 #include "wilton/wiltoncall.h"
+#include "wilton/support/handle_registry.hpp"
+#include "wilton/support/payload_handle_registry.hpp"
+#include "wilton/support/span_operations.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"

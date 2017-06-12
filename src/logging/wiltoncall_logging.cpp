@@ -15,7 +15,7 @@ namespace logging {
 sl::support::optional<sl::io::span<char>> logging_initialize(sl::io::span<const char> data) {
     char* err = wilton_logger_initialize(data.data(), static_cast<int>(data.size()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
-    return common::empty_span();
+    return support::empty_span();
 }
 
 sl::support::optional<sl::io::span<char>> logging_log(sl::io::span<const char> data) {
@@ -48,7 +48,7 @@ sl::support::optional<sl::io::span<char>> logging_log(sl::io::span<const char> d
             logger.c_str(), static_cast<int>(logger.length()),
             message.c_str(), static_cast<int>(message.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
-    return common::empty_span();
+    return support::empty_span();
 }
 
 sl::support::optional<sl::io::span<char>> logging_is_level_enabled(sl::io::span<const char> data) {
@@ -77,7 +77,7 @@ sl::support::optional<sl::io::span<char>> logging_is_level_enabled(sl::io::span<
     char* err = wilton_logger_is_level_enabled(logger.c_str(), static_cast<int>(logger.length()),
             level.c_str(), static_cast<int>(level.length()), std::addressof(out));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
-    return common::into_span({
+    return support::into_span({
         { "enabled", out != 0 }
     });
 }
@@ -86,7 +86,7 @@ sl::support::optional<sl::io::span<char>> logging_shutdown(sl::io::span<const ch
     // call wilton
     char* err = wilton_logger_shutdown();
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
-    return common::empty_span();
+    return support::empty_span();
 }
 
 } // namespace

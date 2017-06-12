@@ -92,29 +92,6 @@ void dump_error(const std::string& directory, const std::string& msg) {
     }
 }
 
-sl::support::optional<sl::io::span<char>> empty_span() {
-    return sl::support::optional<sl::io::span<char>>();
-}
-
-sl::support::optional<sl::io::span<char>> into_span(const sl::json::value& val) {
-    auto sink = sl::io::array_sink();
-    val.dump(sink);
-    return sl::support::make_optional(sink.release());
-}
-
-sl::support::optional<sl::io::span<char>> into_span(char* buf, int buf_len) {
-    if (nullptr != buf) {
-        return sl::support::make_optional(sl::io::make_span(buf, buf_len));
-    } else {
-        return empty_span();
-    }
-}
-
-sl::support::optional<sl::io::span<char>> into_span(const std::string& st) {
-    auto buf = sl::utils::alloc_copy(st);
-    return sl::support::make_optional(sl::io::make_span(buf, st.length()));
-}
-
 } //namespace
 }  
 

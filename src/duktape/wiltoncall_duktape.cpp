@@ -57,18 +57,18 @@ char* wiltoncall_runscript_duktape(const char* json_in, int json_in_len, char** 
             .as_string_nonempty_or_throw("requireJsDirPath");
     static const sl::json::value& requirejs_config = wilton::internal::static_wiltoncall_config()["requireJsConfig"];
     
-    if (nullptr == json_in) return sl::utils::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
-    if (!sl::support::is_uint32(json_in_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == json_in) return wilton::support::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
+    if (!sl::support::is_uint32(json_in_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'json_in_len' parameter specified: [" + sl::support::to_string(json_in_len) + "]"));
-    if (nullptr == json_out) return sl::utils::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
-    if (nullptr == json_out_len) return sl::utils::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
+    if (nullptr == json_out) return wilton::support::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
+    if (nullptr == json_out_len) return wilton::support::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
     try {
         uint32_t json_in_len_u32 = static_cast<uint32_t>(json_in_len);
         auto json = std::string(json_in, json_in_len_u32);
         auto en = thread_local_engine(requirejs_dir_path, requirejs_config);
         auto res = en->run_script(json);
         if(!res.empty()) {
-            *json_out = sl::utils::alloc_copy(res);
+            *json_out = wilton::support::alloc_copy(res);
             *json_out_len = res.length();
         } else {
             *json_out = nullptr;
@@ -76,7 +76,7 @@ char* wiltoncall_runscript_duktape(const char* json_in, int json_in_len, char** 
         }
         return nullptr;
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 

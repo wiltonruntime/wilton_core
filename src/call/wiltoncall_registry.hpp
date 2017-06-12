@@ -17,6 +17,8 @@
 #include "staticlib/io.hpp"
 #include "staticlib/support.hpp"
 
+#include "wilton/support/span_operations.hpp"
+
 #include "common/utils.hpp"
 #include "common/wilton_internal_exception.hpp"
 
@@ -66,7 +68,7 @@ public:
         try {
             // get function
             fun_type fun = [](sl::io::span<const char>) {
-                return common::empty_span();
+                return support::empty_span();
             };
             {
                 std::lock_guard<std::mutex> guard{mutex};

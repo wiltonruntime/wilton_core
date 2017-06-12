@@ -17,6 +17,8 @@
 #include "staticlib/config.hpp"
 #include "staticlib/utils.hpp"
 
+#include "wilton/support/alloc_copy.hpp"
+
 namespace { // anonymous
 
 class shared_entry {
@@ -65,11 +67,11 @@ std::unordered_map<std::string, shared_entry>& static_map() {
 
 char* wilton_shared_put(const char* key, int key_len, const char* value, int value_len,
         char** prev_value_out, int* prev_value_out_len) /* noexcept */ {
-    if (nullptr == key) return sl::utils::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!sl::support::is_uint16_positive(key_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == key) return wilton::support::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
+    if (!sl::support::is_uint16_positive(key_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'key_len' parameter specified: [" + sl::support::to_string(key_len) + "]"));
-    if (nullptr == value) return sl::utils::alloc_copy(TRACEMSG("Null 'value' parameter specified"));
-    if (!sl::support::is_uint32(value_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == value) return wilton::support::alloc_copy(TRACEMSG("Null 'value' parameter specified"));
+    if (!sl::support::is_uint32(value_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'value_len' parameter specified: [" + sl::support::to_string(value_len) + "]"));
     try {
         // prepare tuple
@@ -81,7 +83,7 @@ char* wilton_shared_put(const char* key, int key_len, const char* value, int val
         std::lock_guard<std::mutex> guard{static_mutex()};
         auto it = static_map().find(key_str);
         if (static_map().end() != it) {
-            *prev_value_out = sl::utils::alloc_copy(it->second.get_value());
+            *prev_value_out = wilton::support::alloc_copy(it->second.get_value());
             *prev_value_out_len = static_cast<int> (it->second.get_value().length());
             it->second.get_cv_ref().notify_all();
             static_map().erase(key_str);
@@ -92,16 +94,16 @@ char* wilton_shared_put(const char* key, int key_len, const char* value, int val
         static_map().emplace(std::move(key_str), shared_entry(std::move(value_str)));
         return nullptr;
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 char* wilton_shared_get(const char* key, int key_len, char** value_out, int* value_out_len) /* noexcept */ {
-    if (nullptr == key) return sl::utils::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!sl::support::is_uint16_positive(key_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == key) return wilton::support::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
+    if (!sl::support::is_uint16_positive(key_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'key_len' parameter specified: [" + sl::support::to_string(key_len) + "]"));
-    if (nullptr == value_out) return sl::utils::alloc_copy(TRACEMSG("Null 'value_out' parameter specified"));
-    if (nullptr == value_out_len) return sl::utils::alloc_copy(TRACEMSG("Null 'value_out_len' parameter specified"));
+    if (nullptr == value_out) return wilton::support::alloc_copy(TRACEMSG("Null 'value_out' parameter specified"));
+    if (nullptr == value_out_len) return wilton::support::alloc_copy(TRACEMSG("Null 'value_out_len' parameter specified"));
     try {
         // prepare key
         uint16_t key_len_u16 = static_cast<uint16_t> (key_len);
@@ -110,7 +112,7 @@ char* wilton_shared_get(const char* key, int key_len, char** value_out, int* val
         std::lock_guard<std::mutex> guard{static_mutex()};
         auto it = static_map().find(key_str);
         if (static_map().end() != it) {
-            *value_out = sl::utils::alloc_copy(it->second.get_value());
+            *value_out = wilton::support::alloc_copy(it->second.get_value());
             *value_out_len = static_cast<int>(it->second.get_value().length());
         } else {
             *value_out = nullptr;
@@ -118,7 +120,7 @@ char* wilton_shared_get(const char* key, int key_len, char** value_out, int* val
         }
         return nullptr;
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
@@ -126,16 +128,16 @@ char* wilton_shared_get(const char* key, int key_len, char** value_out, int* val
 char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len,
         const char* current_value, int current_value_len, char** changed_value_out,
         int* changed_value_out_len) /* noexcept */ {
-    if (!sl::support::is_uint32_positive(timeout_millis)) return sl::utils::alloc_copy(TRACEMSG(
+    if (!sl::support::is_uint32_positive(timeout_millis)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'timeout_millis' parameter specified: [" + sl::support::to_string(timeout_millis) + "]"));
-    if (nullptr == key) return sl::utils::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!sl::support::is_uint16_positive(key_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == key) return wilton::support::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
+    if (!sl::support::is_uint16_positive(key_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'key_len' parameter specified: [" + sl::support::to_string(key_len) + "]"));
-    if (nullptr == current_value) return sl::utils::alloc_copy(TRACEMSG("Null 'current_value' parameter specified"));
-    if (!sl::support::is_uint32(current_value_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == current_value) return wilton::support::alloc_copy(TRACEMSG("Null 'current_value' parameter specified"));
+    if (!sl::support::is_uint32(current_value_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'current_value_len' parameter specified: [" + sl::support::to_string(current_value_len) + "]"));
-    if (nullptr == changed_value_out) return sl::utils::alloc_copy(TRACEMSG("Null 'changed_value_out' parameter specified"));
-    if (nullptr == changed_value_out_len) return sl::utils::alloc_copy(TRACEMSG("Null 'changed_value_out_len' parameter specified"));
+    if (nullptr == changed_value_out) return wilton::support::alloc_copy(TRACEMSG("Null 'changed_value_out' parameter specified"));
+    if (nullptr == changed_value_out_len) return wilton::support::alloc_copy(TRACEMSG("Null 'changed_value_out_len' parameter specified"));
     try {
         // prepare tuple
         uint32_t timeout_millis_u32 = static_cast<uint32_t> (timeout_millis);
@@ -147,11 +149,11 @@ char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len
         std::unique_lock<std::mutex> lock{static_mutex()};
         auto it = static_map().find(key_str);
         if (static_map().end() == it) {
-            return sl::utils::alloc_copy(TRACEMSG("Shared record not found, key: [" + key_str + "]"));
+            return wilton::support::alloc_copy(TRACEMSG("Shared record not found, key: [" + key_str + "]"));
         }
         const std::string& val = it->second.get_value();
         if (val != current_value_str) {
-            *changed_value_out = sl::utils::alloc_copy(val);
+            *changed_value_out = wilton::support::alloc_copy(val);
             *changed_value_out_len = static_cast<int>(val.length());
             return nullptr;
         }
@@ -165,7 +167,7 @@ char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len
                 return true;
             }
             if (it->second.get_value() != current_value_str) {
-                *changed_value_out = sl::utils::alloc_copy(it->second.get_value());
+                *changed_value_out = wilton::support::alloc_copy(it->second.get_value());
                 *changed_value_out_len = static_cast<int> (it->second.get_value().length());
                 return true;
             }
@@ -174,17 +176,17 @@ char* wilton_shared_wait_change(int timeout_millis, const char* key, int key_len
         if (nullptr != *changed_value_out) {
             return nullptr;
         } else {
-            return sl::utils::alloc_copy(TRACEMSG("Shared record wait timeout exceeded," +
+            return wilton::support::alloc_copy(TRACEMSG("Shared record wait timeout exceeded," +
                     "key: [" + key_str + "], timeout_millis: [" + sl::support::to_string(timeout_millis_u32) + "]"));
         }
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 char* wilton_shared_remove(const char* key, int key_len, char** value_out, int* value_out_len) /* noexcept */ {
-    if (nullptr == key) return sl::utils::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
-    if (!sl::support::is_uint16_positive(key_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == key) return wilton::support::alloc_copy(TRACEMSG("Null 'key' parameter specified"));
+    if (!sl::support::is_uint16_positive(key_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'key_len' parameter specified: [" + sl::support::to_string(key_len) + "]"));
     try {
         // prepare key
@@ -194,7 +196,7 @@ char* wilton_shared_remove(const char* key, int key_len, char** value_out, int* 
         std::lock_guard<std::mutex> guard{static_mutex()};
         auto it = static_map().find(key_str);
         if (static_map().end() != it) {
-            *value_out = sl::utils::alloc_copy(it->second.get_value());
+            *value_out = wilton::support::alloc_copy(it->second.get_value());
             *value_out_len = static_cast<int> (it->second.get_value().length());
             it->second.get_cv_ref().notify_all();
             static_map().erase(key_str);
@@ -204,6 +206,6 @@ char* wilton_shared_remove(const char* key, int key_len, char** value_out, int* 
         }
         return nullptr;
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }

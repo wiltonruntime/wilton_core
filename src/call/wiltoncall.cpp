@@ -37,8 +37,8 @@ const sl::json::value& static_wiltoncall_config(const std::string& cf_json) {
 }
 
 char* wiltoncall_init(const char* config_json, int config_json_len) {
-    if (nullptr == config_json) return sl::utils::alloc_copy(TRACEMSG("Null 'default_script_engine_name' parameter specified"));
-    if (!sl::support::is_uint16_positive(config_json_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == config_json) return wilton::support::alloc_copy(TRACEMSG("Null 'default_script_engine_name' parameter specified"));
+    if (!sl::support::is_uint16_positive(config_json_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'config_json_len' parameter specified: [" + sl::support::to_string(config_json_len) + "]"));
     
     try {
@@ -103,21 +103,21 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         
         return nullptr;
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() +
+        return wilton::support::alloc_copy(TRACEMSG(e.what() +
                 "\n'wiltoncall' initialization error"));
     }
 }
 
 char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, int json_in_len,
         char** json_out, int* json_out_len) /* noexcept */ {
-    if (nullptr == call_name) return sl::utils::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
-    if (!sl::support::is_uint16_positive(call_name_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == call_name) return wilton::support::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
+    if (!sl::support::is_uint16_positive(call_name_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'call_name_len' parameter specified: [" + sl::support::to_string(call_name_len) + "]"));
-    if (nullptr == json_in) return sl::utils::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
-    if (!sl::support::is_uint32_positive(json_in_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == json_in) return wilton::support::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
+    if (!sl::support::is_uint32_positive(json_in_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'json_in_len' parameter specified: [" + sl::support::to_string(json_in_len) + "]"));
-    if (nullptr == json_out) return sl::utils::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
-    if (nullptr == json_out_len) return sl::utils::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
+    if (nullptr == json_out) return wilton::support::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
+    if (nullptr == json_out_len) return wilton::support::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
     std::string call_name_str = "";
     uint32_t json_in_len_u32 = static_cast<uint32_t> (json_in_len);
     try {
@@ -133,7 +133,7 @@ char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, 
         }
         return nullptr;
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + 
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + 
                 "\n'wiltoncall' error for name: [" + call_name_str + "]," +
                 " data: [" + std::string(json_in, json_in_len_u32) + "]"));
     }
@@ -142,10 +142,10 @@ char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, 
 char* wiltoncall_register(const char* call_name, int call_name_len, void* call_ctx,
         char* (*call_cb)
         (void* call_ctx, const char* json_in, int json_in_len, char** json_out, int* json_out_len)) /* noexcept */ {
-    if (nullptr == call_name) return sl::utils::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
-    if (!sl::support::is_uint16_positive(call_name_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == call_name) return wilton::support::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
+    if (!sl::support::is_uint16_positive(call_name_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'call_name_len' parameter specified: [" + sl::support::to_string(call_name_len) + "]"));
-    if (nullptr == call_cb) return sl::utils::alloc_copy(TRACEMSG("Null 'call_cb' parameter specified"));
+    if (nullptr == call_cb) return wilton::support::alloc_copy(TRACEMSG("Null 'call_cb' parameter specified"));
     try {
         uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
         std::string call_name_str{call_name, call_name_len_u16};
@@ -160,24 +160,24 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
                 throw wilton::common::wilton_internal_exception(msg);
             }
             if (nullptr != out) {
-                if (!sl::support::is_uint32_positive(out_len)) {
+                if (!sl::support::is_uint32(out_len)) {
                     throw wilton::common::wilton_internal_exception(TRACEMSG(
                             "Invalid result length value returned: [" + sl::support::to_string(out_len) + "]"));
                 }
-                return sl::support::make_optional(sl::io::make_span(out, out_len));
+                return wilton::support::into_span(out, out_len);
             }
-            return wilton::common::empty_span();
+            return wilton::support::empty_span();
         };
         static_registry().put(call_name_str, fun);
         return nullptr;
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
 char* wiltoncall_remove(const char* call_name, int call_name_len) {
-    if (nullptr == call_name) return sl::utils::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
-    if (!sl::support::is_uint16_positive(call_name_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == call_name) return wilton::support::alloc_copy(TRACEMSG("Null 'call_name' parameter specified"));
+    if (!sl::support::is_uint16_positive(call_name_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'call_name_len' parameter specified: [" + sl::support::to_string(call_name_len) + "]"));
     try {
         uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
@@ -185,7 +185,7 @@ char* wiltoncall_remove(const char* call_name, int call_name_len) {
         static_registry().remove(call_name_str);
         return nullptr;
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
 
@@ -195,8 +195,8 @@ char* wiltoncall_runscript(const char* script_engine_name, int script_engine_nam
         const char* json_in, int json_in_len, char** json_out, int* json_out_len) {
     static std::string default_engine = wilton::internal::static_wiltoncall_config()["defaultScriptEngine"]
             .as_string("duktape");
-    if (nullptr == script_engine_name) return sl::utils::alloc_copy(TRACEMSG("Null 'script_engine_name' parameter specified"));
-    if (!sl::support::is_uint16(script_engine_name_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == script_engine_name) return wilton::support::alloc_copy(TRACEMSG("Null 'script_engine_name' parameter specified"));
+    if (!sl::support::is_uint16(script_engine_name_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'script_engine_name_len' parameter specified: [" + sl::support::to_string(script_engine_name_len) + "]"));
     auto engine = std::ref(sl::utils::empty_string());
     uint16_t script_engine_name_len_u16 = static_cast<uint16_t> (script_engine_name_len);
@@ -207,7 +207,7 @@ char* wiltoncall_runscript(const char* script_engine_name, int script_engine_nam
     } else if ("jni" == engine.get()) {
         return wiltoncall_runscript_jni(json_in, json_in_len, json_out, json_out_len);
     }
-    return sl::utils::alloc_copy(TRACEMSG("Unsupported engine: [" + engine.get() + "]"));
+    return wilton::support::alloc_copy(TRACEMSG("Unsupported engine: [" + engine.get() + "]"));
 }
 
 #endif // WILTON_DISABLE_DEFAULT_RUNSCRIPT

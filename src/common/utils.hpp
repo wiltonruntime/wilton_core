@@ -28,67 +28,6 @@ void check_json_callback_script(const sl::json::field& field);
 
 void dump_error(const std::string& directory, const std::string& msg);
 
-sl::support::optional<sl::io::span<char>> empty_span();
-
-sl::support::optional<sl::io::span<char>> into_span(const sl::json::value& val);
-
-sl::support::optional<sl::io::span<char>> into_span(char* buf, int buf_len);
-
-sl::support::optional<sl::io::span<char>> into_span(const std::string& st);
-
-template<typename T>
-class handle_registry {
-    std::unordered_set<T*> registry;
-    std::mutex mutex;
-
-public:
-    int64_t put(T* ptr) {
-        std::lock_guard<std::mutex> lock{mutex};
-        auto pair = registry.insert(ptr);
-        return pair.second ? reinterpret_cast<int64_t> (ptr) : 0;
-    }
-
-    T* remove(int64_t handle) {
-        std::lock_guard<std::mutex> lock{mutex};
-        T* ptr = reinterpret_cast<T*> (handle);
-        auto erased = registry.erase(ptr);
-        return 1 == erased ? ptr : nullptr;
-    }
-
-    T* peek(int64_t handle) {
-        std::lock_guard<std::mutex> lock{mutex};
-        T* ptr = reinterpret_cast<T*> (handle);
-        auto exists = registry.count(ptr);
-        return 1 == exists ? ptr : nullptr;
-    }
-};
-
-template<typename T, typename P>
-class payload_handle_registry {
-    std::unordered_map<T*, P> registry;
-    std::mutex mutex;
-
-public:
-    int64_t put(T* ptr, P&& ctx) {
-        std::lock_guard<std::mutex> lock(mutex);
-        auto pair = registry.emplace(ptr, std::move(ctx));
-        return pair.second ? reinterpret_cast<int64_t> (ptr) : 0;
-    }
-
-    std::pair<T*, P> remove(int64_t handle) {
-        std::lock_guard<std::mutex> lock(mutex);
-        T* ptr = reinterpret_cast<T*> (handle);
-        auto it = registry.find(ptr);
-        if (registry.end() != it) {
-            auto ctx = std::move(it->second);
-            registry.erase(ptr);
-            return std::make_pair(ptr, std::move(ctx));
-        } else {
-            return std::make_pair(nullptr, P());
-        }
-    }
-};
-
 } //namespace
 }        
         

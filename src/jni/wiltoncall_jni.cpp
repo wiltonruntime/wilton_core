@@ -246,11 +246,11 @@ JNIEXPORT jstring JNICALL WILTON_JNI_FUNCTION(wiltoncall)
 
 char* wiltoncall_runscript_jni(const char* json_in, int json_in_len, char** json_out, 
         int* json_out_len) /* noexcept */ {
-    if (nullptr == json_in) return sl::utils::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
-    if (!sl::support::is_uint32(json_in_len)) return sl::utils::alloc_copy(TRACEMSG(
+    if (nullptr == json_in) return wilton::support::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
+    if (!sl::support::is_uint32(json_in_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'json_in_len' parameter specified: [" + sl::support::to_string(json_in_len) + "]"));
-    if (nullptr == json_out) return sl::utils::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
-    if (nullptr == json_out_len) return sl::utils::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
+    if (nullptr == json_out) return wilton::support::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
+    if (nullptr == json_out_len) return wilton::support::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
     try {
         jni_ctx& ctx = static_jni_ctx();
         JNIEnv* env = get_jni_env();
@@ -262,7 +262,7 @@ char* wiltoncall_runscript_jni(const char* json_in, int json_in_len, char** json
         if (nullptr == exc) {
             if (nullptr !=  res) {
                 std::string res_str = wj::jstring_to_str(env, static_cast<jstring> (res));
-                *json_out = sl::utils::alloc_copy(res_str.c_str());
+                *json_out = wilton::support::alloc_copy(res_str.c_str());
                 *json_out_len = static_cast<int> (res_str.length());
             } else {
                 *json_out = nullptr;
@@ -273,9 +273,9 @@ char* wiltoncall_runscript_jni(const char* json_in, int json_in_len, char** json
             env->ExceptionClear();
             std::string trace = describe_java_exception(env, exc);
             std::string msg = TRACEMSG(trace);
-            return sl::utils::alloc_copy(msg.c_str());
+            return wilton::support::alloc_copy(msg.c_str());
         }
     } catch (const std::exception& e) {
-        return sl::utils::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }

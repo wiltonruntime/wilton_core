@@ -87,18 +87,18 @@ public:
     }
 };
 
-common::payload_handle_registry<wilton_Server, server_ctx>& static_server_registry() {
-    static common::payload_handle_registry<wilton_Server, server_ctx> registry;
+support::payload_handle_registry<wilton_Server, server_ctx>& static_server_registry() {
+    static support::payload_handle_registry<wilton_Server, server_ctx> registry;
     return registry;
 }
 
-common::handle_registry<wilton_Request>& static_request_registry() {
-    static common::handle_registry<wilton_Request> registry;
+support::handle_registry<wilton_Request>& static_request_registry() {
+    static support::handle_registry<wilton_Request> registry;
     return registry;
 }
 
-common::handle_registry<wilton_ResponseWriter>& static_response_writer_registry() {
-    static common::handle_registry<wilton_ResponseWriter> registry;
+support::handle_registry<wilton_ResponseWriter>& static_response_writer_registry() {
+    static support::handle_registry<wilton_ResponseWriter> registry;
     return registry;
 }
 
@@ -209,7 +209,7 @@ sl::support::optional<sl::io::span<char>> server_create(sl::io::span<const char>
             paths_pass.data(), static_cast<int>(paths_pass.size()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_server_registry().put(server, std::move(ctx));
-    return common::into_span({
+    return support::into_span({
         { "serverHandle", handle}
     });
 }
@@ -238,7 +238,7 @@ sl::support::optional<sl::io::span<char>> server_stop(sl::io::span<const char> d
         static_server_registry().put(pa.first, std::move(pa.second));
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return common::empty_span();
+    return support::empty_span();
 }
 
 sl::support::optional<sl::io::span<char>> request_get_metadata(sl::io::span<const char> data) {
@@ -268,7 +268,7 @@ sl::support::optional<sl::io::span<char>> request_get_metadata(sl::io::span<cons
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return common::into_span(out, out_len);
+    return support::into_span(out, out_len);
 }
 
 sl::support::optional<sl::io::span<char>> request_get_data(sl::io::span<const char> data) {
@@ -296,7 +296,7 @@ sl::support::optional<sl::io::span<char>> request_get_data(sl::io::span<const ch
             std::addressof(out), std::addressof(out_len));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::into_span(out, out_len);
+    return support::into_span(out, out_len);
 }
 
 sl::support::optional<sl::io::span<char>> request_get_data_filename(sl::io::span<const char> data) {
@@ -324,7 +324,7 @@ sl::support::optional<sl::io::span<char>> request_get_data_filename(sl::io::span
             std::addressof(out), std::addressof(out_len));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::into_span(out, out_len);
+    return support::into_span(out, out_len);
 }
 
 sl::support::optional<sl::io::span<char>> request_set_response_metadata(sl::io::span<const char> data) {
@@ -354,7 +354,7 @@ sl::support::optional<sl::io::span<char>> request_set_response_metadata(sl::io::
     char* err = wilton_Request_set_response_metadata(request, metadata.c_str(), static_cast<int>(metadata.length()));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::empty_span();
+    return support::empty_span();
 }
 
 sl::support::optional<sl::io::span<char>> request_send_response(sl::io::span<const char> data) {
@@ -383,7 +383,7 @@ sl::support::optional<sl::io::span<char>> request_send_response(sl::io::span<con
     char* err = wilton_Request_send_response(request, request_data.c_str(), static_cast<int>(request_data.length()));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::empty_span();
+    return support::empty_span();
 }
 
 sl::support::optional<sl::io::span<char>> request_send_temp_file(sl::io::span<const char> data) {
@@ -419,7 +419,7 @@ sl::support::optional<sl::io::span<char>> request_send_temp_file(sl::io::span<co
             });
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::empty_span();
+    return support::empty_span();
 }
 
 sl::support::optional<sl::io::span<char>> request_send_mustache(sl::io::span<const char> data) {
@@ -457,7 +457,7 @@ sl::support::optional<sl::io::span<char>> request_send_mustache(sl::io::span<con
             values.c_str(), static_cast<int>(values.length()));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::empty_span();
+    return support::empty_span();
 }
 
 sl::support::optional<sl::io::span<char>> request_send_later(sl::io::span<const char> data) {
@@ -484,7 +484,7 @@ sl::support::optional<sl::io::span<char>> request_send_later(sl::io::span<const 
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t rwhandle = static_response_writer_registry().put(writer);
-    return common::into_span({
+    return support::into_span({
         { "responseWriterHandle", rwhandle}
     });
 }
@@ -514,7 +514,7 @@ sl::support::optional<sl::io::span<char>> request_send_with_response_writer(sl::
     // call wilton
     char* err = wilton_ResponseWriter_send(writer, request_data.c_str(), static_cast<int>(request_data.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::empty_span();
+    return support::empty_span();
 }
 
 } // namespace

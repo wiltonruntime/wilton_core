@@ -39,7 +39,7 @@ sl::support::optional<sl::io::span<char>> mustache_render(sl::io::span<const cha
     char* err = wilton_render_mustache(templade.c_str(), static_cast<int>(templade.length()),
             values.c_str(), static_cast<int>(values.length()), std::addressof(out), std::addressof(out_len));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::into_span(out, out_len);
+    return support::into_span(out, out_len);
 }
 
 sl::support::optional<sl::io::span<char>> mustache_render_file(sl::io::span<const char> data) {
@@ -69,7 +69,7 @@ sl::support::optional<sl::io::span<char>> mustache_render_file(sl::io::span<cons
     char* err = wilton_render_mustache_file(file.c_str(), static_cast<int>(file.length()),
             values.c_str(), static_cast<int>(values.length()), std::addressof(out), std::addressof(out_len));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return common::into_span(out, out_len);
+    return support::into_span(out, out_len);
 }
 
 } // namespace

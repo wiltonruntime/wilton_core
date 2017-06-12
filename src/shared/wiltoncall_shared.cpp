@@ -42,7 +42,7 @@ sl::support::optional<sl::io::span<char>> shared_put(sl::io::span<const char> da
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return common::into_span(out, out_len);
+    return support::into_span(out, out_len);
 }
 
 sl::support::optional<sl::io::span<char>> shared_get(sl::io::span<const char> data) {
@@ -68,7 +68,7 @@ sl::support::optional<sl::io::span<char>> shared_get(sl::io::span<const char> da
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return common::into_span(out, out_len);
+    return support::into_span(out, out_len);
 }
 
 sl::support::optional<sl::io::span<char>> shared_wait_change(sl::io::span<const char> data) {
@@ -107,7 +107,7 @@ sl::support::optional<sl::io::span<char>> shared_wait_change(sl::io::span<const 
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return common::into_span(out, out_len);
+    return support::into_span(out, out_len);
 }
 
 sl::support::optional<sl::io::span<char>> shared_remove(sl::io::span<const char> data) {
@@ -133,7 +133,7 @@ sl::support::optional<sl::io::span<char>> shared_remove(sl::io::span<const char>
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return common::into_span(out, out_len);
+    return support::into_span(out, out_len);
 }
 
 } // namespace
