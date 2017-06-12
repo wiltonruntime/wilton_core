@@ -9,6 +9,7 @@
 #define	WILTON_SUPPORT_REGISTRAR_HPP
 
 #include <functional>
+#include <memory>
 #include <utility>
 
 #include "wilton/wilton.h"
@@ -29,10 +30,10 @@ using cb_type = char* (*)(
         char** json_out,
         int* json_out_len);
 
-using cb_span_type = sl::support::optional<sl::io::span<char>>(*)(sl::io::span<const char>);
+using fun_span_type = sl::support::optional<sl::io::span<char>>(*)(sl::io::span<const char>);
 
 inline char* cb_fun(void* call_ctx, const char* json_in, int json_in_len, char** json_out, int* json_out_len) {
-    auto fun = reinterpret_cast<detail_registrar::cb_span_type> (call_ctx);
+    auto fun = reinterpret_cast<fun_span_type> (call_ctx);
     try {
         auto out = fun({json_in, json_in_len});
         if (out) {
@@ -50,10 +51,13 @@ inline char* cb_fun(void* call_ctx, const char* json_in, int json_in_len, char**
 
 } // namespace
 
-inline void register_wiltoncall(const std::string& name,
-        std::function<sl::support::optional<sl::io::span<char>>(sl::io::span<const char> data)> fun) {
-    void* cb_ctx = reinterpret_cast<void*> (fun.target<detail_registrar::cb_span_type>());
-    auto err = wiltoncall_register(name.c_str(), static_cast<int> (name.length()), cb_ctx, detail_registrar::cb_fun);
+inline void register_wiltoncall(const std::string& name, detail_registrar::fun_span_type fun) {
+    if (nullptr == fun) {
+        throw wilton_support_exception(TRACEMSG("Registrar error, invalid empty function specified," +
+                " name: [" + name + "]"));
+    }
+    auto err = wiltoncall_register(name.c_str(), static_cast<int> (name.length()), 
+            reinterpret_cast<void*> (fun), detail_registrar::cb_fun);
     if (nullptr != err) {
         auto msg = TRACEMSG(err);
         wilton_free(err);
