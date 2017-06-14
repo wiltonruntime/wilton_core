@@ -25,7 +25,7 @@ endif ( )
 set ( CMAKE_TOOLCHAIN_FILE ${STATICLIB_CMAKE}/toolchains/${STATICLIB_TOOLCHAIN}.cmake CACHE INTERNAL "" )
 
 # project
-project ( wilton_test CXX C )
+project ( wilton_core_test CXX C )
 include ( ${STATICLIB_CMAKE}/staticlibs_common.cmake )
 staticlib_enable_deplibs_cache ( )
 
@@ -35,8 +35,8 @@ set ( staticlib_pion_USE_LOG4CPLUS ON CACHE BOOL "Use log4cplus lib for logging"
 set ( staticlib_pion_USE_OPENSSL ON CACHE BOOL "Use OpenSSL lib for https" )
 
 # dependencies
-add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../libwilton ${CMAKE_BINARY_DIR}/libwilton )
-set ( ${PROJECT_NAME}_DEPS wilton )
+staticlib_add_subdirectory ( ${CMAKE_CURRENT_LIST_DIR}/../../wilton_core )
+set ( ${PROJECT_NAME}_DEPS wilton_core )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
 # tests
