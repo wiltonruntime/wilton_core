@@ -485,6 +485,17 @@ WILTON_EXPORT char* wilton_shared_remove(
         char** value_out,
         int* value_out_len);
 
+WILTON_EXPORT char* wilton_shared_list_append(
+        const char* key,
+        int key_len,
+        const char* value,
+        int value_len,
+        char** updated_value_out,
+        int* updated_value_out_len);
+
+WILTON_EXPORT char* wilton_shared_dump(
+        char** dump_out,
+        int* dump_out_len);
 
 // thread
 

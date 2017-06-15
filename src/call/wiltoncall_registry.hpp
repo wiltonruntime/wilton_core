@@ -42,6 +42,7 @@ public:
         if (name.empty()) {
             throw common::wilton_internal_exception(TRACEMSG("Invalid empty wilton_function name specified"));
         }
+        // todo: check override
         auto pa = registry.emplace(name, callback);
         if (!pa.second) {
             throw common::wilton_internal_exception(TRACEMSG(

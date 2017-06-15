@@ -109,6 +109,10 @@ sl::support::optional<sl::io::span<char>> shared_wait_change(sl::io::span<const 
 
 sl::support::optional<sl::io::span<char>> shared_remove(sl::io::span<const char> data);
 
+sl::support::optional<sl::io::span<char>> shared_list_append(sl::io::span<const char> data);
+
+sl::support::optional<sl::io::span<char>> shared_dump(sl::io::span<const char> data);
+
 } // namespace
 
 // thread

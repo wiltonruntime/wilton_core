@@ -160,8 +160,15 @@ std::vector<std::unique_ptr<wilton_HttpPath, http_path_deleter>> create_paths(
                     sl::json::value* cb_ptr = static_cast<sl::json::value*> (passed);
                     sl::json::value params = cb_ptr->clone();
                     // params structure is pre-checked
-                    std::vector<sl::json::value>& args = params.getattr_or_throw("args").as_array_or_throw();
-                    args.emplace_back(requestHandle);
+                    if (sl::json::type::nullt == params["args"].json_type()) {
+                        auto args = std::vector<sl::json::value>();
+                        args.emplace_back(requestHandle);
+                        params.as_object_or_throw().emplace_back("args", std::move(args));
+                    } else {
+                        // args attr type is pre-checked
+                        std::vector<sl::json::value>& args = params.getattr_or_throw("args").as_array_or_throw();
+                        args.emplace_back(requestHandle);
+                    }
                     std::string params_str = params.dumps();
                     std::string engine = params["engine"].as_string();
                     // output will be ignored

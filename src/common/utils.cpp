@@ -30,8 +30,6 @@ void check_json_callback_script(const sl::json::field& field) {
                 " value: [" + field.val().dumps() + "]"));
     }
     bool module = false;
-    bool func = false;
-    bool args = false;
     for (const sl::json::field& fi : field.as_object()) {
         auto& name = fi.name();
         if ("module" == name) {
@@ -47,14 +45,12 @@ void check_json_callback_script(const sl::json::field& field) {
                         " type: [" + sl::json::stringify_json_type(fi.json_type()) + "]," +
                         " value: [" + fi.val().dumps() + "]"));
             }
-            func = true;
         } else if ("args" == name) {
             if (sl::json::type::array != fi.json_type()) {
                 throw common::wilton_internal_exception(TRACEMSG("Invalid '" + fi.name() + "' field,"
                         " type: [" + sl::json::stringify_json_type(fi.json_type()) + "]," +
                         " value: [" + fi.val().dumps() + "]"));
             }
-            args = true;
         } else if ("engine" == name) {
             if (sl::json::type::string != fi.json_type()) {
                 throw common::wilton_internal_exception(TRACEMSG("Invalid '" + fi.name() + "' field,"
@@ -69,14 +65,6 @@ void check_json_callback_script(const sl::json::field& field) {
     if (!module) {
         throw common::wilton_internal_exception(TRACEMSG(
                 "Required field: 'module' is not supplied in object: [" + field.name() + "]"));
-    }
-    if (!func) {
-        throw common::wilton_internal_exception(TRACEMSG(
-                "Required field: 'func' is not supplied in object: [" + field.name() + "]"));
-    }
-    if (!args) {
-        throw common::wilton_internal_exception(TRACEMSG(
-                "Required field: 'func' is not supplied in object: [" + field.name() + "]"));
     }
 }
 

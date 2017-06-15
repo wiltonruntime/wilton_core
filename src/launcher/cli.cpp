@@ -18,7 +18,7 @@
 int main(int argc, char** argv) {
     try {
         if (argc < 2) {
-            std::cerr << "Error: invalid arguments" << std::endl;
+            std::cerr << "ERROR: invalid arguments" << std::endl;
             std::cerr << "Usage: wilton path/to/index.js [arg1 arg2 ...]" << std::endl;
             return 1;
         }
@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
         auto& index = argvec.at(1);
         auto indexpath = sl::tinydir::path(index);
         if (!indexpath.exists()) {
-            std::cerr << "Error: specified script file not found: [" + index + "]" << std::endl;
+            std::cerr << "ERROR: specified script file not found: [" + index + "]" << std::endl;
             return 1;
         }
         auto modulesdir = sl::utils::strip_filename(index);
@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
         });
         auto err_init = wiltoncall_init(config.c_str(), static_cast<int> (config.length()));
         if (nullptr != err_init) {
-            std::cerr << "Error: " << err_init << std::endl;
+            std::cerr << "ERROR: " << err_init << std::endl;
             wilton_free(err_init);
             return 1;
         }
@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
         int out_len = 0;
         char* err_run = wiltoncall_runscript_duktape(input.c_str(), static_cast<int> (input.length()), &out, &out_len);
         if (nullptr != err_run) {
-            std::cerr << "Error: " << err_run << std::endl;
+            std::cerr << "ERROR: " << err_run << std::endl;
             wilton_free(err_run);
             return 1;
         }
@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
         return 0;
 
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "ERROR: " << e.what() << std::endl;
         return 1;
     }
     return 0;

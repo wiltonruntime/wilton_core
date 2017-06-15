@@ -88,6 +88,8 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("shared_get", wilton::shared::shared_get);
         reg.put("shared_wait_change", wilton::shared::shared_wait_change);
         reg.put("shared_remove", wilton::shared::shared_remove);
+        reg.put("shared_list_append", wilton::shared::shared_list_append);
+        reg.put("shared_dump", wilton::shared::shared_dump);
         // thread
         reg.put("thread_run", wilton::thread::thread_run);
         reg.put("thread_sleep_millis", wilton::thread::thread_sleep_millis);
