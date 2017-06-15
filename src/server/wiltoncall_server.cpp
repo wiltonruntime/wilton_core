@@ -178,7 +178,9 @@ std::vector<std::unique_ptr<wilton_HttpPath, http_path_deleter>> create_paths(
                             params_str.c_str(), static_cast<int> (params_str.length()),
                             std::addressof(out), std::addressof(out_len));
                     if (nullptr == err) {
-                        wilton_free(out);
+                        if (nullptr != out) {
+                            wilton_free(out);
+                        }
                     } else {
                         std::string msg = TRACEMSG(err);
                         wilton_free(err);
