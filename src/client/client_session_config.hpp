@@ -22,6 +22,7 @@ namespace client {
 
 class client_session_config {
 public:
+    bool use_multi_threaded_session = false;
     sl::http::session_options options;
 
     client_session_config(const client_session_config&) = delete;
@@ -29,9 +30,11 @@ public:
     client_session_config& operator=(const client_session_config&) = delete;
 
     client_session_config(client_session_config&& other) :
+    use_multi_threaded_session(other.use_multi_threaded_session),
     options(std::move(other.options)) { }
 
     client_session_config& operator=(client_session_config&& other) {
+        this->use_multi_threaded_session = other.use_multi_threaded_session;
         this->options = std::move(other.options);
         return *this;
     }
@@ -44,7 +47,9 @@ public:
         for (size_t i = 0; i < vec.size(); i++) {
             const sl::json::field& fi = vec[i];
             auto& name = fi.name();
-            if ("requestQueueMaxSize" == name) {
+            if ("multiThreaded" == name) {
+                this->use_multi_threaded_session = fi.as_bool_or_throw(name);
+            } else if ("requestQueueMaxSize" == name) {
                 this->options.requests_queue_max_size = fi.as_uint32_positive_or_throw(name);
             } else if ("fdsetTimeoutMillis" == name) {
                 this->options.fdset_timeout_millis = fi.as_uint32_positive_or_throw(name);
@@ -64,6 +69,7 @@ public:
 
     sl::json::value to_json() const {
         return {
+            { "multiThreaded", use_multi_threaded_session },
             { "requestQueueMaxSize", options.requests_queue_max_size },
             { "fdsetTimeoutMillis", options.fdset_timeout_millis },
             { "allRequestsPausedTimeoutMillis", options.all_requests_paused_timeout_millis },

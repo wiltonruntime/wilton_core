@@ -8,6 +8,7 @@
 #include "wilton/wilton.h"
 
 #include <array>
+#include <memory>
 #include <string>
 
 #include "staticlib/config.hpp"
@@ -25,14 +26,17 @@
 
 struct wilton_HttpClient {
 private:
-    sl::http::multi_threaded_session delegate;
+    std::unique_ptr<sl::http::session> delegate;
 
 public:
     wilton_HttpClient(sl::http::multi_threaded_session&& delegate) :
-    delegate(std::move(delegate)) { }
+    delegate(new sl::http::multi_threaded_session(std::move(delegate))) { }
+
+    wilton_HttpClient(sl::http::single_threaded_session&& delegate) :
+    delegate(new sl::http::single_threaded_session(std::move(delegate))) { }
 
     sl::http::session& impl() {
-        return delegate;
+        return *delegate;
     }
 };
 
@@ -49,8 +53,12 @@ char* wilton_HttpClient_create(
         std::string json_str{conf_json, conf_json_len_u32};
         sl::json::value json = sl::json::loads(json_str);
         wilton::client::client_session_config conf{std::move(json)};
-        sl::http::multi_threaded_session session{std::move(conf.options)};
-        wilton_HttpClient* http_ptr = new wilton_HttpClient(std::move(session));
+        wilton_HttpClient* http_ptr = nullptr;
+        if (conf.use_multi_threaded_session) {
+            http_ptr = new wilton_HttpClient(sl::http::multi_threaded_session(std::move(conf.options)));
+        } else {
+            http_ptr = new wilton_HttpClient(sl::http::single_threaded_session(std::move(conf.options)));
+        }
         *http_out = http_ptr;
         return nullptr;
     } catch (const std::exception& e) {
