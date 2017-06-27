@@ -21,7 +21,10 @@ namespace cron {
 namespace { //anonymous
 
 support::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>>& static_registry() {
-    static support::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>> registry;
+    static support::payload_handle_registry<wilton_CronTask, std::unique_ptr<std::string>> registry{
+        [] (wilton_CronTask* cron) STATICLIB_NOEXCEPT {
+            wilton_CronTask_stop(cron);
+        }};
     return registry;
 }
 

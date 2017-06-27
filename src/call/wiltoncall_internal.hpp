@@ -79,11 +79,7 @@ sl::support::optional<sl::io::span<char>> mustache_render_file(sl::io::span<cons
 // HttpClient
 namespace client {
 
-sl::support::optional<sl::io::span<char>> httpclient_create(sl::io::span<const char> data);
-
-sl::support::optional<sl::io::span<char>> httpclient_close(sl::io::span<const char> data);
-
-sl::support::optional<sl::io::span<char>> httpclient_execute(sl::io::span<const char> data);
+sl::support::optional<sl::io::span<char>> httpclient_send_request(sl::io::span<const char> data);
 
 sl::support::optional<sl::io::span<char>> httpclient_send_temp_file(sl::io::span<const char> data);
 

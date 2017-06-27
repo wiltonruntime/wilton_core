@@ -88,17 +88,32 @@ public:
 };
 
 support::payload_handle_registry<wilton_Server, server_ctx>& static_server_registry() {
-    static support::payload_handle_registry<wilton_Server, server_ctx> registry;
+    static support::payload_handle_registry<wilton_Server, server_ctx> registry{
+        [] (wilton_Server* server) STATICLIB_NOEXCEPT {
+            wilton_Server_stop(server);
+        }};
     return registry;
 }
 
 support::handle_registry<wilton_Request>& static_request_registry() {
-    static support::handle_registry<wilton_Request> registry;
+    static support::handle_registry<wilton_Request> registry{
+        [] (wilton_Request* request) STATICLIB_NOEXCEPT {
+            static std::string conf = sl::json::dumps({
+                { "statusCode", 503 },
+                { "statusMessage", "Service Unavailable" }
+            });
+            wilton_Request_set_response_metadata(request, conf.c_str(), static_cast<int> (conf.length()));
+            wilton_Request_send_response(request, "", 0);
+        }
+    };
     return registry;
 }
 
 support::handle_registry<wilton_ResponseWriter>& static_response_writer_registry() {
-    static support::handle_registry<wilton_ResponseWriter> registry;
+    static support::handle_registry<wilton_ResponseWriter> registry {
+        [] (wilton_ResponseWriter* writer) STATICLIB_NOEXCEPT {
+            wilton_ResponseWriter_send(writer, "", 0);
+        }};
     return registry;
 }
 
@@ -137,7 +152,10 @@ std::vector<http_view> extract_and_delete_views(sl::json::value& conf) {
 void send_system_error(int64_t requestHandle, std::string errmsg) {
     wilton_Request* request = static_request_registry().remove(requestHandle);
     if (nullptr != request) {
-        std::string conf{R"({"statusCode": 500, "statusMessage": "server Error"})"};
+        static std::string conf = sl::json::dumps({
+            { "statusCode", 500 },
+            { "statusMessage", "Internal Server Error" }
+        });
         wilton_Request_set_response_metadata(request, conf.c_str(), static_cast<int>(conf.length()));
         wilton_Request_send_response(request, errmsg.c_str(), static_cast<int>(errmsg.length()));
         static_request_registry().put(request);

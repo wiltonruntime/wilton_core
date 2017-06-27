@@ -9,9 +9,12 @@
 #define	WILTON_SUPPORT_PAYLOAD_HANDLE_REGISTRY_HPP
 
 #include <cstdint>
+#include <functional>
 #include <mutex>
 #include <unordered_map>
 #include <utility>
+
+#include "staticlib/config.hpp"
 
 namespace wilton {
 namespace support {
@@ -20,8 +23,36 @@ template<typename T, typename P>
 class payload_handle_registry {
     std::unordered_map<T*, P> registry;
     std::mutex mutex;
+    std::function<void(T*)> destoyer;
 
 public:
+    
+    payload_handle_registry() { }
+    
+    template<typename DestroyFunc>
+    payload_handle_registry(DestroyFunc destroyFunc) :
+    destoyer(destroyFunc) {
+#ifdef STATICLIB_NOEXCEPT_SUPPORTED
+        static_assert(noexcept(destroyFunc(nullptr)),
+                "Please check that the destroyer func cannot throw, "
+                "and mark the lambda as 'noexcept'.");
+#endif
+    }
+
+    payload_handle_registry(const payload_handle_registry&) = delete;
+
+    payload_handle_registry& operator=(const payload_handle_registry&) = delete;
+
+    ~payload_handle_registry() STATICLIB_NOEXCEPT {
+        std::lock_guard<std::mutex> lock{mutex};
+        if (destoyer) {
+            for (auto& pa : registry) {
+                destoyer(pa.first);
+            }
+        }
+        registry.clear();
+    }
+    
     int64_t put(T* ptr, P&& ctx) {
         std::lock_guard<std::mutex> lock(mutex);
         auto pair = registry.emplace(ptr, std::move(ctx));
