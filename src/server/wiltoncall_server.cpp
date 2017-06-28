@@ -87,13 +87,6 @@ public:
     }
 };
 
-support::payload_handle_registry<wilton_Server, server_ctx>& static_server_registry() {
-    static support::payload_handle_registry<wilton_Server, server_ctx> registry{
-        [] (wilton_Server* server) STATICLIB_NOEXCEPT {
-            wilton_Server_stop(server);
-        }};
-    return registry;
-}
 
 support::handle_registry<wilton_Request>& static_request_registry() {
     static support::handle_registry<wilton_Request> registry{
@@ -104,6 +97,17 @@ support::handle_registry<wilton_Request>& static_request_registry() {
             });
             wilton_Request_set_response_metadata(request, conf.c_str(), static_cast<int> (conf.length()));
             wilton_Request_send_response(request, "", 0);
+        }
+    };
+    return registry;
+}
+
+support::payload_handle_registry<wilton_Server, server_ctx>& static_server_registry() {
+    // init/destroy order attempt, todo: verifyme
+    static_request_registry();
+    static support::payload_handle_registry<wilton_Server, server_ctx> registry{
+        [] (wilton_Server * server) STATICLIB_NOEXCEPT {
+            wilton_Server_stop(server);
         }
     };
     return registry;
