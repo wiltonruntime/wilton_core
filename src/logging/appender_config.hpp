@@ -38,8 +38,8 @@ public:
     filePath(std::move(other.filePath)),
     layout(std::move(other.layout)),
     thresholdLevel(std::move(other.thresholdLevel)),
-    useLockFile(useLockFile),
-    maxBackupIndex(maxBackupIndex) { }
+    useLockFile(other.useLockFile),
+    maxBackupIndex(other.maxBackupIndex) { }
 
     appender_config& operator=(appender_config&& other) {
         this->appenderType = std::move(other.appenderType);
