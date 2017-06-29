@@ -9,61 +9,148 @@
 #include <string>
 #include <vector>
 
+#include <popt.h>
+
 #include "staticlib/json.hpp"
 #include "staticlib/utils.hpp"
 #include "staticlib/tinydir.hpp"
 
 #include "wilton/wiltoncall.h"
 
-int main(int argc, char** argv) {
+#include "cli_options.hpp"
+
+namespace { // anonymous
+
+int find_launcher_args_end(int argc, char** argv) {
+    for (int i = 0; i < argc; i++) {
+        if ("--" ==  std::string(argv[i])) {
+            return i;
+        }
+    }
+    return argc;
+}
+
+std::string find_modules_dir(const std::string& opt_modulesdir, const std::string& idxfile_or_dir) {
+    if (!opt_modulesdir.empty()) {
+        return opt_modulesdir;
+    } 
+    std::string md = sl::utils::strip_filename(idxfile_or_dir);
+    if (md == idxfile_or_dir) {
+        if (!('/' == md.at(md.length() -1))) {
+            md.push_back('/');
+        }
+        md.append("../");
+    }
+    return md;
+}
+
+std::string find_requirejs_dir(const std::string& opts_requirejsdir) {
+    if (!opts_requirejsdir.empty()) {
+        return opts_requirejsdir;
+    }
+    auto exepath = sl::utils::current_executable_path();
+    auto exedir = sl::utils::strip_filename(exepath);
+    std::replace(exedir.begin(), exedir.end(), '\\', '/');
+    return exedir + "requirejs";
+}
+
+std::string find_startup_module(const std::string& opts_startup_module_name, const std::string& idxfile_or_dir) {
+    if (!opts_startup_module_name.empty()) {
+        return opts_startup_module_name;
+    }
+    auto sm = sl::utils::strip_parent_dir(idxfile_or_dir);
+    if (sl::utils::ends_with(sm, ".js")) {
+        sm.resize(sm.length() - 3);
+    }
+    return sm;
+}
+
+std::string find_statup_module_path(const std::string& idxfile_or_dir) {
+    auto smp = idxfile_or_dir;
+    if (sl::utils::ends_with(smp, ".js")) {
+        smp.resize(smp.length() - 3);
+    }
+    return smp;
+}
+
+} // namespace
+
+int main(int argc, char** argv) {    
     try {
-        if (argc < 2) {
-            std::cerr << "ERROR: invalid arguments" << std::endl;
-            std::cerr << "Usage: wilton path/to/index.js [arg1 arg2 ...]" << std::endl;
+        // parse laucher args
+        int launcher_argc = find_launcher_args_end(argc, argv);
+        wilton::launcher::cli_options opts(launcher_argc, argv);
+        
+        // collect app args
+        auto apprags = std::vector<std::string>();
+        for (int i = launcher_argc + 1; i < argc; i++) {
+            apprags.emplace_back(argv[i]);
+            std::cout << "app: " << i << ": " << apprags.back() << std::endl;
+        }
+
+        // check invalid options
+        if (!opts.parse_error.empty()) {
+            std::cerr << "ERROR: " << opts.parse_error << std::endl;
+            std::cerr << opts.usage() << std::endl;
             return 1;
         }
 
-        // arguments
-        auto argvec = std::vector<std::string>();
-        for (int i = 0; i < argc; ++i) {
-            argvec.emplace_back(argv[i]);
-        }
-        std::replace(argvec.at(0).begin(), argvec.at(0).end(), '\\', '/');
-        std::replace(argvec.at(1).begin(), argvec.at(1).end(), '\\', '/');
-
-        // paths
-        auto& index = argvec.at(1);
-        auto indexpath = sl::tinydir::path(index);
+        // show help
+        if (0 != opts.help) {
+            std::cout << opts.usage() << std::endl;
+            poptPrintHelp(opts.ctx, stdout, 0);
+            return 0;
+        }                
+        
+        // check startup script
+        auto idxfile_or_dir = opts.indexjs;
+        auto indexpath = sl::tinydir::path(idxfile_or_dir);
         if (!indexpath.exists()) {
-            std::cerr << "ERROR: specified script file not found: [" + index + "]" << std::endl;
+            std::cerr << "ERROR: specified script file not found: [" + idxfile_or_dir + "]" << std::endl;
             return 1;
         }
-        auto modulesdir = sl::utils::strip_filename(index);
-        if (modulesdir == index) {
-            modulesdir = ".";
+        if (indexpath.is_directory() && '/' != idxfile_or_dir.at(idxfile_or_dir.length() -1)) {
+            idxfile_or_dir.push_back('/');
+        }                
+        
+        // check modules dir
+        auto moddir = find_modules_dir(opts.modules_dir, idxfile_or_dir);
+        auto modpath = sl::tinydir::path(moddir);
+        if (!(modpath.exists() && modpath.is_directory())) {
+            std::cerr << "ERROR: specified modules directory not found: [" + moddir + "]" << std::endl;
+            return 1;
+        }       
+        
+        // check requirejs dir
+        auto rjdir = find_requirejs_dir(opts.requirejs_dir);
+        auto rjpath = sl::tinydir::path(rjdir);
+        if (!(rjpath.exists() && rjpath.is_directory())) {
+            std::cerr << "ERROR: specified requirejs directory not found: [" + rjdir + "]" << std::endl;
+            return 1;
         }
-        auto indexmod = sl::utils::strip_parent_dir(index);
-        if (sl::utils::ends_with(indexmod, ".js")) {
-            indexmod.resize(indexmod.length() - 3);
-        }
-
-        // current dir
-        auto exepath = sl::utils::current_executable_path();
-        auto exedir = sl::utils::strip_filename(exepath);
-        std::replace(exedir.begin(), exedir.end(), '\\', '/');
+        
+        // get index module
+        auto startmod = find_startup_module(opts.startup_module_name, idxfile_or_dir);
+        auto startmodpath = find_statup_module_path(idxfile_or_dir);
 
         // wilton init
         auto config = sl::json::dumps({
             {"defaultScriptEngine", "duktape"},
-            {"requireJsDirPath", exedir + "requirejs"},
+            {"requireJsDirPath", rjdir},
             {"requireJsConfig", {
                     {"waitSeconds", 0},
                     {"enforceDefine", true},
                     {"nodeIdCompat", true},
-                    {"baseUrl", modulesdir}
+                    {"baseUrl", moddir},
+                    {"paths", {
+                        { startmod, "file://" + startmodpath }
+                    }}
                 }
             }
         });
+        
+//        std::cerr << config << std::endl;
+        
         auto err_init = wiltoncall_init(config.c_str(), static_cast<int> (config.length()));
         if (nullptr != err_init) {
             std::cerr << "ERROR: " << err_init << std::endl;
@@ -73,11 +160,11 @@ int main(int argc, char** argv) {
 
         // index.js input
         auto input = sl::json::dumps({
-            {"module", indexmod},
+            {"module", startmod},
             {"func", "main"},
-            {"args", [&argvec] {
+            {"args", [&apprags] {
                     auto res = std::vector<sl::json::value>();
-                    for (auto& st : argvec) {
+                    for (auto& st : apprags) {
                         res.emplace_back(st);
                     }
                     return res;
@@ -95,7 +182,6 @@ int main(int argc, char** argv) {
         }
         wilton_free(out);
         return 0;
-
     } catch (const std::exception& e) {
         std::cerr << "ERROR: " << e.what() << std::endl;
         return 1;

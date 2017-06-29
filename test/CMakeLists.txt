@@ -61,10 +61,6 @@ endif ( )
 
 # test dir structure
 add_custom_target ( testcopy ALL
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_LIST_DIR}/../../wilton-requirejs
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/requirejs
-        
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_LIST_DIR}/winservice/config.json
         ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/config.json

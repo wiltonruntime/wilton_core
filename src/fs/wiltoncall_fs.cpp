@@ -141,6 +141,9 @@ sl::support::optional<sl::io::span<char>> fs_list_directory(sl::io::span<const c
 
 sl::support::optional<sl::io::span<char>> fs_read_script_file_or_module(sl::io::span<const char> data) {
     auto path = std::string(data.data(), data.size());
+    if (sl::utils::starts_with(path, "file://")) {
+        path = path.substr(7);
+    }
     try {
         return support::into_span(read_file(path));
     } catch (const sl::tinydir::tinydir_exception& epath) {
