@@ -22,13 +22,13 @@ inline sl::support::optional<sl::io::span<char>> empty_span() {
     return sl::support::optional<sl::io::span<char>>();
 }
 
-inline sl::support::optional<sl::io::span<char>> into_span(const sl::json::value& val) {
+inline sl::support::optional<sl::io::span<char>> json_span(const sl::json::value& val) {
     auto sink = sl::io::make_array_sink(wilton_alloc, wilton_free);
     val.dump(sink);
     return sl::support::make_optional(sink.release());
 }
 
-inline sl::support::optional<sl::io::span<char>> into_span(char* buf, int buf_len) {
+inline sl::support::optional<sl::io::span<char>> buffer_span(char* buf, int buf_len) {
     if (nullptr != buf) {
         return sl::support::make_optional(sl::io::make_span(buf, buf_len));
     } else {
@@ -36,7 +36,7 @@ inline sl::support::optional<sl::io::span<char>> into_span(char* buf, int buf_le
     }
 }
 
-inline sl::support::optional<sl::io::span<char>> into_span(const std::string& st) {
+inline sl::support::optional<sl::io::span<char>> string_span(const std::string& st) {
     auto span = alloc_copy_span(st);
     return sl::support::make_optional(std::move(span));
 }

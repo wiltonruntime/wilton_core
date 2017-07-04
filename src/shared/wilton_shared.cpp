@@ -265,7 +265,7 @@ WILTON_EXPORT char* wilton_shared_dump(char** dump_out, int* dump_out_len) {
         for (auto& pa : static_map()) {
             res.emplace_back(pa.first, pa.second.value);
         }
-        auto span = wilton::support::into_span(sl::json::value(std::move(res)));
+        auto span = wilton::support::json_span(sl::json::value(std::move(res)));
         *dump_out = span.value().data();
         *dump_out_len = static_cast<int> (span.value().size());
         return nullptr;

@@ -165,7 +165,7 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
                     throw wilton::common::wilton_internal_exception(TRACEMSG(
                             "Invalid result length value returned: [" + sl::support::to_string(out_len) + "]"));
                 }
-                return wilton::support::into_span(out, out_len);
+                return wilton::support::buffer_span(out, out_len);
             }
             return wilton::support::empty_span();
         };

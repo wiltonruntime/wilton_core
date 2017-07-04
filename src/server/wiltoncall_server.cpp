@@ -240,7 +240,7 @@ sl::support::optional<sl::io::span<char>> server_create(sl::io::span<const char>
             paths_pass.data(), static_cast<int>(paths_pass.size()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_server_registry().put(server, std::move(ctx));
-    return support::into_span({
+    return support::json_span({
         { "serverHandle", handle}
     });
 }
@@ -299,7 +299,7 @@ sl::support::optional<sl::io::span<char>> request_get_metadata(sl::io::span<cons
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::into_span(out, out_len);
+    return support::buffer_span(out, out_len);
 }
 
 sl::support::optional<sl::io::span<char>> request_get_data(sl::io::span<const char> data) {
@@ -327,7 +327,7 @@ sl::support::optional<sl::io::span<char>> request_get_data(sl::io::span<const ch
             std::addressof(out), std::addressof(out_len));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return support::into_span(out, out_len);
+    return support::buffer_span(out, out_len);
 }
 
 sl::support::optional<sl::io::span<char>> request_get_data_filename(sl::io::span<const char> data) {
@@ -355,7 +355,7 @@ sl::support::optional<sl::io::span<char>> request_get_data_filename(sl::io::span
             std::addressof(out), std::addressof(out_len));
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return support::into_span(out, out_len);
+    return support::buffer_span(out, out_len);
 }
 
 sl::support::optional<sl::io::span<char>> request_set_response_metadata(sl::io::span<const char> data) {
@@ -515,7 +515,7 @@ sl::support::optional<sl::io::span<char>> request_send_later(sl::io::span<const 
     static_request_registry().put(request);
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t rwhandle = static_response_writer_registry().put(writer);
-    return support::into_span({
+    return support::json_span({
         { "responseWriterHandle", rwhandle}
     });
 }

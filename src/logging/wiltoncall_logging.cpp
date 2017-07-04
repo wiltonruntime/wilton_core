@@ -77,7 +77,7 @@ sl::support::optional<sl::io::span<char>> logging_is_level_enabled(sl::io::span<
     char* err = wilton_logger_is_level_enabled(logger.c_str(), static_cast<int>(logger.length()),
             level.c_str(), static_cast<int>(level.length()), std::addressof(out));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
-    return support::into_span({
+    return support::json_span({
         { "enabled", out != 0 }
     });
 }

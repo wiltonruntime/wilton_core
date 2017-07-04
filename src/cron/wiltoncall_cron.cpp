@@ -74,7 +74,7 @@ sl::support::optional<sl::io::span<char>> cron_start(sl::io::span<const char> da
             });
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
     int64_t handle = static_registry().put(cron, std::unique_ptr<std::string>(str_to_pass));
-    return support::into_span({
+    return support::json_span({
         { "cronHandle", handle}
     });
 }

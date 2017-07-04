@@ -82,7 +82,7 @@ sl::support::optional<sl::io::span<char>> process_spawn(sl::io::span<const char>
     } else {
         pid = sl::utils::exec_async(executable, args, outfile);
     }
-    return support::into_span(sl::json::value(pid));
+    return support::json_span(sl::json::value(pid));
 }
 
 } // namespace
