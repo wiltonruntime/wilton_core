@@ -71,6 +71,8 @@ char* wilton_HttpClient_close(
     if (nullptr == http) return wilton::support::alloc_copy(TRACEMSG("Null 'http' parameter specified"));
     try {
         delete http;
+        std::string suppress_c4702;
+        (void) suppress_c4702;
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));

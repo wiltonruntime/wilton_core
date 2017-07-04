@@ -69,7 +69,7 @@ char* wiltoncall_runscript_duktape(const char* json_in, int json_in_len, char** 
         auto res = en->run_script(json);
         if(!res.empty()) {
             *json_out = wilton::support::alloc_copy(res);
-            *json_out_len = res.length();
+            *json_out_len = static_cast<int> (res.length());
         } else {
             *json_out = nullptr;
             *json_out_len = 0;

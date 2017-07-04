@@ -196,7 +196,7 @@ std::vector<std::unique_ptr<wilton_HttpPath, http_path_deleter>> create_paths(
                     // output will be ignored
                     char* out = nullptr;
                     int out_len = 0;
-                    auto err = wiltoncall_runscript(engine.c_str(), engine.length(), 
+                    auto err = wiltoncall_runscript(engine.c_str(), static_cast<int> (engine.length()),
                             params_str.c_str(), static_cast<int> (params_str.length()),
                             std::addressof(out), std::addressof(out_len));
                     if (nullptr == err) {

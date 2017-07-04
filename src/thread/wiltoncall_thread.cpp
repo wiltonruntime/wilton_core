@@ -42,7 +42,7 @@ sl::support::optional<sl::io::span<char>> thread_run(sl::io::span<const char> da
                 // output will be ignored
                 char* out = nullptr;
                 int out_len = 0;
-                auto err = wiltoncall_runscript(engine.c_str(), engine.length(),
+                auto err = wiltoncall_runscript(engine.c_str(), static_cast<int> (engine.length()),
                         sptr->c_str(), static_cast<int>(sptr->length()),
                         std::addressof(out), std::addressof(out_len));
                 delete sptr;

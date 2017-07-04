@@ -53,7 +53,7 @@ const char* logging_config() {
 
 void init_logging() {
     const char* lconf = logging_config();
-    char* lerr = wilton_logger_initialize(lconf, strlen(lconf));
+    char* lerr = wilton_logger_initialize(lconf, (int) strlen(lconf));
     check_err(lerr);
 }
 
@@ -72,7 +72,7 @@ void test_server() {
     check_err(err);
     wilton_HttpPath_destroy(path);
 
-    sleep(20);
+    //sleep(20);
 
     err = wilton_Server_stop(server);
     check_err(err);
@@ -82,7 +82,7 @@ void test_duktape_fail() {
     const char* in = "{\"module\": \"tests/hello_duktapeX\", \"func\": \"hello\", \"args\": []}";
     char* out = NULL;
     int out_len = 0;
-    char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);
+    char* err = wiltoncall_runscript_duktape(in, (int) strlen(in), &out, &out_len);
     puts(err);
     wilton_free(err);
 }
@@ -90,7 +90,7 @@ void test_duktape_fail() {
 void runScript(const char* in) {
     char* out = NULL;
     int out_len = 0;
-    char* err = wiltoncall_runscript_duktape(in, strlen(in), &out, &out_len);
+    char* err = wiltoncall_runscript_duktape(in, (int) strlen(in), &out, &out_len);
     check_err(err);
     wilton_free(out);
 }
@@ -98,7 +98,7 @@ void runScript(const char* in) {
 void test_wiltonjs() {
     init_logging();
     const char* config = wilton_config();
-    wiltoncall_init(config, strlen(config));
+    wiltoncall_init(config, (int) strlen(config));
     runScript("{\"module\": \"runWiltonTests\", \"func\": \"main\"}");
 //    runScript("{\"module\": \"runNodeTests\"}");
     
@@ -106,12 +106,12 @@ void test_wiltonjs() {
 
 void test_dyload() {
     const char* config = wilton_config();
-    wiltoncall_init(config, strlen(config));
+    wiltoncall_init(config, (int) strlen(config));
     const char* name = "dyload_shared_library";
     const char* data = "{\"path\": \"libwilton_test_module.so\"}";
     char* out = NULL;
     int out_len = 0;
-    char* err = wiltoncall(name, strlen(name), data, strlen(data), &out, &out_len);
+    char* err = wiltoncall(name, (int) strlen(name), data, (int) strlen(data), &out, &out_len);
     if (NULL != err) {
         puts(err);
         wilton_free(err);

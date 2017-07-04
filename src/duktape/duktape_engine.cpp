@@ -140,7 +140,7 @@ duk_ret_t wiltoncall_func(duk_context* ctx) {
     }
 }
 
-void register_c_func(duk_context* ctx, const std::string& name, duk_c_function fun, size_t argnum) {
+void register_c_func(duk_context* ctx, const std::string& name, duk_c_function fun, duk_idx_t argnum) {
     duk_push_global_object(ctx);
     duk_push_c_function(ctx, fun, argnum);
     duk_put_prop_string(ctx, -2, name.c_str());
