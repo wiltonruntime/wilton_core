@@ -8,27 +8,19 @@
 #ifndef WILTON_H
 #define	WILTON_H
 
-#ifndef WILTON_EXPORT
-#ifdef WILTON_SHARED
-#ifdef _WIN32
-#ifdef WILTON_SHARED_IMPORT
-#define WILTON_EXPORT __declspec(dllimport)
-#else
-#define WILTON_EXPORT __declspec(dllexport)
-#endif // WILTON_SHARED_IMPORT
-#else
-#ifdef WILTON_SHARED_IMPORT
-#define WILTON_EXPORT
-#else
-#define WILTON_EXPORT __attribute__ ((visibility ("default")))
-#endif // WILTON_SHARED_IMPORT
-#endif // _WIN32
-#else
-#define WILTON_EXPORT
-#endif // WILTON_SHARED
-#endif // WILTON_EXPORT
+#if !defined(WILTON_EXPORT) && defined(WILTON_SHARED)
+#  if defined(WILTON_SHARED_EXPORT) && defined(_WIN32)
+#    define WILTON_EXPORT __declspec(dllexport)
+#  elif defined(_WIN32)
+#    define WILTON_EXPORT __declspec(dllimport)
+#  elif defined(WILTON_SHARED_EXPORT) 
+#    define WILTON_EXPORT __attribute__((visibility("default")))
+#  else
+#    define WILTON_EXPORT
+#  endif
+#endif // !WILTON_EXPORT && WILTON_SHARED
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
     
@@ -522,7 +514,7 @@ WILTON_EXPORT char* wilton_tcp_wait_for_connection(
         int tcp_port,
         int timeout_millis);
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 
