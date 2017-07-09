@@ -25,16 +25,19 @@ namespace client {
 class client_request_config {
 public:
     sl::http::request_options options;
+    std::string respone_data_file_path;
 
     client_request_config(const client_request_config&) = delete;
 
     client_request_config& operator=(const client_request_config&) = delete;
 
     client_request_config(client_request_config&& other) :
-    options(std::move(other.options)) { }
+    options(std::move(other.options)),
+    respone_data_file_path(std::move(other.respone_data_file_path)) { }
 
     client_request_config& operator=(client_request_config&& other) {
         this->options = std::move(other.options);
+        this->respone_data_file_path = std::move(other.respone_data_file_path);
         return *this;
     }
 
@@ -118,6 +121,8 @@ public:
                 options.crlfile_filename = fi.as_string_nonempty_or_throw(name);
             } else if ("sslCipherList" == name) {
                 options.ssl_cipher_list = fi.as_string_nonempty_or_throw(name);
+            } else if ("responseDataFilePath" == name) {
+                respone_data_file_path = fi.as_string_nonempty_or_throw(name);
             } else {
                 throw common::wilton_internal_exception(TRACEMSG("Unknown 'ClientRequest' field: [" + name + "]"));
             }
@@ -165,7 +170,8 @@ public:
             {"sslVerifystatus", options.ssl_verifystatus},
             {"cainfoFilename", options.cainfo_filename},
             {"crlfileFilename", options.crlfile_filename},
-            {"sslCipherList", options.ssl_cipher_list}
+            {"sslCipherList", options.ssl_cipher_list},
+            {"responseDataFilePath", respone_data_file_path}
         };
     }
 

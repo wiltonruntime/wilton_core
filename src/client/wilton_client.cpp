@@ -103,22 +103,30 @@ char* wilton_HttpClient_execute(
         if (request_metadata_len > 0) {
             opts_json = sl::json::load({request_metadata_json, request_metadata_len});
         }
-        wilton::client::client_request_config opts{std::move(opts_json)};
-        std::array<char, 4096> buf;
-        sl::io::string_sink sink{};
-        sl::json::value resp_json{};
-        if (request_data_len > 0) {
-            auto data_src = sl::io::array_source(request_data, static_cast<uint32_t> (request_data_len));
-            // POST will be used by default for this API call
-            sl::http::resource resp = http->impl().open_url(url_str, std::move(data_src), opts.options);            
-            sl::io::copy_all(resp, sink, buf);
-            resp_json = wilton::client::client_response::to_json(std::move(sink.get_string()), resp, resp.get_info());
+        auto opts = wilton::client::client_request_config(std::move(opts_json));
+        sl::http::resource resp = [&] {
+            if (request_data_len > 0) {
+                auto data_src = sl::io::array_source(request_data, static_cast<uint32_t> (request_data_len));
+                // POST will be used by default for this API call
+                return http->impl().open_url(url_str, std::move(data_src), opts.options);
+            } else {
+                // GET will be used by default for this API call
+                return http->impl().open_url(url_str, opts.options);
+            }
+        }();
+        auto data_str = std::string();
+        if (opts.respone_data_file_path.empty()) {
+            auto sink = sl::io::string_sink();
+            sl::io::copy_all(resp, sink);
+            data_str = sink.get_string();
         } else {
-            // GET will be used by default for this API call
-            sl::http::resource resp = http->impl().open_url(url_str, opts.options);
-            sl::io::copy_all(resp, sink, buf);
-            resp_json = wilton::client::client_response::to_json(std::move(sink.get_string()), resp, resp.get_info());
+            auto sink = sl::tinydir::file_sink(opts.respone_data_file_path);
+            sl::io::copy_all(resp, sink);
+            data_str = sl::json::dumps({
+                {"responseDataFilePath", opts.respone_data_file_path}
+            });
         }
+        auto resp_json = wilton::client::client_response::to_json(std::move(data_str), resp, resp.get_info());
         std::string resp_complete = resp_json.dumps();
         *response_data_out = wilton::support::alloc_copy(resp_complete);
         *response_data_len_out = static_cast<int>(resp_complete.length());
@@ -159,12 +167,11 @@ char* wilton_HttpClient_send_file(
             opts_json = sl::json::loads(meta_str);
         }
         wilton::client::client_request_config opts{std::move(opts_json)};
-        std::array<char, 4096> buf;
         std::string file_path_str{file_path, static_cast<uint32_t> (file_path_len)};
         auto fd = sl::tinydir::file_source(file_path_str);
         sl::http::resource resp = http->impl().open_url(url_str, std::move(fd), opts.options);
         sl::io::string_sink sink{};
-        sl::io::copy_all(resp, sink, buf);
+        sl::io::copy_all(resp, sink);
         sl::json::value resp_json = wilton::client::client_response::to_json(
                 std::move(sink.get_string()), resp, resp.get_info());
         std::string resp_complete = resp_json.dumps();
