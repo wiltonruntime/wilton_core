@@ -499,6 +499,7 @@ WILTON_EXPORT char* wilton_thread_run(
 WILTON_EXPORT char* wilton_thread_sleep_millis(
         int millis);
 
+WILTON_EXPORT char* wilton_thread_wait_for_signal();
 
 // misc
 

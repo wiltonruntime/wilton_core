@@ -55,3 +55,12 @@ char* wilton_thread_sleep_millis(int millis) /* noexcept */ {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
+
+char* wilton_thread_wait_for_signal() {
+    try {
+        sl::utils::wait_for_signal();
+        return nullptr;
+    } catch (const std::exception& e) {
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}

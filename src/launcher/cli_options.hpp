@@ -39,7 +39,7 @@ public:
     table({
         { "modules-dir", 'm', POPT_ARG_STRING, std::addressof(modules_dir_ptr), static_cast<int> ('m'), "Path to modules directory", nullptr},
         { "requirejs-dir", 'r', POPT_ARG_STRING, std::addressof(requirejs_dir_ptr), static_cast<int> ('r'), "Path to requirejs directory", nullptr},
-        { "startup-module-name", 's', POPT_ARG_STRING, std::addressof(startup_module_name_ptr), static_cast<int> ('i'), "Name of the index module", nullptr},
+        { "startup-module-name", 's', POPT_ARG_STRING, std::addressof(startup_module_name_ptr), static_cast<int> ('s'), "Name of the index module", nullptr},
         { "help", 'h', POPT_ARG_NONE, std::addressof(help), static_cast<int> ('h'), "Show this help message", nullptr},
         { nullptr, 0, 0, nullptr, 0, nullptr, nullptr}
     }) {

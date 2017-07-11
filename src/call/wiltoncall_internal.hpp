@@ -118,6 +118,8 @@ sl::support::optional<sl::io::span<char>> thread_run(sl::io::span<const char> da
 
 sl::support::optional<sl::io::span<char>> thread_sleep_millis(sl::io::span<const char> data);
 
+sl::support::optional<sl::io::span<char>> thread_wait_for_signal(sl::io::span<const char> data);
+
 } // namespace
 
 namespace fs {

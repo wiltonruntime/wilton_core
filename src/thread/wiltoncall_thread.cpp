@@ -82,6 +82,15 @@ sl::support::optional<sl::io::span<char>> thread_sleep_millis(sl::io::span<const
     return support::empty_span();
 }
 
+sl::support::optional<sl::io::span<char>> thread_wait_for_signal(sl::io::span<const char>) {
+    // call wilton
+    char* err = wilton_thread_wait_for_signal();
+    if (nullptr != err) {
+        common::throw_wilton_error(err, TRACEMSG(err));
+    }
+    return support::empty_span();
+}
+
 
 } // namespace
 }

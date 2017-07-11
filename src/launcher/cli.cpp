@@ -75,6 +75,9 @@ std::string find_statup_module_path(const std::string& idxfile_or_dir) {
 
 } // namespace
 
+// valgrind run:
+// valgrind --leak-check=yes --show-reachable=yes --track-origins=yes --error-exitcode=42 --track-fds=yes --suppressions=../../../staticlibs/cmake/resources/valgrind/openssl_malloc.supp  ./bin/wilton ../../modules/runWiltonTests.js -r ../../wilton-requirejs/
+
 int main(int argc, char** argv) {    
     try {
         // parse laucher args
@@ -171,6 +174,9 @@ int main(int argc, char** argv) {
                 }()}
         });
 
+        // init signals/ctrl+c to allow their use fron js
+        sl::utils::initialize_signals();
+        
         // call index.js
         char* out = nullptr;
         int out_len = 0;
