@@ -85,5 +85,9 @@ sl::support::optional<sl::io::span<char>> process_spawn(sl::io::span<const char>
     return support::json_span(sl::json::value(pid));
 }
 
+sl::support::optional<sl::io::span<char>> get_wiltoncall_config(sl::io::span<const char>) {
+    return support::json_span(internal::static_wiltoncall_config());
+}
+
 } // namespace
 }

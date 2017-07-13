@@ -32,7 +32,7 @@ public:
      */
     PIMPL_CONSTRUCTOR(duktape_engine)
             
-    duktape_engine(const std::string& requirejs_dir_path, const sl::json::value& requirejs_config);
+    duktape_engine(const std::string& requirejs_dir_path);
 
     std::string run_script(const std::string& callback_script_json);
 };

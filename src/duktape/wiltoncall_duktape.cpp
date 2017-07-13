@@ -36,13 +36,13 @@ std::unordered_map<std::thread::id, std::shared_ptr<wilton::duktape::duktape_eng
 
 // no TLS in vs2013
 std::shared_ptr<wilton::duktape::duktape_engine> thread_local_engine(
-        const std::string& requirejs_dir_path, const sl::json::value& requirejs_config) {
+        const std::string& requirejs_dir_path) {
     std::lock_guard<std::mutex> guard{static_engines_mutex()};
     auto& map = static_engines();
     auto tid = std::this_thread::get_id();
     auto it = map.find(tid);
     if (map.end() == it) {
-        auto se = std::make_shared<wilton::duktape::duktape_engine>(requirejs_dir_path, requirejs_config);
+        auto se = std::make_shared<wilton::duktape::duktape_engine>(requirejs_dir_path);
         auto pa = map.emplace(tid, std::move(se));
         it = pa.first;
     }
@@ -55,7 +55,6 @@ char* wiltoncall_runscript_duktape(const char* json_in, int json_in_len, char** 
         int* json_out_len) /* noexcept */ {
     static const std::string& requirejs_dir_path = wilton::internal::static_wiltoncall_config()["requireJsDirPath"]
             .as_string_nonempty_or_throw("requireJsDirPath");
-    static const sl::json::value& requirejs_config = wilton::internal::static_wiltoncall_config()["requireJsConfig"];
     
     if (nullptr == json_in) return wilton::support::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
     if (!sl::support::is_uint32(json_in_len)) return wilton::support::alloc_copy(TRACEMSG(
@@ -65,7 +64,7 @@ char* wiltoncall_runscript_duktape(const char* json_in, int json_in_len, char** 
     try {
         uint32_t json_in_len_u32 = static_cast<uint32_t>(json_in_len);
         auto json = std::string(json_in, json_in_len_u32);
-        auto en = thread_local_engine(requirejs_dir_path, requirejs_config);
+        auto en = thread_local_engine(requirejs_dir_path);
         auto res = en->run_script(json);
         if(!res.empty()) {
             *json_out = wilton::support::alloc_copy(res);

@@ -102,6 +102,7 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         // misc
         reg.put("tcp_wait_for_connection", wilton::misc::tcp_wait_for_connection);
         reg.put("process_spawn", wilton::misc::process_spawn);
+        reg.put("get_wiltoncall_config", wilton::misc::get_wiltoncall_config);
         
         return nullptr;
     } catch (const std::exception& e) {

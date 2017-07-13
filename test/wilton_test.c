@@ -27,7 +27,7 @@ void check_err(char* err) {
 
 const char* wilton_config() {
     return "{"
-    "  \"defaultScriptEngine\": \"duktape\"," // optional, duktape is default
+    "  \"defaultScriptEngine\": \"duktape\","
     "  \"requireJsDirPath\": \"../../wilton-requirejs\","
     "  \"requireJsConfig\": {"
     "    \"waitSeconds\": 0,"

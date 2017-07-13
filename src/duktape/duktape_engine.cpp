@@ -188,7 +188,7 @@ class duktape_engine::impl : public sl::pimpl::object::impl {
     std::unique_ptr<duk_context, std::function<void(duk_context*)>> dukctx;
     
 public:
-    impl(const std::string& requirejs_dir_path, const sl::json::value& requirejs_config) :
+    impl(const std::string& requirejs_dir_path) :
     dukctx(duk_create_heap(nullptr, nullptr, nullptr, nullptr, fatal_handler), ctx_deleter) {
         auto ctx = dukctx.get();
         if (nullptr == ctx) throw common::wilton_internal_exception(TRACEMSG(
@@ -198,11 +198,7 @@ public:
         });
         register_c_func(ctx, "WILTON_load", load_func, 1);
         register_c_func(ctx, "WILTON_wiltoncall", wiltoncall_func, 2);        
-        eval_js(ctx, "WILTON_REQUIREJS_DIRECTORY = \"" + requirejs_dir_path + "/\"");
-        auto rcf = requirejs_config.dumps();
-        std::replace(rcf.begin(), rcf.end(), '\n', ' ');
-        eval_js(ctx, "WILTON_REQUIREJS_CONFIG = '" + rcf + "'");
-        auto code = read_file(requirejs_dir_path + "/wilton-duktape.js");
+        auto code = read_file(requirejs_dir_path + "/wilton-require.js");
         eval_js(ctx, code);
     }
 
@@ -228,7 +224,7 @@ public:
     }    
 };
 
-PIMPL_FORWARD_CONSTRUCTOR(duktape_engine, (const std::string&)(const sl::json::value&), (), common::wilton_internal_exception)
+PIMPL_FORWARD_CONSTRUCTOR(duktape_engine, (const std::string&), (), common::wilton_internal_exception)
 PIMPL_FORWARD_METHOD(duktape_engine, std::string, run_script, (const std::string&), (), common::wilton_internal_exception)
 
 

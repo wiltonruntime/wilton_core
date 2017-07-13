@@ -148,6 +148,8 @@ namespace misc {
 sl::support::optional<sl::io::span<char>> tcp_wait_for_connection(sl::io::span<const char> data);
 
 sl::support::optional<sl::io::span<char>> process_spawn(sl::io::span<const char> data);
+
+sl::support::optional<sl::io::span<char>> get_wiltoncall_config(sl::io::span<const char> data);
     
 } // namespace
 
