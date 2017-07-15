@@ -151,7 +151,8 @@ int main(int argc, char** argv) {
         });
 
         // init signals/ctrl+c to allow their use fron js
-        sl::utils::initialize_signals();
+        // todo: hide behind switch
+//        sl::utils::initialize_signals();
         
         // call index.js
         char* out = nullptr;

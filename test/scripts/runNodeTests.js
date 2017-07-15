@@ -31,6 +31,7 @@ define([
     "minimist/test/whitespace",
 // slow in duktape
 //  "validator/test/sanitizers",
+    "validator/wilton-sanity-test",
     "moment/wilton-sanity-test",
     "bluebird/wilton-sanity-test",
     "sprintf-js/test/test",
