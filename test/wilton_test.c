@@ -28,12 +28,14 @@ void check_err(char* err) {
 const char* wilton_config() {
     return "{"
     "  \"defaultScriptEngine\": \"duktape\","
-    "  \"requireJsDirPath\": \"../../wilton-requirejs\","
     "  \"requireJsConfig\": {"
     "    \"waitSeconds\": 0,"
     "    \"enforceDefine\": true,"
     "    \"nodeIdCompat\": true,"
-    "    \"baseUrl\": \"../../modules\""
+    "    \"baseUrl\": \"../../modules\","
+    "    \"paths\": {"
+    "      \"test/scripts\": \"file://../test/scripts\" "
+    "    }"
     "  }"
     "}";
 }
@@ -99,8 +101,8 @@ void test_wiltonjs() {
     init_logging();
     const char* config = wilton_config();
     wiltoncall_init(config, (int) strlen(config));
-    runScript("{\"module\": \"runWiltonTests\", \"func\": \"main\"}");
-//    runScript("{\"module\": \"runNodeTests\"}");
+    runScript("{\"module\": \"test/scripts/runWiltonTests\", \"func\": \"main\"}");
+//    runScript("{\"module\": \"test/scripts/runNodeTests\", \"func\": \"main\"}");
     
 }
 

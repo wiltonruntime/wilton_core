@@ -20,7 +20,6 @@ namespace launcher {
 class cli_options {
     std::vector<struct poptOption> table;
     char* modules_dir_ptr = nullptr;
-    char* requirejs_dir_ptr = nullptr;
     char* startup_module_name_ptr = nullptr;
     
 public:    
@@ -30,7 +29,6 @@ public:
 
     // public options list
     std::string modules_dir;
-    std::string requirejs_dir;
     std::string startup_module_name;
     int help = 0;
     std::string indexjs;
@@ -38,7 +36,6 @@ public:
     cli_options(int argc, char** argv) :
     table({
         { "modules-dir", 'm', POPT_ARG_STRING, std::addressof(modules_dir_ptr), static_cast<int> ('m'), "Path to modules directory", nullptr},
-        { "requirejs-dir", 'r', POPT_ARG_STRING, std::addressof(requirejs_dir_ptr), static_cast<int> ('r'), "Path to requirejs directory", nullptr},
         { "startup-module-name", 's', POPT_ARG_STRING, std::addressof(startup_module_name_ptr), static_cast<int> ('s'), "Name of the index module", nullptr},
         { "help", 'h', POPT_ARG_NONE, std::addressof(help), static_cast<int> ('h'), "Show this help message", nullptr},
         { nullptr, 0, 0, nullptr, 0, nullptr, nullptr}
@@ -81,15 +78,12 @@ public:
         std::replace(indexjs.begin(), indexjs.end(), '\\', '/');
         modules_dir = nullptr != modules_dir_ptr ? std::string(modules_dir_ptr) : "";
         fix_dir_slashes(modules_dir);
-        requirejs_dir = nullptr != requirejs_dir_ptr ? std::string(requirejs_dir_ptr) : "";
-        fix_dir_slashes(requirejs_dir);
         startup_module_name = nullptr != startup_module_name_ptr ? std::string(startup_module_name_ptr) : "";
     }
     
     const std::string& usage() {
         static std::string msg = "OPTIONS: wilton path/to/script.js"
                 " [-m|--modules-dir=STRING]"
-                " [-r|--requirejs-dir=STRING]"
                 " [-s|--startup-module-name=STRING]"
                 " [-- <app arguments>]";
         return msg;

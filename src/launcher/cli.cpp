@@ -30,28 +30,11 @@ int find_launcher_args_end(int argc, char** argv) {
     return argc;
 }
 
-std::string find_modules_dir(const std::string& opt_modulesdir, const std::string& idxfile_or_dir) {
-    if (!opt_modulesdir.empty()) {
-        return opt_modulesdir;
-    } 
-    std::string md = sl::utils::strip_filename(idxfile_or_dir);
-    if (md == idxfile_or_dir) {
-        if (!('/' == md.at(md.length() -1))) {
-            md.push_back('/');
-        }
-        md.append("../");
-    }
-    return md;
-}
-
-std::string find_requirejs_dir(const std::string& opts_requirejsdir) {
-    if (!opts_requirejsdir.empty()) {
-        return opts_requirejsdir;
-    }
+std::string find_exedir() {
     auto exepath = sl::utils::current_executable_path();
     auto exedir = sl::utils::strip_filename(exepath);
     std::replace(exedir.begin(), exedir.end(), '\\', '/');
-    return exedir + "requirejs";
+    return exedir;
 }
 
 std::string find_startup_module(const std::string& opts_startup_module_name, const std::string& idxfile_or_dir) {
@@ -114,23 +97,17 @@ int main(int argc, char** argv) {
         }
         if (indexpath.is_directory() && '/' != idxfile_or_dir.at(idxfile_or_dir.length() -1)) {
             idxfile_or_dir.push_back('/');
-        }                
+        }
+        
+        auto exedir = find_exedir();
         
         // check modules dir
-        auto moddir = find_modules_dir(opts.modules_dir, idxfile_or_dir);
+        auto moddir = !opts.modules_dir.empty() ? opts.modules_dir : exedir + "modules";
         auto modpath = sl::tinydir::path(moddir);
         if (!(modpath.exists() && modpath.is_directory())) {
             std::cerr << "ERROR: specified modules directory not found: [" + moddir + "]" << std::endl;
             return 1;
         }       
-        
-        // check requirejs dir
-        auto rjdir = find_requirejs_dir(opts.requirejs_dir);
-        auto rjpath = sl::tinydir::path(rjdir);
-        if (!(rjpath.exists() && rjpath.is_directory())) {
-            std::cerr << "ERROR: specified requirejs directory not found: [" + rjdir + "]" << std::endl;
-            return 1;
-        }
         
         // get index module
         auto startmod = find_startup_module(opts.startup_module_name, idxfile_or_dir);
@@ -139,7 +116,6 @@ int main(int argc, char** argv) {
         // wilton init
         auto config = sl::json::dumps({
             {"defaultScriptEngine", "duktape"},
-            {"requireJsDirPath", rjdir},
             {"requireJsConfig", {
                     {"waitSeconds", 0},
                     {"enforceDefine", true},
