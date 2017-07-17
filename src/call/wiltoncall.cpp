@@ -60,8 +60,9 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         // init static modules index
         auto cf = sl::json::loads(config_json_str);
         auto modpath = cf["requireJsConfig"]["baseUrl"].as_string_nonempty_or_throw("requireJsConfig.baseUrl");
-        if (sl::utils::ends_with(modpath, ".zip")) {
-            wilton::internal::static_modules_idx(new sl::unzip::file_index(modpath));
+        if (sl::utils::starts_with(modpath, wilton::internal::mzip_proto_prefix)) {
+            auto zippath = modpath.substr(wilton::internal::mzip_proto_prefix.length());
+            wilton::internal::static_modules_idx(new sl::unzip::file_index(zippath));
         }
         
         // registry
@@ -108,8 +109,9 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("fs_read_file", wilton::fs::fs_read_file);
         reg.put("fs_write_file", wilton::fs::fs_write_file);
         reg.put("fs_list_directory", wilton::fs::fs_list_directory);
-        reg.put("fs_read_module_script", wilton::fs::fs_read_module_script);
-        reg.put("fs_read_module_resource", wilton::fs::fs_read_module_resource);
+        // load
+        reg.put("load_module_resource", wilton::load::load_module_resource);
+        reg.put("load_module_script", wilton::load::load_module_script);
         // dyload
         reg.put("dyload_shared_library", wilton::dyload::dyload_shared_library);
         // misc

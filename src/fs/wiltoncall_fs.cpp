@@ -171,38 +171,5 @@ sl::support::optional<sl::io::span<char>> fs_list_directory(sl::io::span<const c
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_read_module_script(sl::io::span<const char> data) {
-    auto path = std::string(data.data(), data.size());
-    if (sl::utils::starts_with(path, "file://")) {
-        path = path.substr(7);
-    }
-    try {
-        return support::string_span(read_file_or_zip_entry(path));
-    } catch (const std::exception& epath) {
-        std::string tpath = path;
-        if (sl::utils::ends_with(tpath, ".js")) {
-            tpath.resize(tpath.length() - 3);
-        }
-        if (!sl::utils::ends_with(tpath, "/")) {
-            tpath.push_back('/');
-        }
-        auto main = read_main_from_package_json(tpath);
-        tpath.append(main);
-        try {
-            return support::string_span(read_file_or_zip_entry(tpath));
-        } catch (const std::exception& etpath) {
-            throw common::wilton_internal_exception(TRACEMSG(epath.what() + "\n" + etpath.what()));
-        }
-    }
-}
-
-sl::support::optional<sl::io::span<char>> fs_read_module_resource(sl::io::span<const char> data) {
-    auto path = std::string(data.data(), data.size());
-    if (sl::utils::starts_with(path, "file://")) {
-        path = path.substr(7);
-    }
-    return support::string_span(read_file_or_zip_entry(path));
-}
-
 } // namespace
 }

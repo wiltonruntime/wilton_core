@@ -70,7 +70,7 @@ duk_ret_t load_func(duk_context* ctx) {
         }    
         path = std::string(path_ptr, path_len);
         // read file
-        auto code = fs::fs_read_module_script({path.c_str(), path.length()});
+        auto code = load::load_module_script({path.c_str(), path.length()});
         if (!code) {
             throw common::wilton_internal_exception(TRACEMSG(
                     "\nInvalid empty source code loaded, path: [" + path + "]").c_str());
@@ -192,7 +192,7 @@ public:
         register_c_func(ctx, "WILTON_load", load_func, 1);
         register_c_func(ctx, "WILTON_wiltoncall", wiltoncall_func, 2);
         auto code_path = requirejs_dir_path + "/wilton-require.js";
-        auto code = wilton::fs::fs_read_module_script(sl::io::make_span(code_path.c_str(), code_path.length()));
+        auto code = load::load_module_script(sl::io::make_span(code_path.c_str(), code_path.length()));
         if (!code) throw common::wilton_internal_exception(TRACEMSG(
                 "Error loading requirejs, path: [" + code_path + "]"));
         eval_js(ctx, std::string(code.value().data(), code.value().size()));

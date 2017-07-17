@@ -131,11 +131,17 @@ sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char>
 
 sl::support::optional<sl::io::span<char>> fs_list_directory(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_read_module_script(sl::io::span<const char> data);
-
-sl::support::optional<sl::io::span<char>> fs_read_module_resource(sl::io::span<const char> data);
-
 } // namespace
+
+// load
+
+namespace load {
+
+sl::support::optional<sl::io::span<char>> load_module_resource(sl::io::span<const char> data);
+
+sl::support::optional<sl::io::span<char>> load_module_script(sl::io::span<const char> data);
+
+}
 
 // dyload
 
@@ -160,6 +166,9 @@ sl::support::optional<sl::io::span<char>> get_wiltoncall_config(sl::io::span<con
 // internal api
 
 namespace internal {
+
+const std::string file_proto_prefix = "file://";
+const std::string mzip_proto_prefix = "mzip://";
 
 const sl::json::value& static_wiltoncall_config(const std::string& cf_json = "");
 

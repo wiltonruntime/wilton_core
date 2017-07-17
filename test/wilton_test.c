@@ -32,7 +32,8 @@ const char* wilton_config() {
     "    \"waitSeconds\": 0,"
     "    \"enforceDefine\": true,"
     "    \"nodeIdCompat\": true,"
-    "    \"baseUrl\": \"../../modules\","
+//    "    \"baseUrl\": \"file://../../modules\","
+    "    \"baseUrl\": \"mzip://../../modules.zip\","
     "    \"paths\": {"
     "      \"test/scripts\": \"file://../test/scripts\" "
     "    }"
@@ -102,6 +103,7 @@ void test_wiltonjs() {
     const char* config = wilton_config();
     wiltoncall_init(config, (int) strlen(config));
     runScript("{\"module\": \"test/scripts/runWiltonTests\", \"func\": \"main\"}");
+//    runScript("{\"module\": \"test/scripts/runWiltonTests\", \"func\": \"main\"}");
 //    runScript("{\"module\": \"test/scripts/runNodeTests\", \"func\": \"main\"}");
     
 }

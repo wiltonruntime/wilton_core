@@ -102,16 +102,18 @@ int main(int argc, char** argv) {
         auto exedir = find_exedir();
         
         // check modules dir
-        auto moddir = !opts.modules_dir.empty() ? opts.modules_dir : exedir + "modules";
-        if (!sl::utils::ends_with(moddir, ".zip") && '/' != moddir.at(moddir.length() - 1)) {
-            moddir.push_back('/');
-        }
+        auto moddir = !opts.modules_dir_or_zip.empty() ? opts.modules_dir_or_zip : exedir + "modules.zip";
         auto modpath = sl::tinydir::path(moddir);
-        if (!(modpath.exists() && (modpath.is_directory() || 
-                (sl::utils::ends_with(moddir, ".zip") && modpath.is_regular_file())))) {
-            std::cerr << "ERROR: specified modules directory not found: [" + moddir + "]" << std::endl;
+        if (!modpath.exists()) {
+            std::cerr << "ERROR: specified modules directory (or zip bundle) not found: [" + moddir + "]" << std::endl;
             return 1;
-        }       
+        }
+        auto modurl = modpath.is_directory() ?
+                std::string("file://") + moddir :
+                std::string("mzip://") + moddir;
+        if (modpath.is_directory() && '/' != modurl.at(modurl.length() - 1)) {
+            modurl.push_back('/');
+        }
         
         // get index module
         auto startmod = find_startup_module(opts.startup_module_name, idxfile_or_dir);
@@ -124,15 +126,13 @@ int main(int argc, char** argv) {
                     {"waitSeconds", 0},
                     {"enforceDefine", true},
                     {"nodeIdCompat", true},
-                    {"baseUrl", moddir},
+                    {"baseUrl", modurl},
                     {"paths", {
                         { startmod, "file://" + startmodpath }
                     }}
                 }
             }
         });
-        
-//        std::cerr << config << std::endl;
         
         auto err_init = wiltoncall_init(config.c_str(), static_cast<int> (config.length()));
         if (nullptr != err_init) {
@@ -154,7 +154,7 @@ int main(int argc, char** argv) {
                 }()}
         });
 
-        // init signals/ctrl+c to allow their use fron js
+        // init signals/ctrl+c to allow their use from js
         // todo: hide behind switch
 //        sl::utils::initialize_signals();
         

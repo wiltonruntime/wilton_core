@@ -148,6 +148,11 @@ list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_CALL} )
 set ( ${PROJECT_NAME}_SRC_COMMON 
         ${CMAKE_CURRENT_LIST_DIR}/src/common/utils.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_COMMON} )
+# load
+set ( ${PROJECT_NAME}_SRC_LOAD
+        ${CMAKE_CURRENT_LIST_DIR}/src/load/wiltoncall_load.cpp )
+list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_LOAD} )
+
 # dyload
 set ( ${PROJECT_NAME}_SRC_DYLOAD
         ${CMAKE_CURRENT_LIST_DIR}/src/dyload/wiltoncall_dyload.cpp )
