@@ -15,6 +15,7 @@
 #include "staticlib/json.hpp"
 #include "staticlib/io.hpp"
 #include "staticlib/support.hpp"
+#include "staticlib/unzip.hpp"
 #include "staticlib/utils.hpp"
 
 #include "wilton/wiltoncall.h"
@@ -130,7 +131,9 @@ sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char>
 
 sl::support::optional<sl::io::span<char>> fs_list_directory(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_read_script_file_or_module(sl::io::span<const char> data);
+sl::support::optional<sl::io::span<char>> fs_read_module_script(sl::io::span<const char> data);
+
+sl::support::optional<sl::io::span<char>> fs_read_module_resource(sl::io::span<const char> data);
 
 } // namespace
 
@@ -159,6 +162,8 @@ sl::support::optional<sl::io::span<char>> get_wiltoncall_config(sl::io::span<con
 namespace internal {
 
 const sl::json::value& static_wiltoncall_config(const std::string& cf_json = "");
+
+sl::support::observer_ptr<sl::unzip::file_index> static_modules_idx(sl::unzip::file_index* = nullptr);
 
 void clean_duktape_thread_local(const std::thread::id& tid);
 

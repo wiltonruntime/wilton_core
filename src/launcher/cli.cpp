@@ -103,8 +103,12 @@ int main(int argc, char** argv) {
         
         // check modules dir
         auto moddir = !opts.modules_dir.empty() ? opts.modules_dir : exedir + "modules";
+        if (!sl::utils::ends_with(moddir, ".zip") && '/' != moddir.at(moddir.length() - 1)) {
+            moddir.push_back('/');
+        }
         auto modpath = sl::tinydir::path(moddir);
-        if (!(modpath.exists() && modpath.is_directory())) {
+        if (!(modpath.exists() && (modpath.is_directory() || 
+                (sl::utils::ends_with(moddir, ".zip") && modpath.is_regular_file())))) {
             std::cerr << "ERROR: specified modules directory not found: [" + moddir + "]" << std::endl;
             return 1;
         }       

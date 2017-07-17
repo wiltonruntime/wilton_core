@@ -33,6 +33,11 @@ const sl::json::value& static_wiltoncall_config(const std::string& cf_json) {
     return cf;
 }
 
+sl::support::observer_ptr<sl::unzip::file_index> static_modules_idx(sl::unzip::file_index* index) {
+    static std::unique_ptr<sl::unzip::file_index> idx = std::unique_ptr<sl::unzip::file_index>(index);
+    return sl::support::make_observer_ptr(idx.get());
+}
+
 } // namespace
 }
 
@@ -52,6 +57,13 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         auto config_json_str = std::string(config_json, static_cast<uint16_t> (config_json_len));
         wilton::internal::static_wiltoncall_config(config_json_str);
                 
+        // init static modules index
+        auto cf = sl::json::loads(config_json_str);
+        auto modpath = cf["requireJsConfig"]["baseUrl"].as_string_nonempty_or_throw("requireJsConfig.baseUrl");
+        if (sl::utils::ends_with(modpath, ".zip")) {
+            wilton::internal::static_modules_idx(new sl::unzip::file_index(modpath));
+        }
+        
         // registry
         auto& reg = static_registry();
         
@@ -96,7 +108,8 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("fs_read_file", wilton::fs::fs_read_file);
         reg.put("fs_write_file", wilton::fs::fs_write_file);
         reg.put("fs_list_directory", wilton::fs::fs_list_directory);
-        reg.put("fs_read_script_file_or_module", wilton::fs::fs_read_script_file_or_module);
+        reg.put("fs_read_module_script", wilton::fs::fs_read_module_script);
+        reg.put("fs_read_module_resource", wilton::fs::fs_read_module_resource);
         // dyload
         reg.put("dyload_shared_library", wilton::dyload::dyload_shared_library);
         // misc

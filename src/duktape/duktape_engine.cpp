@@ -60,13 +60,6 @@ std::string format_error(duk_context* ctx) {
     }
 }
 
-std::string read_file(const std::string& path) {
-    auto src = sl::tinydir::file_source(path);
-    auto sink = sl::io::string_sink();
-    sl::io::copy_all(src, sink);
-    return std::move(sink.get_string());
-}
-
 duk_ret_t load_func(duk_context* ctx) {
     std::string path = "";
     try {        
@@ -77,7 +70,7 @@ duk_ret_t load_func(duk_context* ctx) {
         }    
         path = std::string(path_ptr, path_len);
         // read file
-        auto code = fs::fs_read_script_file_or_module({path.c_str(), path.length()});
+        auto code = fs::fs_read_module_script({path.c_str(), path.length()});
         if (!code) {
             throw common::wilton_internal_exception(TRACEMSG(
                     "\nInvalid empty source code loaded, path: [" + path + "]").c_str());
@@ -197,9 +190,13 @@ public:
             pop_stack(ctx);
         });
         register_c_func(ctx, "WILTON_load", load_func, 1);
-        register_c_func(ctx, "WILTON_wiltoncall", wiltoncall_func, 2);        
-        auto code = read_file(requirejs_dir_path + "/wilton-require.js");
-        eval_js(ctx, code);
+        register_c_func(ctx, "WILTON_wiltoncall", wiltoncall_func, 2);
+        auto code_path = requirejs_dir_path + "/wilton-require.js";
+        auto code = wilton::fs::fs_read_module_script(sl::io::make_span(code_path.c_str(), code_path.length()));
+        if (!code) throw common::wilton_internal_exception(TRACEMSG(
+                "Error loading requirejs, path: [" + code_path + "]"));
+        eval_js(ctx, std::string(code.value().data(), code.value().size()));
+        wilton_free(code.value().data());
     }
 
     std::string run_script(duktape_engine&, const std::string& callback_script_json) {

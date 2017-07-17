@@ -77,7 +77,7 @@ public:
         indexjs = 0 == help ? args.at(0) : "";
         std::replace(indexjs.begin(), indexjs.end(), '\\', '/');
         modules_dir = nullptr != modules_dir_ptr ? std::string(modules_dir_ptr) : "";
-        fix_dir_slashes(modules_dir);
+        std::replace(modules_dir.begin(), modules_dir.end(), '\\', '/');
         startup_module_name = nullptr != startup_module_name_ptr ? std::string(startup_module_name_ptr) : "";
     }
     
@@ -96,17 +96,6 @@ public:
     cli_options(const cli_options& other) = delete;
 
     cli_options& operator=(const cli_options& other) = delete;
-
-private:
-    static void fix_dir_slashes(std::string& dir) {
-        if (!dir.empty()) {
-            std::replace(dir.begin(), dir.end(), '\\', '/');        
-            if ('/' != dir.at(dir.length() - 1)) {
-                dir.push_back('/');
-            }
-        }
-    }
-    
 };
 
 

@@ -11,6 +11,7 @@
 
 #include "staticlib/io.hpp"
 #include "staticlib/ranges.hpp"
+#include "staticlib/support.hpp"
 #include "staticlib/tinydir.hpp"
 
 #include "wilton/wilton.h"
@@ -20,11 +21,42 @@ namespace fs {
 
 namespace { // anonymous
 
+// todo: think about the non-throwing fail logic
+
 std::string read_file(const std::string& path) {
     auto src = sl::tinydir::file_source(path);
     auto sink = sl::io::string_sink();
     sl::io::copy_all(src, sink);
     return std::move(sink.get_string());
+}
+
+std::string read_zip_entry(const sl::unzip::file_index& idx, const std::string& path) {
+    auto enpath = path;
+    sl::utils::replace_all(enpath, "/./", "/");
+    auto& zippath = idx.get_zip_file_path();
+    if (enpath.length() > zippath.length() && sl::utils::starts_with(enpath, zippath)) {
+        auto en_path = enpath.substr(zippath.length() + 1);
+        auto stream = sl::unzip::open_zip_entry(idx, en_path);
+        auto src = sl::io::streambuf_source(stream.get());
+        auto sink = sl::io::string_sink();
+        sl::io::copy_all(src, sink);
+        return std::move(sink.get_string());
+    }
+    throw wilton::common::wilton_internal_exception(TRACEMSG("Error loading zip entry," +
+            " path: [" + path +"], zip file: [" + zippath + "]"));
+}
+
+std::string read_file_or_zip_entry(const std::string& path) {
+    auto idx_ptr = wilton::internal::static_modules_idx();
+    if (idx_ptr.has_value()) {
+        try {
+            return read_zip_entry(*idx_ptr, path);
+        } catch (const std::exception&) {
+            return read_file(path);
+        }
+    } else {
+        return read_file(path);
+    }
 }
 
 void write_file(const std::string& path, const std::string& contents) {
@@ -44,14 +76,14 @@ std::vector<std::string> list_directory(const std::string& path) {
 std::string read_main_from_package_json(const std::string& path) {
     std::string pjpath = std::string(path) + "package.json";
     try {
-        auto src = sl::tinydir::file_source(pjpath);
-        auto pj = sl::json::load(src);
+        auto src = read_file_or_zip_entry(pjpath);
+        auto pj = sl::json::loads(src);
         auto main = pj["main"].as_string("index.js");
         if (!sl::utils::ends_with(main, ".js")) {
             main.append(".js");
         }
         return main;
-    } catch (const sl::tinydir::tinydir_exception&) {
+    } catch (const std::exception&) {
         return "index.js";
     }
 }
@@ -139,14 +171,14 @@ sl::support::optional<sl::io::span<char>> fs_list_directory(sl::io::span<const c
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_read_script_file_or_module(sl::io::span<const char> data) {
+sl::support::optional<sl::io::span<char>> fs_read_module_script(sl::io::span<const char> data) {
     auto path = std::string(data.data(), data.size());
     if (sl::utils::starts_with(path, "file://")) {
         path = path.substr(7);
     }
     try {
-        return support::string_span(read_file(path));
-    } catch (const sl::tinydir::tinydir_exception& epath) {
+        return support::string_span(read_file_or_zip_entry(path));
+    } catch (const std::exception& epath) {
         std::string tpath = path;
         if (sl::utils::ends_with(tpath, ".js")) {
             tpath.resize(tpath.length() - 3);
@@ -157,11 +189,19 @@ sl::support::optional<sl::io::span<char>> fs_read_script_file_or_module(sl::io::
         auto main = read_main_from_package_json(tpath);
         tpath.append(main);
         try {
-            return support::string_span(read_file(tpath));
-        } catch (const sl::tinydir::tinydir_exception& etpath) {
+            return support::string_span(read_file_or_zip_entry(tpath));
+        } catch (const std::exception& etpath) {
             throw common::wilton_internal_exception(TRACEMSG(epath.what() + "\n" + etpath.what()));
         }
     }
+}
+
+sl::support::optional<sl::io::span<char>> fs_read_module_resource(sl::io::span<const char> data) {
+    auto path = std::string(data.data(), data.size());
+    if (sl::utils::starts_with(path, "file://")) {
+        path = path.substr(7);
+    }
+    return support::string_span(read_file_or_zip_entry(path));
 }
 
 } // namespace

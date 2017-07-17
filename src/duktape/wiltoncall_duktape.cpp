@@ -55,7 +55,7 @@ char* wiltoncall_runscript_duktape(const char* json_in, int json_in_len, char** 
         int* json_out_len) /* noexcept */ {
     static const std::string& requirejs_dir_path = 
             wilton::internal::static_wiltoncall_config()["requireJsConfig"]["baseUrl"]
-            .as_string_nonempty_or_throw("requireJsConfig.baseUrl") + "/wilton-requirejs/";
+            .as_string_nonempty_or_throw("requireJsConfig.baseUrl") + "/wilton-requirejs";
     
     if (nullptr == json_in) return wilton::support::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
     if (!sl::support::is_uint32(json_in_len)) return wilton::support::alloc_copy(TRACEMSG(
