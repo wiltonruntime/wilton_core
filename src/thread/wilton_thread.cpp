@@ -64,6 +64,11 @@ char* wilton_thread_sleep_millis(int millis) /* noexcept */ {
 char* wilton_thread_initialize_signals() {
     try {
         sl::utils::initialize_signals();
+        sl::utils::register_signal_listener([] {
+            if (!static_signal_waiter_registered().load(std::memory_order_acquire)) {
+                std::abort();
+            }
+        });
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -79,20 +84,6 @@ char* wilton_thread_wait_for_signal() {
                     "Signal waiting thread is already registered"));
         }
         sl::utils::wait_for_signal();
-        return nullptr;
-    } catch (const std::exception& e) {
-        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
-    }
-}
-
-char* wilton_thread_signal_waiters_count(int* count_out) {
-    if (nullptr == count_out) return wilton::support::alloc_copy(TRACEMSG("Null 'count_out' parameter specified"));
-    try {
-        if (static_signal_waiter_registered().load(std::memory_order_acquire)) {
-            *count_out = 1;
-        } else {
-            *count_out = 0;
-        }
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));

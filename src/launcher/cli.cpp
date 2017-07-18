@@ -64,13 +64,6 @@ void init_signals() {
         wilton_free(err_init);
         throw wilton::support::wilton_support_exception(msg);
     }
-    sl::utils::register_signal_listener([] {
-        int signal_waiters_count = 0;
-        wilton_thread_signal_waiters_count(std::addressof(signal_waiters_count));
-        if (0 == signal_waiters_count) {
-            std::abort();
-        }
-    });
 }
 
 } // namespace
