@@ -60,6 +60,16 @@ char* wilton_thread_sleep_millis(int millis) /* noexcept */ {
     }
 }
 
+// note: sl::utils::initialize_signals() cannot be called directly from another DLL/EXE
+char* wilton_thread_initialize_signals() {
+    try {
+        sl::utils::initialize_signals();
+        return nullptr;
+    } catch (const std::exception& e) {
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}
+
 char* wilton_thread_wait_for_signal() {
     try {
         bool the_false = false;

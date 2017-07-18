@@ -16,6 +16,7 @@
 #include "staticlib/tinydir.hpp"
 
 #include "wilton/wiltoncall.h"
+#include "wilton/support/wilton_support_exception.hpp"
 
 #include "cli_options.hpp"
 
@@ -57,7 +58,12 @@ std::string find_statup_module_path(const std::string& idxfile_or_dir) {
 }
 
 void init_signals() {
-    sl::utils::initialize_signals();
+    auto err_init = wilton_thread_initialize_signals();
+    if (nullptr != err_init) {
+        auto msg = TRACEMSG(err_init);
+        wilton_free(err_init);
+        throw wilton::support::wilton_support_exception(msg);
+    }
     sl::utils::register_signal_listener([] {
         int signal_waiters_count = 0;
         wilton_thread_signal_waiters_count(std::addressof(signal_waiters_count));
