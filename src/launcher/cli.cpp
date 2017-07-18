@@ -56,6 +56,13 @@ std::string find_statup_module_path(const std::string& idxfile_or_dir) {
     return smp;
 }
 
+void init_signals() {
+    sl::utils::initialize_signals();
+    sl::utils::register_signal_listener([] {
+        std::cout << "signal" << std::endl;
+    });
+}
+
 } // namespace
 
 // valgrind run:
@@ -155,8 +162,7 @@ int main(int argc, char** argv) {
         });
 
         // init signals/ctrl+c to allow their use from js
-        // todo: hide behind switch
-//        sl::utils::initialize_signals();
+        init_signals();
         
         // call index.js
         char* out = nullptr;
