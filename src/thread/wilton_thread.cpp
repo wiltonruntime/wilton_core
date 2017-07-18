@@ -8,19 +8,23 @@
 #include "wilton/wilton.h"
 
 #include <cstdint>
-#include <thread>
+#include <atomic>
 #include <chrono>
+#include <thread>
 
 #include "staticlib/config.hpp"
 #include "staticlib/support.hpp"
 #include "staticlib/utils.hpp"
 
 #include "call/wiltoncall_internal.hpp"
+#include "common/wilton_internal_exception.hpp"
 
 namespace { // anonymous
 
-namespace sc = staticlib::config;
-namespace su = staticlib::utils;
+std::atomic<bool>& static_signal_waiter_registered() {
+    static std::atomic<bool> flag{false};
+    return flag;
+}
 
 } // namespace
 
@@ -58,7 +62,27 @@ char* wilton_thread_sleep_millis(int millis) /* noexcept */ {
 
 char* wilton_thread_wait_for_signal() {
     try {
+        bool the_false = false;
+        bool changed = static_signal_waiter_registered().compare_exchange_strong(the_false, true, std::memory_order_acq_rel);
+        if(!changed) {
+            throw wilton::common::wilton_internal_exception(TRACEMSG(
+                    "Signal waiting thread is already registered"));
+        }
         sl::utils::wait_for_signal();
+        return nullptr;
+    } catch (const std::exception& e) {
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}
+
+char* wilton_thread_signal_waiters_count(int* count_out) {
+    if (nullptr == count_out) return wilton::support::alloc_copy(TRACEMSG("Null 'count_out' parameter specified"));
+    try {
+        if (static_signal_waiter_registered().load(std::memory_order_acquire)) {
+            *count_out = 1;
+        } else {
+            *count_out = 0;
+        }
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));

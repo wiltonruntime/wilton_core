@@ -59,14 +59,18 @@ std::string find_statup_module_path(const std::string& idxfile_or_dir) {
 void init_signals() {
     sl::utils::initialize_signals();
     sl::utils::register_signal_listener([] {
-        std::cout << "signal" << std::endl;
+        int signal_waiters_count = 0;
+        wilton_thread_signal_waiters_count(std::addressof(signal_waiters_count));
+        if (0 == signal_waiters_count) {
+            std::abort();
+        }
     });
 }
 
 } // namespace
 
 // valgrind run:
-// valgrind --leak-check=yes --show-reachable=yes --track-origins=yes --error-exitcode=42 --track-fds=yes --suppressions=../../../staticlibs/cmake/resources/valgrind/openssl_malloc.supp  ./bin/wilton ../../modules/runWiltonTests.js -r ../../wilton-requirejs/
+// valgrind --leak-check=yes --show-reachable=yes --track-origins=yes --error-exitcode=42 --track-fds=yes --suppressions=../../../staticlibs/cmake/resources/valgrind/openssl_malloc.supp  ./bin/wilton ../test/scripts/runWiltonTests.js -m ../../modules.zip
 
 int main(int argc, char** argv) {    
     try {

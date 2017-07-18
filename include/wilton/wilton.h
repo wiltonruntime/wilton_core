@@ -501,6 +501,8 @@ WILTON_EXPORT char* wilton_thread_sleep_millis(
 
 WILTON_EXPORT char* wilton_thread_wait_for_signal();
 
+WILTON_EXPORT char* wilton_thread_signal_waiters_count(int* count_out);
+
 // misc
 
 WILTON_EXPORT char* wilton_alloc(
