@@ -35,7 +35,7 @@ public:
 
     cli_options(int argc, char** argv) :
     table({
-        { "modules-dir-or-zip", 'm', POPT_ARG_STRING, std::addressof(modules_dir_or_zip_ptr), static_cast<int> ('m'), "Path to modules directory or zip bundle", nullptr},
+        { "js-modules-dir-or-zip", 'm', POPT_ARG_STRING, std::addressof(modules_dir_or_zip_ptr), static_cast<int> ('m'), "Path to JavaScript modules directory or zip bundle", nullptr},
         { "startup-module-name", 's', POPT_ARG_STRING, std::addressof(startup_module_name_ptr), static_cast<int> ('s'), "Name of the index module", nullptr},
         { "help", 'h', POPT_ARG_NONE, std::addressof(help), static_cast<int> ('h'), "Show this help message", nullptr},
         { nullptr, 0, 0, nullptr, 0, nullptr, nullptr}

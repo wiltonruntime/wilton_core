@@ -503,6 +503,8 @@ WILTON_EXPORT char* wilton_thread_initialize_signals();
 
 WILTON_EXPORT char* wilton_thread_wait_for_signal();
 
+WILTON_EXPORT char* wilton_thread_fire_signal();
+
 // misc
 
 WILTON_EXPORT char* wilton_alloc(

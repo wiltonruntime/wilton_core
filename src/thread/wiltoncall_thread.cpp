@@ -91,6 +91,15 @@ sl::support::optional<sl::io::span<char>> thread_wait_for_signal(sl::io::span<co
     return support::empty_span();
 }
 
+sl::support::optional<sl::io::span<char>> thread_fire_signal(sl::io::span<const char>) {
+    // call wilton
+    char* err = wilton_thread_fire_signal();
+    if (nullptr != err) {
+        common::throw_wilton_error(err, TRACEMSG(err));
+    }
+    return support::empty_span();
+}
+
 
 } // namespace
 }

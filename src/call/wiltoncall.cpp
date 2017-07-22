@@ -105,6 +105,7 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("thread_run", wilton::thread::thread_run);
         reg.put("thread_sleep_millis", wilton::thread::thread_sleep_millis);
         reg.put("thread_wait_for_signal", wilton::thread::thread_wait_for_signal);
+        reg.put("thread_fire_signal", wilton::thread::thread_fire_signal);
         // fs
         reg.put("fs_read_file", wilton::fs::fs_read_file);
         reg.put("fs_write_file", wilton::fs::fs_write_file);

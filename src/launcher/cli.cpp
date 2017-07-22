@@ -112,7 +112,7 @@ int main(int argc, char** argv) {
         auto exedir = find_exedir();
         
         // check modules dir
-        auto moddir = !opts.modules_dir_or_zip.empty() ? opts.modules_dir_or_zip : exedir + "modules.zip";
+        auto moddir = !opts.modules_dir_or_zip.empty() ? opts.modules_dir_or_zip : exedir + "js.zip";
         auto modpath = sl::tinydir::path(moddir);
         if (!modpath.exists()) {
             std::cerr << "ERROR: specified modules directory (or zip bundle) not found: [" + moddir + "]" << std::endl;

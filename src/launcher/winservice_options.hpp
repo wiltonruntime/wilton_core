@@ -25,20 +25,19 @@ public:
     std::vector<std::string> args;
 
     // public options list
-    char* config = nullptr;
+    char* config_ptr = nullptr;
+    std::string config;
     int install = 0;
     int uninstall = 0;
     int stop = 0;
-    int direct = 0;
     int help = 0;
 
     winservice_options(int argc, char** argv) :
     table({
-        { "config", 'c', POPT_ARG_STRING, std::addressof(config), static_cast<int> ('c'), "Path to config file", nullptr},
+        { "config", 'c', POPT_ARG_STRING, std::addressof(config_ptr), static_cast<int> ('c'), "Path to config file", nullptr},
         { "install", 'i', POPT_ARG_NONE, std::addressof(install), static_cast<int> ('i'), "Install this executable as Windows Service", nullptr},
         { "uninstall", 'u', POPT_ARG_NONE, std::addressof(uninstall), static_cast<int> ('u'), "Uninstall Windows Service (must be stopped)", nullptr},
         { "stop", 's', POPT_ARG_NONE, std::addressof(stop), static_cast<int> ('s'), "Stop Windows Service", nullptr},
-        { "direct", 'd', POPT_ARG_NONE, std::addressof(direct), static_cast<int> ('d'), "Run target script directly", nullptr},
         { "help", 'h', POPT_ARG_NONE, std::addressof(help), static_cast<int> ('h'), "Show this help message", nullptr},
         { nullptr, 0, 0, nullptr, 0, nullptr, nullptr}
     }) {
@@ -78,6 +77,9 @@ public:
                 }
             }
         }
+        
+        // set vars
+        config = nullptr != config_ptr ? std::string(config_ptr) : "";
     }
 
     ~winservice_options() {

@@ -89,3 +89,12 @@ char* wilton_thread_wait_for_signal() {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
 }
+
+char* wilton_thread_fire_signal() {
+    try {
+        sl::utils::fire_signal();
+        return nullptr;
+    } catch (const std::exception& e) {
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}

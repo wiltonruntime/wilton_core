@@ -36,40 +36,56 @@ std::string current_exedir() {
     return exedir;
 }
 
-wilton::launcher::winservice_config load_config(const std::string& exedir, char* cpath) {
-    auto path = [&exedir, cpath] {
-        if (nullptr != cpath) {
-            return std::string(cpath);
-        }
-        return exedir + "config.json";
-    }();
-    std::map<std::string, std::string> values = {{"appdir", exedir}};
-    auto onerr = [](const std::string & err) {
-        throw wilton::launcher::winservice_exception(TRACEMSG(err));
-    };
+std::string replace_appdir(const std::string& str, const std::string& exedir) {
+    auto values = sl::json::dumps({
+        { "exedir", exedir }
+    });
+    char* out = nullptr;
+    int out_len = 0;
+    auto err = wilton_render_mustache(str.c_str(), static_cast<int>(str.length()),
+            values.c_str(), values.length(), std::addressof(out), std::addressof(out_len));
+    if (nullptr != err) {
+        auto msg = TRACEMSG(err);
+        wilton_free(err);
+        throw wilton::launcher::winservice_exception(msg);
+    }
+    auto out_str = std::string(out, out_len);
+    wilton_free(out);
+    return out_str;
+}
+
+wilton::launcher::winservice_config load_config(const std::string& exedir, const std::string& cpath) {
     try {
-        auto src = sl::io::replacer_source<sl::tinydir::file_source>(
-                sl::tinydir::file_source(path), values, onerr, "${", "}");
-        auto json = sl::json::load(src);
-        return wilton::launcher::winservice_config(std::move(json));
+        // get path
+        auto path = !cpath.empty() ? cpath : exedir + "config.json";
+
+        // load file
+        auto src = sl::tinydir::file_source(path);
+        auto conf = sl::json::load(src);
+
+        // substitute appdir in wilton paths
+        auto& wconf = conf.getattr_or_throw("wiltonConfig", "wiltonConfig");
+        auto& rjsconf = wconf.getattr_or_throw("requireJsConfig", "wiltonConfig.requireJsConfig");
+        auto& base_url = rjsconf.getattr_or_throw("baseUrl", "wiltonConfig.requireJsConfig.baseUrl");
+        auto base_url_replaced = replace_appdir(base_url.as_string_nonempty_or_throw("wiltonConfig.requireJsConfig.baseUrl"), exedir);
+        base_url.set_string(base_url_replaced);
+        auto& paths = rjsconf.getattr_or_throw("paths", "wiltonConfig.requireJsConfig.paths");
+        for (auto& pa : paths.as_object_or_throw("wiltonConfig.requireJsConfig.paths")) {
+            auto pa_replaced = replace_appdir(pa.as_string_nonempty_or_throw("wiltonConfig.requireJsConfig.paths._"), exedir);
+            pa.val().set_string(pa_replaced);
+        }
+        
+        // return partially parsed config
+        return wilton::launcher::winservice_config(std::move(conf));
     } catch (const std::exception& e) {
         throw wilton::launcher::winservice_exception(TRACEMSG(e.what() + 
                 "\nError loading config file, path: [" + path + "]"));
     }
 }
 
-void init_wilton(const std::string& exedir) {
-    auto config = sl::json::dumps({
-        {"defaultScriptEngine", "duktape"},
-        {"requireJsDirPath", exedir + "requirejs"},
-        {"requireJsConfig", {
-                {"waitSeconds", 0},
-                {"enforceDefine", true},
-                {"nodeIdCompat", true},
-                {"baseUrl", exedir + "modules"}
-            }}
-    });
-    auto err = wiltoncall_init(config.c_str(), static_cast<int> (config.length()));
+void init_wilton(wilton::launcher::winservice_config& sconf) {
+    auto& wconf = sconf.json_config.getattr_or_throw("wiltonConfig", "wiltonConfig");
+    auto err = wiltoncall_init(wconf.c_str(), static_cast<int> (wconf.length()));
     if (nullptr != err) {
         auto msg = TRACEMSG(err);
         wilton_free(err);
@@ -77,15 +93,10 @@ void init_wilton(const std::string& exedir) {
     }
 }
 
-void run_script(const std::string& func, const wilton::launcher::winservice_config& conf) {
+void run_script(const wilton::launcher::winservice_config& conf) {
     std::string in = sl::json::dumps({
-        { "module", "index"},
-        { "func", func},
-        { "args", [&conf] {
-                auto vec = std::vector<sl::json::value>();
-                vec.emplace_back(conf.json_config.clone());
-                return vec;
-            } ()},
+        { "module", conf.startup_module},
+        { "func", "main"}
     });
     char* out = nullptr;
     int out_len = 0;
@@ -135,10 +146,10 @@ void start_service_and_wait(const wilton::launcher::winservice_config& conf) {
     auto cf = std::make_shared<wilton::launcher::winservice_config>(conf.clone());
     sl::winservice::start_service_and_wait(conf.service_name,
     [cf] {
-        run_script("start", *cf);
+        run_script(*cf);
     },
-    [cf] {
-        run_script("stop", *cf);
+    [] {
+        wilton_thread_fire_signal();
         std::cout << "Stopping service ..." << std::endl;
     },
     [](const std::string& msg) {
@@ -169,8 +180,8 @@ int main(int argc, char** argv) {
     
     try {
         std::string exedir = current_exedir();
-        init_wilton(exedir);
         wilton::launcher::winservice_config conf = load_config(exedir, opts.config);
+        init_wilton(conf);
 
         if (opts.install) {
             install(conf);
@@ -178,8 +189,6 @@ int main(int argc, char** argv) {
             uninstall(conf);
         } else if (opts.stop) {
             stop(conf);
-        } else if (opts.direct) {
-            run_script("start", conf);
         } else { // SCM call            
             start_service_and_wait(conf);
         }

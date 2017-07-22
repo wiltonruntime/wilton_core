@@ -25,6 +25,7 @@ public:
     std::string display_name;
     std::string user;
     std::string password;
+    std::string startup_module;
 
     winservice_config(const winservice_config&) = delete;
 
@@ -35,7 +36,8 @@ public:
     service_name(std::move(other.service_name)),
     display_name(std::move(other.display_name)),
     user(std::move(other.user)),
-    password(std::move(other.password)) { }
+    password(std::move(other.password)),
+    startup_module(std::move(other.startup_module)) { }
 
     winservice_config& operator=(winservice_config&& other) {
         this->json_config = std::move(other.json_config);
@@ -43,6 +45,7 @@ public:
         this->display_name = std::move(other.display_name);
         this->user = std::move(other.user);
         this->password = std::move(other.password);
+        this->startup_module = std::move(other.startup_module);
         return *this;
     }
 
@@ -60,6 +63,8 @@ public:
                 this->user = fi.as_string_nonempty_or_throw(name);
             } else if ("password" == name) {
                 this->password = fi.as_string_or_throw(name);
+            } else if ("startupModule" == name) {
+                this->startup_module = fi.as_string_or_throw(name);
             } else {
                 throw winservice_exception(TRACEMSG("Unknown 'winservice' field: [" + name + "]"));
             }
@@ -69,7 +74,9 @@ public:
         if (0 == display_name.length()) throw winservice_exception(TRACEMSG(
                 "Invalid 'winservice.displayName' field: []"));
         if (0 == user.length()) throw winservice_exception(TRACEMSG(
-                "Invalid 'winservice.user' field: []"));        
+                "Invalid 'winservice.user' field: []"));
+        if (0 == startup_module.length()) throw winservice_exception(TRACEMSG(
+                "Invalid 'winservice.startupModule' field: []"));        
     }
 
     sl::json::value to_json() const {
@@ -77,7 +84,8 @@ public:
             { "serviceName", service_name },
             { "displayName", display_name },
             { "user", user },
-            { "password", "***" }
+            { "password", "***" },
+            { "startupModule", startup_module },
         };
     }
 
@@ -88,6 +96,7 @@ public:
         res.display_name = std::string(display_name.data(), display_name.length());
         res.user = std::string(user.data(), user.length());
         res.password = std::string(password.data(), password.length());
+        res.startup_module = std::string(startup_module.data(), startup_module.length());
         return res;
     }
 };
