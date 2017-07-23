@@ -36,9 +36,9 @@ std::string current_exedir() {
     return exedir;
 }
 
-std::string replace_appdir(const std::string& str, const std::string& exedir) {
+std::string replace_appdir(const std::string& str, const std::string& appdir) {
     auto values = sl::json::dumps({
-        { "exedir", exedir }
+        { "appdir", appdir }
     });
     char* out = nullptr;
     int out_len = 0;
@@ -54,11 +54,18 @@ std::string replace_appdir(const std::string& str, const std::string& exedir) {
     return out_str;
 }
 
-wilton::launcher::winservice_config load_config(const std::string& exedir, const std::string& cpath) {
+wilton::launcher::winservice_config load_config(const std::string& cpath) {
     std::string path = "";
     try {
         // get path
-        path = !cpath.empty() ? cpath : exedir + "config.json";
+        path = [&cpath] () -> std::string {
+            if (!cpath.empty()) {
+                return cpath;
+            }
+            std::string exedir = current_exedir();
+            return exedir + "../conf/config.json";
+        }();
+        auto appdir = sl::utils::strip_filename(path) + "../";
 
         // load file
         auto src = sl::tinydir::file_source(path);
@@ -68,11 +75,11 @@ wilton::launcher::winservice_config load_config(const std::string& exedir, const
         auto& wconf = conf.getattr_or_throw("wiltonConfig", "wiltonConfig");
         auto& rjsconf = wconf.getattr_or_throw("requireJsConfig", "wiltonConfig.requireJsConfig");
         auto& base_url = rjsconf.getattr_or_throw("baseUrl", "wiltonConfig.requireJsConfig.baseUrl");
-        auto base_url_replaced = replace_appdir(base_url.as_string_nonempty_or_throw("wiltonConfig.requireJsConfig.baseUrl"), exedir);
+        auto base_url_replaced = replace_appdir(base_url.as_string_nonempty_or_throw("wiltonConfig.requireJsConfig.baseUrl"), appdir);
         base_url.set_string(base_url_replaced);
         auto& paths = rjsconf.getattr_or_throw("paths", "wiltonConfig.requireJsConfig.paths");
         for (auto& pa : paths.as_object_or_throw("wiltonConfig.requireJsConfig.paths")) {
-            auto pa_replaced = replace_appdir(pa.as_string_nonempty_or_throw("wiltonConfig.requireJsConfig.paths._"), exedir);
+            auto pa_replaced = replace_appdir(pa.as_string_nonempty_or_throw("wiltonConfig.requireJsConfig.paths._"), appdir);
             pa.val().set_string(pa_replaced);
         }
         
@@ -80,7 +87,7 @@ wilton::launcher::winservice_config load_config(const std::string& exedir, const
         return wilton::launcher::winservice_config(std::move(conf));
     } catch (const std::exception& e) {
         throw wilton::launcher::winservice_exception(TRACEMSG(e.what() + 
-                "\nError loading config file, path: [" + cpath + "]"));
+                "\nError loading config file, path: [" + path + "]"));
     }
 }
 
@@ -179,9 +186,8 @@ int main(int argc, char** argv) {
         return 0;
     }
     
-    try {
-        std::string exedir = current_exedir();
-        wilton::launcher::winservice_config conf = load_config(exedir, opts.config);
+    try {        
+        wilton::launcher::winservice_config conf = load_config(opts.config);
         init_wilton(conf);
 
         if (opts.install) {

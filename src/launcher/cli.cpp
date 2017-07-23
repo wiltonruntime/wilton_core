@@ -57,6 +57,26 @@ std::string find_statup_module_path(const std::string& idxfile_or_dir) {
     return smp;
 }
 
+std::string find_app_dir(const std::string& idxfile_or_dir, const std::string& startmod) {
+    // starting a standalone script
+    if ('/' != idxfile_or_dir.back()) {
+        return sl::utils::strip_filename(idxfile_or_dir);
+    }
+    
+    // starting module
+    size_t depth = 0;
+    for (size_t i = 0; i < startmod.length(); i++) {
+        if ('/' == startmod.at(i)) {
+            depth += 1;
+        }
+    }
+    auto res = std::string(idxfile_or_dir.data(), idxfile_or_dir.length());
+    for (size_t i = 0; i < depth; i++) {
+        res.append("../");
+    }
+    return res;
+}
+
 void init_signals() {
     auto err_init = wilton_thread_initialize_signals();
     if (nullptr != err_init) {
@@ -105,7 +125,7 @@ int main(int argc, char** argv) {
             std::cerr << "ERROR: specified script file not found: [" + idxfile_or_dir + "]" << std::endl;
             return 1;
         }
-        if (indexpath.is_directory() && '/' != idxfile_or_dir.at(idxfile_or_dir.length() -1)) {
+        if (indexpath.is_directory() && '/' != idxfile_or_dir.back()) {
             idxfile_or_dir.push_back('/');
         }
         
@@ -120,7 +140,7 @@ int main(int argc, char** argv) {
         }
         auto modurl = modpath.is_directory() ?
                 std::string("file://") + moddir :
-                std::string("mzip://") + moddir;
+                std::string("zip://") + moddir;
         if (modpath.is_directory() && '/' != modurl.at(modurl.length() - 1)) {
             modurl.push_back('/');
         }
@@ -128,11 +148,13 @@ int main(int argc, char** argv) {
         // get index module
         auto startmod = find_startup_module(opts.startup_module_name, idxfile_or_dir);
         auto startmodpath = find_statup_module_path(idxfile_or_dir);
-
+        auto appdir = find_app_dir(idxfile_or_dir, startmod);
+                
         // wilton init
         auto config = sl::json::dumps({
             {"defaultScriptEngine", "duktape"},
-            {"requireJsConfig", {
+            {"applicationDirectory", appdir},
+            {"requireJs", {
                     {"waitSeconds", 0},
                     {"enforceDefine", true},
                     {"nodeIdCompat", true},

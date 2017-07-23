@@ -59,9 +59,9 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
                 
         // init static modules index
         auto cf = sl::json::loads(config_json_str);
-        auto modpath = cf["requireJsConfig"]["baseUrl"].as_string_nonempty_or_throw("requireJsConfig.baseUrl");
-        if (sl::utils::starts_with(modpath, wilton::internal::mzip_proto_prefix)) {
-            auto zippath = modpath.substr(wilton::internal::mzip_proto_prefix.length());
+        auto modpath = cf["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl");
+        if (sl::utils::starts_with(modpath, wilton::internal::zip_proto_prefix)) {
+            auto zippath = modpath.substr(wilton::internal::zip_proto_prefix.length());
             wilton::common::normalize_path(zippath);
             wilton::internal::static_modules_idx(new sl::unzip::file_index(zippath));
         }

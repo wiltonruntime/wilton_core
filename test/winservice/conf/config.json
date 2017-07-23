@@ -13,9 +13,9 @@
             "waitSeconds": 0,
             "enforceDefine": true,
             "nodeIdCompat": true,
-            "baseUrl": "mzip://{{appdir}}/../../../js.zip",
+            "baseUrl": "zip://{{{appdir}}}/../../../js.zip",
             "paths": {
-                "winservice": "file://{{appdir}}/../../test/winservice"
+                "winservice": "file://{{{appdir}}}/testmod"
             }
         }
     },
@@ -25,16 +25,16 @@
             {
                 "appenderType": "FILE",
                 "thresholdLevel": "DEBUG",
-                "filePath": "{{exedir}}/winservice_log.txt"
+                "filePath": "{{{appdir}}}/../../build/winservice_log.txt"
             }
         ],
         "loggers": [
             {
-                "name": "staticlib",
-                "level": "WARN"
+                "name": "winservice",
+                "level": "DEBUG"
             }, {
                 "name": "wilton",
-                "level": "INFO"
+                "level": "WARN"
             }
         ]
     }

@@ -58,16 +58,3 @@ if ( "${STATICLIB_ROOT_SOURCE_DIR}" STREQUAL "${PROJECT_SOURCE_DIR}" )
     # module
     add_library ( wilton_test_module SHARED ${CMAKE_CURRENT_LIST_DIR}/wilton_test_module.c )
 endif ( )
-
-# test dir structure
-add_custom_target ( testcopy ALL
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_CURRENT_LIST_DIR}/winservice/config.json
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/config.json
-
-        COMMAND ${CMAKE_COMMAND} -E make_directory
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/modules
-
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_CURRENT_LIST_DIR}/winservice/index.js
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/modules/index.js )

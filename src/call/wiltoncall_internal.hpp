@@ -170,7 +170,7 @@ sl::support::optional<sl::io::span<char>> get_wiltoncall_config(sl::io::span<con
 namespace internal {
 
 const std::string file_proto_prefix = "file://";
-const std::string mzip_proto_prefix = "mzip://";
+const std::string zip_proto_prefix = "zip://";
 
 const sl::json::value& static_wiltoncall_config(const std::string& cf_json = "");
 

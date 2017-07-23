@@ -51,8 +51,8 @@ sl::io::span<char> read_fs_resource(const std::string& path) {
 sl::io::span<char> read_zip_or_fs_resource(const std::string& url) {
     if (sl::utils::starts_with(url, wilton::internal::file_proto_prefix)) {
         return read_fs_resource(url.substr(wilton::internal::file_proto_prefix.length()));
-    } else if (sl::utils::starts_with(url, wilton::internal::mzip_proto_prefix)) {
-        auto zpath = url.substr(wilton::internal::mzip_proto_prefix.length());
+    } else if (sl::utils::starts_with(url, wilton::internal::zip_proto_prefix)) {
+        auto zpath = url.substr(wilton::internal::zip_proto_prefix.length());
         return read_zip_resource(zpath);
     } else {
         throw common::wilton_internal_exception(TRACEMSG("Unknown protocol prefix, path: [" + url + "]"));
