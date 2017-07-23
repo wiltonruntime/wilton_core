@@ -9,6 +9,7 @@
 
     "wilton": {
         "defaultScriptEngine": "duktape",
+        "applicationDirectory": "{{{appdir}}}",
         "requireJs": {
             "waitSeconds": 0,
             "enforceDefine": true,
@@ -26,6 +27,10 @@
                 "appenderType": "FILE",
                 "thresholdLevel": "DEBUG",
                 "filePath": "{{{appdir}}}/../../build/winservice_log.txt"
+            },
+            {
+                "appenderType": "CONSOLE",
+                "thresholdLevel": "DEBUG"
             }
         ],
         "loggers": [

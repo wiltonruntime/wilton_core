@@ -65,21 +65,30 @@ wilton::launcher::winservice_config load_config(const std::string& cpath) {
             std::string exedir = current_exedir();
             return exedir + "../conf/config.json";
         }();
-        auto appdir = sl::utils::strip_filename(path) + "../";
 
         // load file
         auto src = sl::tinydir::file_source(path);
         auto conf = sl::json::load(src);
 
         // substitute appdir in wilton paths
-        auto& wconf = conf.getattr_or_throw("wiltonConfig", "wiltonConfig");
-        auto& rjsconf = wconf.getattr_or_throw("requireJsConfig", "wiltonConfig.requireJsConfig");
-        auto& base_url = rjsconf.getattr_or_throw("baseUrl", "wiltonConfig.requireJsConfig.baseUrl");
-        auto base_url_replaced = replace_appdir(base_url.as_string_nonempty_or_throw("wiltonConfig.requireJsConfig.baseUrl"), appdir);
+        auto& wconf = conf.getattr_or_throw("wilton", "wilton");
+        auto& appdir_el = wconf.getattr_or_throw("applicationDirectory", "wilton.applicationDirectory");
+        auto appdir = [&path, &appdir_el] () -> std::string {
+            auto& val = appdir_el.as_string_nonempty_or_throw("wilton.applicationDirectory");
+            if ("{{{appdir}}}" != val) {
+                return val;
+            }
+            auto res = sl::utils::strip_filename(path) + "../";
+            appdir_el.set_string(res);
+            return res;
+        } ();
+        auto& rjsconf = wconf.getattr_or_throw("requireJs", "wilton.requireJs");
+        auto& base_url = rjsconf.getattr_or_throw("baseUrl", "wilton.requireJs.baseUrl");
+        auto base_url_replaced = replace_appdir(base_url.as_string_nonempty_or_throw("wilton.requireJs.baseUrl"), appdir);
         base_url.set_string(base_url_replaced);
-        auto& paths = rjsconf.getattr_or_throw("paths", "wiltonConfig.requireJsConfig.paths");
-        for (auto& pa : paths.as_object_or_throw("wiltonConfig.requireJsConfig.paths")) {
-            auto pa_replaced = replace_appdir(pa.as_string_nonempty_or_throw("wiltonConfig.requireJsConfig.paths._"), appdir);
+        auto& paths = rjsconf.getattr_or_throw("paths", "wilton.requireJs.paths");
+        for (auto& pa : paths.as_object_or_throw("wilton.requireJs.paths")) {
+            auto pa_replaced = replace_appdir(pa.as_string_nonempty_or_throw("wilton.requireJs.paths._"), appdir);
             pa.val().set_string(pa_replaced);
         }
         
@@ -92,7 +101,7 @@ wilton::launcher::winservice_config load_config(const std::string& cpath) {
 }
 
 void init_wilton(wilton::launcher::winservice_config& sconf) {
-    auto config = sconf.json_config.getattr_or_throw("wiltonConfig", "wiltonConfig").dumps();
+    auto config = sconf.json_config.getattr_or_throw("wilton", "wilton").dumps();
     auto err = wiltoncall_init(config.c_str(), static_cast<int> (config.length()));
     if (nullptr != err) {
         auto msg = TRACEMSG(err);
@@ -101,10 +110,24 @@ void init_wilton(wilton::launcher::winservice_config& sconf) {
     }
 }
 
-void run_script(const wilton::launcher::winservice_config& conf) {
+void init_signals() {
+    auto err_init = wilton_thread_initialize_signals();
+    if (nullptr != err_init) {
+        auto msg = TRACEMSG(err_init);
+        wilton_free(err_init);
+        throw wilton::launcher::winservice_exception(msg);
+    }
+}
+
+void run_script(const wilton::launcher::winservice_config& conf, const std::string& cmd) {
     std::string in = sl::json::dumps({
-        { "module", conf.startup_module},
-        { "func", "main"}
+        { "module", conf.startup_module },
+        { "func", "main" },
+        { "args", [&cmd] {
+            auto vec = std::vector<sl::json::value>();
+            vec.emplace_back(cmd);
+            return vec;
+        }()}
     });
     char* out = nullptr;
     int out_len = 0;
@@ -154,10 +177,10 @@ void start_service_and_wait(const wilton::launcher::winservice_config& conf) {
     auto cf = std::make_shared<wilton::launcher::winservice_config>(conf.clone());
     sl::winservice::start_service_and_wait(conf.service_name,
     [cf] {
-        run_script(*cf);
+        run_script(*cf, "start");
     },
-    [] {
-        wilton_thread_fire_signal();
+    [cf] {
+        run_script(*cf, "stop");
         std::cout << "Stopping service ..." << std::endl;
     },
     [](const std::string& msg) {
@@ -197,7 +220,10 @@ int main(int argc, char** argv) {
         } else if (opts.stop) {
             stop(conf);
         } else if (opts.direct) {
-            run_script(conf);
+            init_signals();
+            run_script(conf, "start");
+            wilton_thread_wait_for_signal();
+            run_script(conf, "stop");
         } else { // SCM call            
             start_service_and_wait(conf);
         }

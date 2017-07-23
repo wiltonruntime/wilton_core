@@ -8,6 +8,7 @@
 #ifndef WILTON_WINSERVICE_OPTIONS_HPP
 #define	WILTON_WINSERVICE_OPTIONS_HPP
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -82,6 +83,7 @@ public:
         
         // set vars
         config = nullptr != config_ptr ? std::string(config_ptr) : "";
+        std::replace(config.begin(), config.end(), '\\', '/');
     }
 
     ~winservice_options() {
