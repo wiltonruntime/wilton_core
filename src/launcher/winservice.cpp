@@ -55,9 +55,10 @@ std::string replace_appdir(const std::string& str, const std::string& exedir) {
 }
 
 wilton::launcher::winservice_config load_config(const std::string& exedir, const std::string& cpath) {
+    std::string path = "";
     try {
         // get path
-        auto path = !cpath.empty() ? cpath : exedir + "config.json";
+        path = !cpath.empty() ? cpath : exedir + "config.json";
 
         // load file
         auto src = sl::tinydir::file_source(path);
@@ -79,13 +80,13 @@ wilton::launcher::winservice_config load_config(const std::string& exedir, const
         return wilton::launcher::winservice_config(std::move(conf));
     } catch (const std::exception& e) {
         throw wilton::launcher::winservice_exception(TRACEMSG(e.what() + 
-                "\nError loading config file, path: [" + path + "]"));
+                "\nError loading config file, path: [" + cpath + "]"));
     }
 }
 
 void init_wilton(wilton::launcher::winservice_config& sconf) {
-    auto& wconf = sconf.json_config.getattr_or_throw("wiltonConfig", "wiltonConfig");
-    auto err = wiltoncall_init(wconf.c_str(), static_cast<int> (wconf.length()));
+    auto config = sconf.json_config.getattr_or_throw("wiltonConfig", "wiltonConfig").dumps();
+    auto err = wiltoncall_init(config.c_str(), static_cast<int> (config.length()));
     if (nullptr != err) {
         auto msg = TRACEMSG(err);
         wilton_free(err);
@@ -189,6 +190,8 @@ int main(int argc, char** argv) {
             uninstall(conf);
         } else if (opts.stop) {
             stop(conf);
+        } else if (opts.direct) {
+            run_script(conf);
         } else { // SCM call            
             start_service_and_wait(conf);
         }
@@ -199,4 +202,3 @@ int main(int argc, char** argv) {
         return 1;
     }
 }
-

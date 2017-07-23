@@ -83,7 +83,7 @@ public:
     
     const std::string& usage() {
         static std::string msg = "OPTIONS: wilton path/to/script.js"
-                " [-m|--modules-dir-or-zip=STRING]"
+                " [-m|--js-modules-dir-or-zip=STRING]"
                 " [-s|--startup-module-name=STRING]"
                 " [-- <app arguments>]";
         return msg;

@@ -80,6 +80,15 @@ void dump_error(const std::string& directory, const std::string& msg) {
     }
 }
 
+std::string& normalize_path(std::string& path) {
+    sl::utils::replace_all(path, "/./", "/");
+    sl::utils::replace_all(path, "\\", "/");
+    while(std::string::npos != path.find("//")) {
+        sl::utils::replace_all(path, "//", "/");
+    }
+    return path;
+}
+
 } //namespace
 }  
 

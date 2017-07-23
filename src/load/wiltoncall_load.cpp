@@ -23,11 +23,7 @@ sl::io::span<char> read_zip_resource(std::string& path) {
     }
     auto& idx = *idx_ptr;
     // normalize path
-    sl::utils::replace_all(path, "/./", "/");
-    sl::utils::replace_all(path, "\\", "/");
-    while(std::string::npos != path.find("//")) {
-        sl::utils::replace_all(path, "//", "/");
-    }
+    wilton::common::normalize_path(path);
     if (path.length() > 1 && '/' == path.at(0)) {
         path = path.substr(1);
     }

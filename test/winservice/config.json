@@ -3,6 +3,39 @@
         "serviceName": "wilton_test_service",
         "displayName": "Wilton Test Service",
         "user": "Administrator",
-        "password": "P@ssword"
+        "password": "P@ssword",
+        "startupModule": "winservice"
+    },
+
+    "wilton": {
+        "defaultScriptEngine": "duktape",
+        "requireJs": {
+            "waitSeconds": 0,
+            "enforceDefine": true,
+            "nodeIdCompat": true,
+            "baseUrl": "mzip://{{appdir}}/../../../js.zip",
+            "paths": {
+                "winservice": "file://{{appdir}}/../../test/winservice"
+            }
+        }
+    },
+
+    "logging": {
+        "appenders": [
+            {
+                "appenderType": "FILE",
+                "thresholdLevel": "DEBUG",
+                "filePath": "{{exedir}}/winservice_log.txt"
+            }
+        ],
+        "loggers": [
+            {
+                "name": "staticlib",
+                "level": "WARN"
+            }, {
+                "name": "wilton",
+                "level": "INFO"
+            }
+        ]
     }
 }

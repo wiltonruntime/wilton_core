@@ -1,12 +1,22 @@
 
-define([], function() {
+define([
+    "lodash/string",
+    "wilton/Logger",
+    "wilton/loader",
+    "wilton/misc",
+    "wilton/thread"
+], function(template, Logger, loader, misc, thread) {
     return {
-        start: function() {
-           print("service start called"); 
-        },
+        main: function() {
+            // load config
+            var conf = loader.loadModuleJson("winservice/config.json"); 
+            var fpTmpl = conf.logging.appenders[0].filePath;
+            string.templateSettings.interpolate = /{{([\s\S]+?)}}/g; 
+            string.template(fpTmpl)({});
 
-        stop: function() {
-            print("service stop called");
-        }
+
+
+            print("service start called"); 
+        },
     };
 });
