@@ -106,7 +106,11 @@ char* wilton_HttpClient_execute(
         auto opts = wilton::client::client_request_config(std::move(opts_json));
         sl::http::resource resp = [&] {
             if (request_data_len > 0) {
-                auto data_src = sl::io::array_source(request_data, static_cast<uint32_t> (request_data_len));
+                auto reqlen_u32 = static_cast<uint32_t> (request_data_len);
+                auto data_src = sl::io::array_source(request_data, reqlen_u32);
+                // do not use chunked post, as lenght is known
+                opts.options.send_request_body_content_length = true;
+                opts.options.request_body_content_length = reqlen_u32;
                 // POST will be used by default for this API call
                 return http->impl().open_url(url_str, std::move(data_src), opts.options);
             } else {
