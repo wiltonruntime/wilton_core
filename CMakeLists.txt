@@ -93,6 +93,7 @@ wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )
 wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_concurrent )
 wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_jni )
 wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
+wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_crypto )
 wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
 wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_endian )
 wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
@@ -113,6 +114,7 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_config
         staticlib_support
         staticlib_io
+        staticlib_crypto
         staticlib_ranges
         staticlib_jni
         staticlib_pion

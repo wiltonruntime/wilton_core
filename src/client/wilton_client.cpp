@@ -12,6 +12,7 @@
 #include <string>
 
 #include "staticlib/config.hpp"
+#include "staticlib/crypto.hpp"
 #include "staticlib/http.hpp"
 #include "staticlib/io.hpp"
 #include "staticlib/json.hpp"
@@ -23,6 +24,27 @@
 #include "client/client_response.hpp"
 #include "client/client_request_config.hpp"
 #include "client/client_session_config.hpp"
+
+namespace { // anonymous
+
+std::string resp_to_json(wilton::client::client_request_config& opts, sl::http::resource& resp) {
+    auto data_str = std::string();
+    if (opts.respone_data_file_path.empty()) {
+        auto sink = sl::io::string_sink();
+        sl::io::copy_all(resp, sink);
+        data_str = sink.get_string();
+    } else {
+        auto sink = sl::tinydir::file_sink(opts.respone_data_file_path);
+        sl::io::copy_all(resp, sink);
+        data_str = sl::json::dumps({
+            {"responseDataFilePath", opts.respone_data_file_path}
+        });
+    }
+    auto resp_json = wilton::client::client_response::to_json(std::move(data_str), resp, resp.get_info());
+    return resp_json.dumps();
+}
+
+} // namespace
 
 struct wilton_HttpClient {
 private:
@@ -108,7 +130,7 @@ char* wilton_HttpClient_execute(
             if (request_data_len > 0) {
                 auto reqlen_u32 = static_cast<uint32_t> (request_data_len);
                 auto data_src = sl::io::array_source(request_data, reqlen_u32);
-                // do not use chunked post, as lenght is known
+                // do not use chunked post, as length is known
                 opts.options.send_request_body_content_length = true;
                 opts.options.request_body_content_length = reqlen_u32;
                 // POST will be used by default for this API call
@@ -118,20 +140,7 @@ char* wilton_HttpClient_execute(
                 return http->impl().open_url(url_str, opts.options);
             }
         }();
-        auto data_str = std::string();
-        if (opts.respone_data_file_path.empty()) {
-            auto sink = sl::io::string_sink();
-            sl::io::copy_all(resp, sink);
-            data_str = sink.get_string();
-        } else {
-            auto sink = sl::tinydir::file_sink(opts.respone_data_file_path);
-            sl::io::copy_all(resp, sink);
-            data_str = sl::json::dumps({
-                {"responseDataFilePath", opts.respone_data_file_path}
-            });
-        }
-        auto resp_json = wilton::client::client_response::to_json(std::move(data_str), resp, resp.get_info());
-        std::string resp_complete = resp_json.dumps();
+        std::string resp_complete = resp_to_json(opts, resp);
         *response_data_out = wilton::support::alloc_copy(resp_complete);
         *response_data_len_out = static_cast<int>(resp_complete.length());
         return nullptr;
@@ -173,12 +182,11 @@ char* wilton_HttpClient_send_file(
         wilton::client::client_request_config opts{std::move(opts_json)};
         std::string file_path_str{file_path, static_cast<uint32_t> (file_path_len)};
         auto fd = sl::tinydir::file_source(file_path_str);
+        // do not use chunked post, as length is known
+        opts.options.send_request_body_content_length = true;
+        opts.options.request_body_content_length = static_cast<uint32_t>(fd.size());
         sl::http::resource resp = http->impl().open_url(url_str, std::move(fd), opts.options);
-        sl::io::string_sink sink{};
-        sl::io::copy_all(resp, sink);
-        sl::json::value resp_json = wilton::client::client_response::to_json(
-                std::move(sink.get_string()), resp, resp.get_info());
-        std::string resp_complete = resp_json.dumps();
+        std::string resp_complete = resp_to_json(opts, resp);
         if (nullptr != finalizer_cb) {
             finalizer_cb(finalizer_ctx, 1);
         }

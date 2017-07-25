@@ -275,6 +275,7 @@ WILTON_EXPORT char* wilton_HttpClient_close(
     "abortOnResponseError": true,
     "maxNumberOfResponseHeaders": uit16_t,
     "consumerThreadWakeupTimeoutMillis": uit16_t,
+    "responseDataFilePath": path/to/file,
 
 // general behavior options
 
@@ -355,7 +356,7 @@ WILTON_EXPORT char* wilton_HttpClient_close(
  {    
     // true if connection was successful
     "connectionSuccess": bool,
-    "data": "response_data",
+    "dataHex": "response_data in hex",
     "headers": {
         "Header-Name": "header_value",
         ...
