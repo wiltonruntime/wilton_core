@@ -46,6 +46,9 @@ std::string find_startup_module(const std::string& opts_startup_module_name, con
     if (sl::utils::ends_with(sm, ".js")) {
         sm.resize(sm.length() - 3);
     }
+    if (sl::utils::ends_with(sm, "/")) {
+        sm.resize(sm.length() - 1);
+    }
     return sm;
 }
 
@@ -132,7 +135,7 @@ int main(int argc, char** argv) {
         auto exedir = find_exedir();
         
         // check modules dir
-        auto moddir = !opts.modules_dir_or_zip.empty() ? opts.modules_dir_or_zip : exedir + "js.zip";
+        auto moddir = !opts.modules_dir_or_zip.empty() ? opts.modules_dir_or_zip : exedir + "../js.zip";
         auto modpath = sl::tinydir::path(moddir);
         if (!modpath.exists()) {
             std::cerr << "ERROR: specified modules directory (or zip bundle) not found: [" + moddir + "]" << std::endl;
