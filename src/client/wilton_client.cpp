@@ -40,7 +40,9 @@ std::string resp_to_json(wilton::client::client_request_config& opts, sl::http::
             {"responseDataFilePath", opts.respone_data_file_path}
         });
     }
-    auto resp_json = wilton::client::client_response::to_json(std::move(data_str), resp, resp.get_info());
+    // todo: streaming, utf-8 validation
+    auto data_hex = sl::crypto::to_hex(data_str);
+    auto resp_json = wilton::client::client_response::to_json(std::move(data_hex), resp, resp.get_info());
     return resp_json.dumps();
 }
 

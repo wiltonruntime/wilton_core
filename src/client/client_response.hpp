@@ -23,7 +23,7 @@ namespace client {
 
 class client_response {
 public:
-    static sl::json::value to_json(std::string&& data, const sl::http::resource& resource,
+    static sl::json::value to_json(std::string&& data_hex, const sl::http::resource& resource,
             const sl::http::resource_info& info) {
         auto ha = sl::ranges::transform(resource.get_headers(), [](const std::pair<std::string, std::string>& el) {
             return sl::json::field{el.first, el.second};
@@ -31,7 +31,7 @@ public:
         std::vector<sl::json::field> hfields = sl::ranges::emplace_to_vector(std::move(ha));
         return {
             {"connectionSuccess", resource.connection_successful()},
-            {"data", std::move(data)},
+            {"dataHex", std::move(data_hex)},
             {"headers", std::move(hfields)},
             {"effectiveUrl", info.effective_url},
             {"responseCode", static_cast<int64_t> (resource.get_status_code())},
