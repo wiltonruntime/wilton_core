@@ -1,0 +1,31 @@
+#define UNICODE
+#define _UNICODE
+#define _USING_V110_SDK71_
+#include <windows.h>
+
+111 ICON ${CMAKE_CURRENT_LIST_DIR}/resources/icon.ico
+1 VERSIONINFO
+FILEVERSION     ${${PROJECT_NAME}_STATICLIB_VERSION}.0
+PRODUCTVERSION  ${${PROJECT_NAME}_STATICLIB_VERSION}.0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName", "Wilton open-source project"
+            VALUE "FileDescription", ""
+            VALUE "FileVersion", "${${PROJECT_NAME}_STATICLIB_VERSION}.0"
+            VALUE "InternalName", "wilton"
+            VALUE "LegalCopyright", "Wilton open-source project"
+            VALUE "OriginalFilename", "wilton.exe"
+            VALUE "ProductName", "wilton"
+            VALUE "ProductVersion", "${${PROJECT_NAME}_STATICLIB_VERSION}.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 0x04E4
+    END
+END
+2   RT_MANIFEST ${CMAKE_CURRENT_LIST_DIR}/resources/wilton.manifest
+

@@ -54,7 +54,7 @@ endif ( )
 
 # standalone build
 if ( NOT DEFINED STATICLIB_DEPS )
-    set ( STATICLIB_DEPS ${CMAKE_CURRENT_LIST_DIR}/../../staticlibs/ CACHE INTERNAL "" )    
+    set ( STATICLIB_DEPS SPECIFY_ME CACHE INTERNAL "" )    
 endif ( )
 if ( NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY )
     set ( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR} )
@@ -215,6 +215,7 @@ else ( )
     set ( ${PROJECT_NAME}_LIBTYPE STATIC )
 endif ( )
 
+# library
 add_library ( ${PROJECT_NAME} ${${PROJECT_NAME}_LIBTYPE}
         ${${PROJECT_NAME}_SRC} 
         ${${PROJECT_NAME}_HEADERS}
@@ -235,38 +236,39 @@ endif ( )
 
 # launchers
 if ( ${PROJECT_NAME}_SHARED )
-    add_executable ( wilton_cli
-            ${CMAKE_CURRENT_LIST_DIR}/src/launcher/cli.cpp )
-    target_include_directories ( wilton_cli BEFORE PRIVATE
+    # todo: conditional windows stuff
+    configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/wilton.rc
+            ${CMAKE_CURRENT_BINARY_DIR}/wilton.rc )
+
+    add_executable ( wilton
+            ${CMAKE_CURRENT_LIST_DIR}/src/launcher/cli.cpp
+            ${CMAKE_CURRENT_BINARY_DIR}/wilton.rc )
+    target_include_directories ( wilton BEFORE PRIVATE
             ${CMAKE_CURRENT_LIST_DIR}/include
             ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
-    target_compile_definitions ( wilton_cli PRIVATE -DWILTON_SHARED -DWILTON_SHARED_IMPORT )
-    target_link_libraries ( wilton_cli 
+    target_compile_definitions ( wilton PRIVATE -DWILTON_SHARED -DWILTON_SHARED_IMPORT )
+    target_link_libraries ( wilton 
             ${PROJECT_NAME} 
             staticlib_json
             staticlib_tinydir
             staticlib_utils )
+    set_property ( TARGET wilton APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
 
     if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
-        add_executable ( wilton_winservice
-                ${CMAKE_CURRENT_LIST_DIR}/src/launcher/winservice.cpp )
-        target_include_directories ( wilton_winservice BEFORE PRIVATE
+        add_executable ( winservice
+                ${CMAKE_CURRENT_LIST_DIR}/src/launcher/winservice.cpp
+                ${CMAKE_CURRENT_BINARY_DIR}/wilton.rc )
+        target_include_directories ( winservice BEFORE PRIVATE
                 ${CMAKE_CURRENT_LIST_DIR}/src/launcher
                 ${CMAKE_CURRENT_LIST_DIR}/include
                 ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
-        target_compile_definitions ( wilton_winservice PRIVATE -DWILTON_SHARED -DWILTON_SHARED_IMPORT )
-        target_link_libraries ( wilton_winservice 
+        target_compile_definitions ( winservice PRIVATE -DWILTON_SHARED -DWILTON_SHARED_IMPORT )
+        target_link_libraries ( winservice 
                 ${PROJECT_NAME}
                 staticlib_winservice
                 staticlib_utils )
+        set_property ( TARGET winservice APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
     endif ( )
-
-    add_custom_target ( wilton_cli_rename ALL
-            COMMAND ${CMAKE_COMMAND} -E copy
-            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/wilton_cli${CMAKE_EXECUTABLE_SUFFIX}
-            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/wilton${CMAKE_EXECUTABLE_SUFFIX}
-            DEPENDS wilton_cli )
-
 endif ( )
 
 # pkg-config
