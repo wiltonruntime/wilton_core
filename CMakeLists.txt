@@ -216,10 +216,18 @@ else ( )
 endif ( )
 
 # library
+set ( ${PROJECT_NAME}_RESFILE )
+if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
+    configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME}.rc
+            ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc )
+    set ( ${PROJECT_NAME}_RESFILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc )
+endif ( )
+
 add_library ( ${PROJECT_NAME} ${${PROJECT_NAME}_LIBTYPE}
         ${${PROJECT_NAME}_SRC} 
         ${${PROJECT_NAME}_HEADERS}
-        ${${PROJECT_NAME}_HEADERS_PRIVATE} )
+        ${${PROJECT_NAME}_HEADERS_PRIVATE}
+        ${${PROJECT_NAME}_RESFILE} )
 
 source_group ( "src" FILES ${${PROJECT_NAME}_SRC} )
 source_group ( "include" FILES ${${PROJECT_NAME}_HEADERS} )
@@ -236,13 +244,16 @@ endif ( )
 
 # launchers
 if ( ${PROJECT_NAME}_SHARED )
-    # todo: conditional windows stuff
-    configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/wilton.rc
-            ${CMAKE_CURRENT_BINARY_DIR}/wilton.rc )
-
+    # cli
+    set ( ${PROJECT_NAME}_CLI_RESFILE )
+    if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
+        configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/wilton.rc
+                ${CMAKE_CURRENT_BINARY_DIR}/wilton.rc )
+        set ( ${PROJECT_NAME}_CLI_RESFILE ${CMAKE_CURRENT_BINARY_DIR}/wilton.rc )
+    endif ( )
     add_executable ( wilton
             ${CMAKE_CURRENT_LIST_DIR}/src/launcher/cli.cpp
-            ${CMAKE_CURRENT_BINARY_DIR}/wilton.rc )
+            ${${PROJECT_NAME}_CLI_RESFILE} )
     target_include_directories ( wilton BEFORE PRIVATE
             ${CMAKE_CURRENT_LIST_DIR}/include
             ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
@@ -251,10 +262,16 @@ if ( ${PROJECT_NAME}_SHARED )
             ${PROJECT_NAME} 
             staticlib_json
             staticlib_tinydir
-            staticlib_utils )
-    set_property ( TARGET wilton APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
-
+            staticlib_utils )            
     if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
+        set_property ( TARGET wilton APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
+    endif ( )
+
+    # winservice
+    if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
+        configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/winservice.rc
+                ${CMAKE_CURRENT_BINARY_DIR}/winservice.rc )
+
         add_executable ( winservice
                 ${CMAKE_CURRENT_LIST_DIR}/src/launcher/winservice.cpp
                 ${CMAKE_CURRENT_BINARY_DIR}/wilton.rc )
@@ -270,6 +287,10 @@ if ( ${PROJECT_NAME}_SHARED )
         set_property ( TARGET winservice APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
     endif ( )
 endif ( )
+
+# version file
+configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/wilton.version
+        ${CMAKE_CURRENT_BINARY_DIR}/wilton.version )
 
 # pkg-config
 set ( ${PROJECT_NAME}_PC_CFLAGS "-I${CMAKE_CURRENT_LIST_DIR}/include" )

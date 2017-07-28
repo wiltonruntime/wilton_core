@@ -3,7 +3,6 @@
 #define _USING_V110_SDK71_
 #include <windows.h>
 
-111 ICON ${CMAKE_CURRENT_LIST_DIR}/resources/icon.ico
 1 VERSIONINFO
 FILEVERSION     ${WILTON_VERSION_EXE}
 PRODUCTVERSION  ${WILTON_VERSION_EXE}
@@ -13,12 +12,12 @@ BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "CompanyName", "Wilton Open-Source Project"
-            VALUE "FileDescription", "Wilton Command Line Tool"
+            VALUE "FileDescription", "Wilton Core Library"
             VALUE "FileVersion", "${WILTON_VERSION_WIN}"
-            VALUE "InternalName", "wilton"
+            VALUE "InternalName", "wilton_core"
             VALUE "LegalCopyright", "Wilton Open-Source Project"
-            VALUE "OriginalFilename", "wilton.exe"
-            VALUE "ProductName", "wilton"
+            VALUE "OriginalFilename", "wilton_core.dll"
+            VALUE "ProductName", "wilton_core"
             VALUE "ProductVersion", "${WILTON_VERSION_WIN}"
         END
     END
