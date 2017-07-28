@@ -24,9 +24,6 @@ sl::io::span<char> read_zip_resource(std::string& path) {
     auto& idx = *idx_ptr;
     // normalize path
     wilton::common::normalize_path(path);
-    if (path.length() > 1 && '/' == path.at(0)) {
-        path = path.substr(1);
-    }
     // load zip entry
     auto& zippath = idx.get_zip_file_path();
     if (path.length() > zippath.length() + 1 && sl::utils::starts_with(path, zippath)) {

@@ -168,7 +168,7 @@ int main(int argc, char** argv) {
                 }
             }
         });
-        
+
         auto err_init = wiltoncall_init(config.c_str(), static_cast<int> (config.length()));
         if (nullptr != err_init) {
             std::cerr << "ERROR: " << err_init << std::endl;
