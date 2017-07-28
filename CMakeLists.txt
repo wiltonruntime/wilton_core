@@ -267,24 +267,24 @@ if ( ${PROJECT_NAME}_SHARED )
         set_property ( TARGET wilton APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
     endif ( )
 
-    # winservice
+    # wilton_winservice
     if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
-        configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/winservice.rc
-                ${CMAKE_CURRENT_BINARY_DIR}/winservice.rc )
+        configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/wilton_winservice.rc
+                ${CMAKE_CURRENT_BINARY_DIR}/wilton_winservice.rc )
 
-        add_executable ( winservice
+        add_executable ( wilton_winservice
                 ${CMAKE_CURRENT_LIST_DIR}/src/launcher/winservice.cpp
-                ${CMAKE_CURRENT_BINARY_DIR}/wilton.rc )
-        target_include_directories ( winservice BEFORE PRIVATE
+                ${CMAKE_CURRENT_BINARY_DIR}/wilton_winservice.rc )
+        target_include_directories ( wilton_winservice BEFORE PRIVATE
                 ${CMAKE_CURRENT_LIST_DIR}/src/launcher
                 ${CMAKE_CURRENT_LIST_DIR}/include
                 ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
-        target_compile_definitions ( winservice PRIVATE -DWILTON_SHARED -DWILTON_SHARED_IMPORT )
-        target_link_libraries ( winservice 
+        target_compile_definitions ( wilton_winservice PRIVATE -DWILTON_SHARED -DWILTON_SHARED_IMPORT )
+        target_link_libraries ( wilton_winservice 
                 ${PROJECT_NAME}
                 staticlib_winservice
                 staticlib_utils )
-        set_property ( TARGET winservice APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
+        set_property ( TARGET wilton_winservice APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
     endif ( )
 endif ( )
 
