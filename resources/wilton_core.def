@@ -1,0 +1,83 @@
+
+EXPORTS
+    wilton_HttpPath_create
+    wilton_HttpPath_destroy
+    
+    wilton_Server_create
+    wilton_Server_stop
+    
+    wilton_Request_get_request_metadata
+    wilton_Request_get_request_data
+    wilton_Request_get_request_data_filename
+    wilton_Request_set_response_metadata
+    wilton_Request_send_response
+    wilton_Request_send_file
+    wilton_Request_send_mustache
+    wilton_Request_send_later
+    wilton_ResponseWriter_send
+    
+    wilton_logger_initialize
+    wilton_logger_log
+    wilton_logger_is_level_enabled
+    wilton_logger_shutdown
+    
+    wilton_render_mustache
+    wilton_render_mustache_file
+    
+    wilton_HttpClient_create
+    wilton_HttpClient_close
+    wilton_HttpClient_execute
+    wilton_HttpClient_send_file
+    
+    wilton_CronTask_start
+    wilton_CronTask_stop
+    
+    wilton_shared_put
+    wilton_shared_get
+    wilton_shared_wait_change
+    wilton_shared_remove
+    wilton_shared_list_append
+    wilton_shared_dump
+    wilton_thread_run
+    wilton_thread_sleep_millis
+    wilton_thread_initialize_signals
+    wilton_thread_wait_for_signal
+    wilton_thread_fire_signal
+    
+    wilton_alloc
+    wilton_free
+    wilton_tcp_wait_for_connection
+    
+    wiltoncall
+    wiltoncall_register
+    wiltoncall_remove
+    wiltoncall_init
+    wiltoncall_runscript
+    wiltoncall_runscript_jni
+    wiltoncall_runscript_duktape
+    
+    json_object
+    json_array
+    json_string
+    json_integer
+    json_real
+    json_true
+    json_false
+    json_null
+    json_delete
+    json_delete
+    json_object_set_new
+    json_array_append_new
+    json_object_size
+    json_object_get
+    json_object_iter
+    json_object_iter_next
+    json_object_iter_key
+    json_array_size
+    json_array_get
+    json_string_value
+    json_integer_value
+    json_real_value
+    json_load_callback
+    json_dump_callback
+    

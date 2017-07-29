@@ -191,7 +191,7 @@ char* wilton_Request_get_request_data(wilton_Request* request, char** data_out,
     }
 }
 
-WILTON_EXPORT char* wilton_Request_get_request_data_filename(wilton_Request* request, 
+char* wilton_Request_get_request_data_filename(wilton_Request* request, 
         char** filename_out, int* filename_len_out) /* noexcept */ {
     if (nullptr == request) return wilton::support::alloc_copy(TRACEMSG("Null 'request' parameter specified"));
     if (nullptr == filename_out) return wilton::support::alloc_copy(TRACEMSG("Null 'filename_out' parameter specified"));

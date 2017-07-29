@@ -19,7 +19,6 @@ project ( wilton_core CXX )
 set ( ${PROJECT_NAME}_STATICLIB_VERSION 0.8.0 CACHE INTERNAL "" )
 set ( ${PROJECT_NAME}_DESCRIPTION "Wilton Core library" )
 set ( ${PROJECT_NAME}_URL https://github.com/wilton-web-toolkit/wilton_core )
-include ( ${CMAKE_CURRENT_LIST_DIR}/resources/macros.cmake )
 
 # check deplibs cache
 if ( STATICLIB_USE_DEPLIBS_CACHE )
@@ -62,34 +61,34 @@ endif ( )
 
 # dependencies add
 if ( NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" ) # system dependencies implied on Linux
-    wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/external_asio )
-    wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/external_zlib )
-    wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
-    wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
-    wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/external_openssl )
-    wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
-    wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/external_popt )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_asio )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_zlib )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_openssl )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_popt )
 endif ( )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/external_duktape )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_concurrent )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_jni )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_crypto )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_endian )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pion )    
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_json )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_http )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
-wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_mustache )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_duktape )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_concurrent )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_jni )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_crypto )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_endian )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pion )    
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_json )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_http )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
+staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_mustache )
 if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
-    wilton_core_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_winservice )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_winservice )
 endif ( )
 
 # dependencies check
@@ -119,7 +118,7 @@ set ( ${PROJECT_NAME}_DEPS
 if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
     list ( APPEND ${PROJECT_NAME}_DEPS staticlib_winservice )
 endif ( )
-wilton_core_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
+staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
 # build steps
 set ( ${PROJECT_NAME}_SRC )
@@ -223,7 +222,7 @@ if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
     set ( ${PROJECT_NAME}_RESFILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc )
 endif ( )
 
-add_library ( ${PROJECT_NAME} ${${PROJECT_NAME}_LIBTYPE}
+add_library ( ${PROJECT_NAME} ${${PROJECT_NAME}_LIBTYPE} ${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME}.def
         ${${PROJECT_NAME}_SRC} 
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_HEADERS_PRIVATE}
@@ -238,54 +237,7 @@ target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE
         ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
 target_compile_options ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_CFLAGS_OTHER} )
 if ( ${PROJECT_NAME}_SHARED )
-    target_compile_definitions ( ${PROJECT_NAME} PRIVATE -DWILTON_SHARED -DWILTON_SHARED_EXPORT )
-    target_link_libraries ( ${PROJECT_NAME} ${${PROJECT_NAME}_DEPS_PC_STATIC_LIBRARIES} )
-endif ( )
-
-# launchers
-if ( ${PROJECT_NAME}_SHARED )
-    # cli
-    set ( ${PROJECT_NAME}_CLI_RESFILE )
-    if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
-        configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/wilton.rc
-                ${CMAKE_CURRENT_BINARY_DIR}/wilton.rc )
-        set ( ${PROJECT_NAME}_CLI_RESFILE ${CMAKE_CURRENT_BINARY_DIR}/wilton.rc )
-    endif ( )
-    add_executable ( wilton
-            ${CMAKE_CURRENT_LIST_DIR}/src/launcher/cli.cpp
-            ${${PROJECT_NAME}_CLI_RESFILE} )
-    target_include_directories ( wilton BEFORE PRIVATE
-            ${CMAKE_CURRENT_LIST_DIR}/include
-            ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
-    target_compile_definitions ( wilton PRIVATE -DWILTON_SHARED -DWILTON_SHARED_IMPORT )
-    target_link_libraries ( wilton 
-            ${PROJECT_NAME} 
-            staticlib_json
-            staticlib_tinydir
-            staticlib_utils )            
-    if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
-        set_property ( TARGET wilton APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
-    endif ( )
-
-    # wilton_winservice
-    if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
-        configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/wilton_winservice.rc
-                ${CMAKE_CURRENT_BINARY_DIR}/wilton_winservice.rc )
-
-        add_executable ( wilton_winservice
-                ${CMAKE_CURRENT_LIST_DIR}/src/launcher/winservice.cpp
-                ${CMAKE_CURRENT_BINARY_DIR}/wilton_winservice.rc )
-        target_include_directories ( wilton_winservice BEFORE PRIVATE
-                ${CMAKE_CURRENT_LIST_DIR}/src/launcher
-                ${CMAKE_CURRENT_LIST_DIR}/include
-                ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
-        target_compile_definitions ( wilton_winservice PRIVATE -DWILTON_SHARED -DWILTON_SHARED_IMPORT )
-        target_link_libraries ( wilton_winservice 
-                ${PROJECT_NAME}
-                staticlib_winservice
-                staticlib_utils )
-        set_property ( TARGET wilton_winservice APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
-    endif ( )
+    target_link_libraries ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_STATIC_LIBRARIES} )
 endif ( )
 
 # version file
@@ -294,13 +246,10 @@ configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/wilton.version
 
 # pkg-config
 set ( ${PROJECT_NAME}_PC_CFLAGS "-I${CMAKE_CURRENT_LIST_DIR}/include" )
-if ( ${PROJECT_NAME}_SHARED )
-    set ( ${PROJECT_NAME}_PC_CFLAGS "${${PROJECT_NAME}_PC_CFLAGS} -DWILTON_SHARED" )
-endif ( )
 set ( ${PROJECT_NAME}_PC_LIBS "-L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} -l${PROJECT_NAME}" )
 if ( CMAKE_SYSTEM_NAME STREQUAL "Linux" )
     set ( ${PROJECT_NAME}_PC_LIBS "${${PROJECT_NAME}_PC_LIBS} -lpthread -ldl" )
 endif ( )
-wilton_core_list_to_string ( ${PROJECT_NAME}_PC_REQUIRES_PRIVATE "" ${PROJECT_NAME}_DEPS )
+staticlib_list_to_string ( ${PROJECT_NAME}_PC_REQUIRES_PRIVATE "" ${PROJECT_NAME}_DEPS )
 configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/pkg-config.in 
         ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/pkgconfig/${PROJECT_NAME}.pc )

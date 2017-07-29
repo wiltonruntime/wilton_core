@@ -64,7 +64,7 @@ char* wilton_CronTask_start(
     }
 }
 
-WILTON_EXPORT char* wilton_CronTask_stop(
+char* wilton_CronTask_stop(
         wilton_CronTask* cron) {
     if (nullptr == cron) return wilton::support::alloc_copy(TRACEMSG("Null 'cron' parameter specified"));
     try {

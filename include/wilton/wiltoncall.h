@@ -14,7 +14,7 @@
 extern "C" {
 #endif
     
-WILTON_EXPORT char* wiltoncall(
+char* wiltoncall(
         const char* call_name,
         int call_name_len,
         const char* json_in,
@@ -22,7 +22,7 @@ WILTON_EXPORT char* wiltoncall(
         char** json_out,
         int* json_out_len);
 
-WILTON_EXPORT char* wiltoncall_register(
+char* wiltoncall_register(
         const char* call_name,
         int call_name_len,
         void* call_ctx,
@@ -33,17 +33,17 @@ WILTON_EXPORT char* wiltoncall_register(
                 char** json_out,
                 int* json_out_len));
 
-WILTON_EXPORT char* wiltoncall_remove(
+char* wiltoncall_remove(
         const char* call_name,
         int call_name_len);
 
-WILTON_EXPORT char* wiltoncall_init(
+char* wiltoncall_init(
         const char* config_json,
         int config_json_len);
 
 // to "override" (implement in client code) this function
 // compile with -DWILTON_DISABLE_DEFAULT_RUNSCRIPT
-WILTON_EXPORT char* wiltoncall_runscript(
+char* wiltoncall_runscript(
         const char* script_engine_name,
         int script_engine_name_len,
         const char* json_in,
@@ -51,13 +51,13 @@ WILTON_EXPORT char* wiltoncall_runscript(
         char** json_out,
         int* json_out_len);
 
-WILTON_EXPORT char* wiltoncall_runscript_jni(
+char* wiltoncall_runscript_jni(
         const char* json_in,
         int json_in_len,
         char** json_out,
         int* json_out_len);
 
-WILTON_EXPORT char* wiltoncall_runscript_duktape(
+char* wiltoncall_runscript_duktape(
         const char* json_in,
         int json_in_len,
         char** json_out,

@@ -256,7 +256,7 @@ char* wilton_shared_list_append(const char* key, int key_len, const char* value,
     }
 }
 
-WILTON_EXPORT char* wilton_shared_dump(char** dump_out, int* dump_out_len) {
+char* wilton_shared_dump(char** dump_out, int* dump_out_len) {
     if (nullptr == dump_out) return wilton::support::alloc_copy(TRACEMSG("Null 'dump_out' parameter specified"));
     if (nullptr == dump_out_len) return wilton::support::alloc_copy(TRACEMSG("Null 'dump_out_len' parameter specified"));
     try {

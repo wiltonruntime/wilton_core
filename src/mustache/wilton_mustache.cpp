@@ -46,7 +46,7 @@ char* wilton_render_mustache /* noexcept */ (
     }
 }
 
-WILTON_EXPORT char* wilton_render_mustache_file /* noexcept */ (
+char* wilton_render_mustache_file /* noexcept */ (
         const char* template_file_path,
         int template_file_path_len,
         const char* values_json,

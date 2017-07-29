@@ -8,18 +8,6 @@
 #ifndef WILTON_H
 #define	WILTON_H
 
-#if !defined(WILTON_EXPORT) && defined(WILTON_SHARED)
-#  if defined(WILTON_SHARED_EXPORT) && defined(_WIN32)
-#    define WILTON_EXPORT __declspec(dllexport)
-#  elif defined(_WIN32)
-#    define WILTON_EXPORT __declspec(dllimport)
-#  elif defined(WILTON_SHARED_EXPORT) 
-#    define WILTON_EXPORT __attribute__((visibility("default")))
-#  else
-#    define WILTON_EXPORT
-#  endif
-#endif // !WILTON_EXPORT && WILTON_SHARED
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,7 +26,7 @@ typedef struct wilton_ResponseWriter wilton_ResponseWriter;
 struct wilton_HttpPath;
 typedef struct wilton_HttpPath wilton_HttpPath;
 
-WILTON_EXPORT char* wilton_HttpPath_create(
+char* wilton_HttpPath_create(
         wilton_HttpPath** http_path_out,
         const char* method,
         int method_len,
@@ -49,7 +37,7 @@ WILTON_EXPORT char* wilton_HttpPath_create(
                 void* handler_ctx,
                 wilton_Request* request));
 
-WILTON_EXPORT char* wilton_HttpPath_destroy(
+char* wilton_HttpPath_destroy(
         wilton_HttpPath* path);
 
 /*
@@ -84,14 +72,14 @@ WILTON_EXPORT char* wilton_HttpPath_destroy(
         }
     }
  */
-WILTON_EXPORT char* wilton_Server_create(
+char* wilton_Server_create(
         wilton_Server** server_out,
         const char* conf_json,
         int conf_json_len,
         wilton_HttpPath** paths,
         int paths_len);
 
-WILTON_EXPORT char* wilton_Server_stop(
+char* wilton_Server_stop(
         wilton_Server* server);
 
 /*
@@ -118,17 +106,17 @@ WILTON_EXPORT char* wilton_Server_stop(
     }
 }
  */
-WILTON_EXPORT char* wilton_Request_get_request_metadata(
+char* wilton_Request_get_request_metadata(
         wilton_Request* request,
         char** metadata_json_out,
         int* metadata_json_len_out);
 
-WILTON_EXPORT char* wilton_Request_get_request_data(
+char* wilton_Request_get_request_data(
         wilton_Request* request,
         char** data_out,
         int* data_len_out);
 
-WILTON_EXPORT char* wilton_Request_get_request_data_filename(
+char* wilton_Request_get_request_data_filename(
         wilton_Request* request,
         char** filename_out,
         int* filename_len_out);
@@ -143,17 +131,17 @@ WILTON_EXPORT char* wilton_Request_get_request_data_filename(
     }
 }
  */
-WILTON_EXPORT char* wilton_Request_set_response_metadata(
+char* wilton_Request_set_response_metadata(
         wilton_Request* request,
         const char* metadata_json,
         int metadata_json_len);
 
-WILTON_EXPORT char* wilton_Request_send_response(
+char* wilton_Request_send_response(
         wilton_Request* request,
         const char* data,
         int data_len);
 
-WILTON_EXPORT char* wilton_Request_send_file(
+char* wilton_Request_send_file(
         wilton_Request* request,
         const char* file_path,
         int file_path_len,
@@ -162,18 +150,18 @@ WILTON_EXPORT char* wilton_Request_send_file(
                 void* finalizer_ctx,
                 int sent_successfully));
 
-WILTON_EXPORT char* wilton_Request_send_mustache(
+char* wilton_Request_send_mustache(
         wilton_Request* request,
         const char* mustache_file_path,
         int mustache_file_path_len,
         const char* values_json,
         int values_json_len);
 
-WILTON_EXPORT char* wilton_Request_send_later(
+char* wilton_Request_send_later(
         wilton_Request* request,
         wilton_ResponseWriter** writer_out);
 
-WILTON_EXPORT char* wilton_ResponseWriter_send(
+char* wilton_ResponseWriter_send(
         wilton_ResponseWriter* writer,
         const char* data,
         int data_len);
@@ -195,11 +183,11 @@ WILTON_EXPORT char* wilton_ResponseWriter_send(
         }, ...]
     }
  */
-WILTON_EXPORT char* wilton_logger_initialize(
+char* wilton_logger_initialize(
         const char* conf_json,
         int conf_json_len);
 
-WILTON_EXPORT char* wilton_logger_log(
+char* wilton_logger_log(
         const char* level_name,
         int level_name_len,
         const char* logger_name,
@@ -207,7 +195,7 @@ WILTON_EXPORT char* wilton_logger_log(
         const char* message,
         int message_len);
 
-WILTON_EXPORT char* wilton_logger_is_level_enabled(
+char* wilton_logger_is_level_enabled(
         const char* logger_name,
         int logger_name_len,
         const char* level_name,
@@ -215,11 +203,11 @@ WILTON_EXPORT char* wilton_logger_is_level_enabled(
         int* res_out
 );
 
-WILTON_EXPORT char* wilton_logger_shutdown();
+char* wilton_logger_shutdown();
 
 // mustache
 
-WILTON_EXPORT char* wilton_render_mustache(
+char* wilton_render_mustache(
         const char* template_text,
         int template_text_len,
         const char* values_json,
@@ -227,7 +215,7 @@ WILTON_EXPORT char* wilton_render_mustache(
         char** output_text_out,
         int* output_text_len_out);
 
-WILTON_EXPORT char* wilton_render_mustache_file(
+char* wilton_render_mustache_file(
         const char* template_file_path,
         int template_file_path_len,
         const char* values_json,
@@ -254,12 +242,12 @@ typedef struct wilton_HttpClient wilton_HttpClient;
     "maxconnects": uint32_t
  }
  */
-WILTON_EXPORT char* wilton_HttpClient_create(
+char* wilton_HttpClient_create(
         wilton_HttpClient** http_out,
         const char* conf_json,
         int conf_json_len);
 
-WILTON_EXPORT char* wilton_HttpClient_close(
+char* wilton_HttpClient_close(
         wilton_HttpClient* http);
 
 /*
@@ -403,7 +391,7 @@ WILTON_EXPORT char* wilton_HttpClient_close(
  }
  */
 
-WILTON_EXPORT char* wilton_HttpClient_execute(
+char* wilton_HttpClient_execute(
         wilton_HttpClient* http,
         const char* url,
         int url_len,
@@ -414,7 +402,7 @@ WILTON_EXPORT char* wilton_HttpClient_execute(
         char** response_data_out,
         int* response_data_len_out);
 
-WILTON_EXPORT char* wilton_HttpClient_send_file(
+char* wilton_HttpClient_send_file(
         wilton_HttpClient* http,
         const char* url,
         int url_len,
@@ -435,7 +423,7 @@ WILTON_EXPORT char* wilton_HttpClient_send_file(
 struct wilton_CronTask;
 typedef struct wilton_CronTask wilton_CronTask;
 
-WILTON_EXPORT char* wilton_CronTask_start(
+char* wilton_CronTask_start(
         wilton_CronTask** cron_out,
         const char* cronexpr,
         int cronexpr_len,
@@ -444,12 +432,12 @@ WILTON_EXPORT char* wilton_CronTask_start(
                 void* task_ctx));
 
 
-WILTON_EXPORT char* wilton_CronTask_stop(
+char* wilton_CronTask_stop(
         wilton_CronTask* cron);
 
 // shared
 
-WILTON_EXPORT char* wilton_shared_put(
+char* wilton_shared_put(
         const char* key,
         int key_len,
         const char* value,
@@ -457,13 +445,13 @@ WILTON_EXPORT char* wilton_shared_put(
         char** prev_value_out,
         int* prev_value_out_len);
 
-WILTON_EXPORT char* wilton_shared_get(
+char* wilton_shared_get(
         const char* key,
         int key_len,
         char** value_out,
         int* value_out_len);
 
-WILTON_EXPORT char* wilton_shared_wait_change(
+char* wilton_shared_wait_change(
         int timeout_millis,
         const char* key,
         int key_len,
@@ -472,13 +460,13 @@ WILTON_EXPORT char* wilton_shared_wait_change(
         char** changed_value_out,
         int* changed_value_out_len);
 
-WILTON_EXPORT char* wilton_shared_remove(
+char* wilton_shared_remove(
         const char* key,
         int key_len,
         char** value_out,
         int* value_out_len);
 
-WILTON_EXPORT char* wilton_shared_list_append(
+char* wilton_shared_list_append(
         const char* key,
         int key_len,
         const char* value,
@@ -486,35 +474,35 @@ WILTON_EXPORT char* wilton_shared_list_append(
         char** updated_value_out,
         int* updated_value_out_len);
 
-WILTON_EXPORT char* wilton_shared_dump(
+char* wilton_shared_dump(
         char** dump_out,
         int* dump_out_len);
 
 // thread
 
-WILTON_EXPORT char* wilton_thread_run(
+char* wilton_thread_run(
         void* cb_ctx,
         void (*cb)(
                 void* cb_ctx));
 
-WILTON_EXPORT char* wilton_thread_sleep_millis(
+char* wilton_thread_sleep_millis(
         int millis);
 
-WILTON_EXPORT char* wilton_thread_initialize_signals();
+char* wilton_thread_initialize_signals();
 
-WILTON_EXPORT char* wilton_thread_wait_for_signal();
+char* wilton_thread_wait_for_signal();
 
-WILTON_EXPORT char* wilton_thread_fire_signal();
+char* wilton_thread_fire_signal();
 
 // misc
 
-WILTON_EXPORT char* wilton_alloc(
+char* wilton_alloc(
         int size_bytes);
 
-WILTON_EXPORT void wilton_free(
+void wilton_free(
         char* buffer);
 
-WILTON_EXPORT char* wilton_tcp_wait_for_connection(
+char* wilton_tcp_wait_for_connection(
         const char* ip_addr,
         int ip_addr_len,
         int tcp_port,
