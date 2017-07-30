@@ -67,7 +67,6 @@ if ( NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" ) # system dependencies implied o
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_openssl )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
-    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_popt )
 endif ( )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_duktape )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
@@ -87,9 +86,6 @@ staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_http )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_cron )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_mustache )
-if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
-    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_winservice )
-endif ( )
 
 # dependencies check
 set ( ${PROJECT_NAME}_DEPS
@@ -108,16 +104,12 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_mustache
         staticlib_tinydir
         staticlib_pimpl
-        popt
         jansson
         log4cplus
         duktape
         libcurl
         openssl
         zlib )
-if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
-    list ( APPEND ${PROJECT_NAME}_DEPS staticlib_winservice )
-endif ( )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
 # build steps
