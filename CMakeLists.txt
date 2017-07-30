@@ -208,17 +208,20 @@ endif ( )
 
 # library
 set ( ${PROJECT_NAME}_RESFILE )
+set ( ${PROJECT_NAME}_DEFFILE )
 if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
     configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME}.rc
             ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc )
     set ( ${PROJECT_NAME}_RESFILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc )
+    set ( ${PROJECT_NAME}_DEFFILE ${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME}.def )
 endif ( )
 
-add_library ( ${PROJECT_NAME} ${${PROJECT_NAME}_LIBTYPE} ${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME}.def
+add_library ( ${PROJECT_NAME} ${${PROJECT_NAME}_LIBTYPE}
         ${${PROJECT_NAME}_SRC} 
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_HEADERS_PRIVATE}
-        ${${PROJECT_NAME}_RESFILE} )
+        ${${PROJECT_NAME}_RESFILE}
+        ${${PROJECT_NAME}_DEFFILE} )
 
 source_group ( "src" FILES ${${PROJECT_NAME}_SRC} )
 source_group ( "include" FILES ${${PROJECT_NAME}_HEADERS} )
