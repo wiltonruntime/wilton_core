@@ -19,77 +19,114 @@
 namespace wilton {
 namespace fs {
 
-namespace { // anonymous
-
-// todo: think about the non-throwing fail logic
-
-std::string read_file(const std::string& path) {
-    auto src = sl::tinydir::file_source(path);
-    auto sink = sl::io::string_sink();
-    sl::io::copy_all(src, sink);
-    return std::move(sink.get_string());
-}
-
-std::string read_zip_entry(const sl::unzip::file_index& idx, const std::string& path) {
-    auto enpath = path;
-    sl::utils::replace_all(enpath, "/./", "/");
-    auto& zippath = idx.get_zip_file_path();
-    if (enpath.length() > zippath.length() && sl::utils::starts_with(enpath, zippath)) {
-        auto en_path = enpath.substr(zippath.length() + 1);
-        auto stream = sl::unzip::open_zip_entry(idx, en_path);
-        auto src = sl::io::streambuf_source(stream.get());
-        auto sink = sl::io::string_sink();
-        sl::io::copy_all(src, sink);
-        return std::move(sink.get_string());
-    }
-    throw wilton::common::wilton_internal_exception(TRACEMSG("Error loading zip entry," +
-            " path: [" + path +"], zip file: [" + zippath + "]"));
-}
-
-std::string read_file_or_zip_entry(const std::string& path) {
-    auto idx_ptr = wilton::internal::static_modules_idx();
-    if (idx_ptr.has_value()) {
-        try {
-            return read_zip_entry(*idx_ptr, path);
-        } catch (const std::exception&) {
-            return read_file(path);
+sl::support::optional<sl::io::span<char>> fs_append_file(sl::io::span<const char> data) {
+    // json parse
+    auto json = sl::json::load(data);
+    auto rpath = std::ref(sl::utils::empty_string());
+    auto rcontents = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
+        auto& name = fi.name();
+        if ("path" == name) {
+            rpath = fi.as_string_nonempty_or_throw(name);
+        } else if ("data" == name) {
+            rcontents = fi.as_string_or_throw(name);
+        } else {
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
-    } else {
-        return read_file(path);
     }
-}
-
-void write_file(const std::string& path, const std::string& contents) {
-    auto src = sl::io::string_source(contents);
-    auto sink = sl::tinydir::file_sink(path);
-    sl::io::copy_all(src, sink);
-}
-
-std::vector<std::string> list_directory(const std::string& path) {
-    auto li = sl::tinydir::list_directory(path);
-    auto ra = sl::ranges::transform(li, [](const sl::tinydir::path& pa) -> std::string {
-        return pa.filename();
-    });
-    return ra.to_vector();
-}
-
-std::string read_main_from_package_json(const std::string& path) {
-    std::string pjpath = std::string(path) + "package.json";
+    if (rpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'path' not specified"));
+    if (rcontents.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'data' not specified"));
+    const std::string& path = rpath.get();
+    const std::string& contents = rcontents.get();
+    // call 
     try {
-        auto src = read_file_or_zip_entry(pjpath);
-        auto pj = sl::json::loads(src);
-        auto main = pj["main"].as_string("index.js");
-        if (!sl::utils::ends_with(main, ".js")) {
-            main.append(".js");
-        }
-        return main;
-    } catch (const std::exception&) {
-        return "index.js";
+        auto src = sl::io::string_source(contents);
+        auto sink = sl::tinydir::file_sink(path, sl::tinydir::file_sink::open_mode::append);
+        sl::io::copy_all(src, sink);
+        return support::empty_span();
+    } catch (const std::exception& e) {
+        throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-} // namespace
+sl::support::optional<sl::io::span<char>> fs_exists(sl::io::span<const char> data) {
+    // json parse
+    auto json = sl::json::load(data);
+    auto rpath = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
+        auto& name = fi.name();
+        if ("path" == name) {
+            rpath = fi.as_string_nonempty_or_throw(name);
+        } else {
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+        }
+    }
+    if (rpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'path' not specified"));
+    const std::string& path = rpath.get();
+    // call 
+    try {
+        auto tpath = sl::tinydir::path(path);
+        return support::json_span({
+            { "exists", tpath.exists() }
+        });
+    } catch (const std::exception& e) {
+        throw common::wilton_internal_exception(TRACEMSG(e.what()));
+    }
+}
 
+sl::support::optional<sl::io::span<char>> fs_mkdir(sl::io::span<const char> data) {
+    // json parse
+    auto json = sl::json::load(data);
+    auto rpath = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
+        auto& name = fi.name();
+        if ("path" == name) {
+            rpath = fi.as_string_nonempty_or_throw(name);
+        } else {
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+        }
+    }
+    if (rpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'path' not specified"));
+    const std::string& path = rpath.get();
+    // call 
+    try {
+        sl::tinydir::create_directory(path);
+        return support::empty_span();
+    } catch (const std::exception& e) {
+        throw common::wilton_internal_exception(TRACEMSG(e.what()));
+    }
+}
+
+sl::support::optional<sl::io::span<char>> fs_readdir(sl::io::span<const char> data) {
+    // json parse
+    auto json = sl::json::load(data);
+    auto rpath = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
+        auto& name = fi.name();
+        if ("path" == name) {
+            rpath = fi.as_string_nonempty_or_throw(name);
+        } else {
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+        }
+    }
+    if (rpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'path' not specified"));
+    const std::string& path = rpath.get();
+    // call 
+    try {
+        auto li = sl::tinydir::list_directory(path);
+        auto ra = sl::ranges::transform(li, [](const sl::tinydir::path & pa) -> sl::json::value {
+            return sl::json::value(pa.filename());
+        });
+        return support::json_span(ra.to_vector());
+    } catch (const std::exception& e) {
+        throw common::wilton_internal_exception(TRACEMSG(e.what()));
+    }
+}
 
 sl::support::optional<sl::io::span<char>> fs_read_file(sl::io::span<const char> data) {
     // json parse
@@ -108,7 +145,127 @@ sl::support::optional<sl::io::span<char>> fs_read_file(sl::io::span<const char> 
     const std::string& path = rpath.get();
     // call 
     try {
-        return support::string_span(read_file(path));
+        auto src = sl::tinydir::file_source(path);
+        auto sink = sl::io::string_sink();
+        sl::io::copy_all(src, sink);
+        return support::string_span(sink.get_string());
+    } catch (const std::exception& e) {
+        throw common::wilton_internal_exception(TRACEMSG(e.what()));
+    }
+}
+
+sl::support::optional<sl::io::span<char>> fs_rename(sl::io::span<const char> data) {
+    // json parse
+    auto json = sl::json::load(data);
+    auto roldpath = std::ref(sl::utils::empty_string());
+    auto rnewpath = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
+        auto& name = fi.name();
+        if ("oldPath" == name) {
+            roldpath = fi.as_string_nonempty_or_throw(name);
+        } else if ("newPath" == name) {
+            rnewpath = fi.as_string_nonempty_or_throw(name);
+        } else {
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+        }
+    }
+    if (roldpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'oldPath' not specified"));
+    if (rnewpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'newPath' not specified"));    
+    const std::string& oldpath = roldpath.get();
+    const std::string& newpath = rnewpath.get();
+    // call 
+    try {
+        auto old = sl::tinydir::path(oldpath);
+        old.rename(newpath);
+        return support::empty_span();
+    } catch (const std::exception& e) {
+        throw common::wilton_internal_exception(TRACEMSG(e.what()));
+    }
+}
+
+sl::support::optional<sl::io::span<char>> fs_rmdir(sl::io::span<const char> data) {
+    // json parse
+    auto json = sl::json::load(data);
+    auto rpath = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
+        auto& name = fi.name();
+        if ("path" == name) {
+            rpath = fi.as_string_nonempty_or_throw(name);
+        } else {
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+        }
+    }
+    if (rpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'path' not specified"));
+    const std::string& path = rpath.get();
+    // call
+    try {
+        auto tpath = sl::tinydir::path(path);
+        if (tpath.is_directory()) {
+            tpath.remove();
+        } else {
+            throw common::wilton_internal_exception(TRACEMSG("Invalid directory path: [" + path + "]"));
+        }
+        return support::empty_span();
+    } catch (const std::exception& e) {
+        throw common::wilton_internal_exception(TRACEMSG(e.what()));
+    }
+}
+
+sl::support::optional<sl::io::span<char>> fs_stat(sl::io::span<const char> data) {
+    // json parse
+    auto json = sl::json::load(data);
+    auto rpath = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
+        auto& name = fi.name();
+        if ("path" == name) {
+            rpath = fi.as_string_nonempty_or_throw(name);
+        } else {
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+        }
+    }
+    if (rpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'path' not specified"));
+    const std::string& path = rpath.get();
+    // call
+    try {
+        auto tpath = sl::tinydir::path(path);
+        return support::json_span({
+            { "size", tpath.open_read().size() },
+            { "isFile", tpath.is_regular_file() },
+            { "isDirectory", tpath.is_directory() }
+        });
+    } catch (const std::exception& e) {
+        throw common::wilton_internal_exception(TRACEMSG(e.what()));
+    }
+}
+
+sl::support::optional<sl::io::span<char>> fs_unlink(sl::io::span<const char> data) {
+    // json parse
+    auto json = sl::json::load(data);
+    auto rpath = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
+        auto& name = fi.name();
+        if ("path" == name) {
+            rpath = fi.as_string_nonempty_or_throw(name);
+        } else {
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+        }
+    }
+    if (rpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'path' not specified"));
+    const std::string& path = rpath.get();
+    // call
+    try {
+        auto tpath = sl::tinydir::path(path);
+        if (tpath.is_regular_file()) {
+            tpath.remove();
+        } else {
+            throw common::wilton_internal_exception(TRACEMSG("Invalid file path: [" + path + "]"));
+        }
+        return support::empty_span();
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
@@ -123,7 +280,7 @@ sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char>
         auto& name = fi.name();
         if ("path" == name) {
             rpath = fi.as_string_nonempty_or_throw(name);
-        } else if ("contents" == name) {
+        } else if ("data" == name) {
             rcontents = fi.as_string_or_throw(name);            
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
@@ -132,40 +289,15 @@ sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char>
     if (rpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'path' not specified"));
     if (rcontents.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
-            "Required parameter 'contents' not specified"));    
+            "Required parameter 'data' not specified"));    
     const std::string& path = rpath.get();
     const std::string& contents = rcontents.get();
     // call 
     try {
-        write_file(path, contents);
+        auto src = sl::io::string_source(contents);
+        auto sink = sl::tinydir::file_sink(path);
+        sl::io::copy_all(src, sink);
         return support::empty_span();
-    } catch (const std::exception& e) {
-        throw common::wilton_internal_exception(TRACEMSG(e.what()));
-    }
-}
-
-sl::support::optional<sl::io::span<char>> fs_list_directory(sl::io::span<const char> data) {
-    // json parse
-    auto json = sl::json::load(data);
-    auto rpath = std::ref(sl::utils::empty_string());
-    for (const sl::json::field& fi : json.as_object()) {
-        auto& name = fi.name();
-        if ("path" == name) {
-            rpath = fi.as_string_nonempty_or_throw(name);
-        } else {
-            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
-        }
-    }
-    if (rpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
-            "Required parameter 'path' not specified"));
-    const std::string& path = rpath.get();
-    // call 
-    try {
-        auto vec = list_directory(path);
-        auto ra = sl::ranges::transform(vec, [](const std::string& st) {
-            return sl::json::value(st);
-        });
-        return support::json_span(ra.to_vector());
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }

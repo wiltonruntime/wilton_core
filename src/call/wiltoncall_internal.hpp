@@ -127,11 +127,25 @@ sl::support::optional<sl::io::span<char>> thread_fire_signal(sl::io::span<const 
 
 namespace fs {
 
+sl::support::optional<sl::io::span<char>> fs_append_file(sl::io::span<const char> data);
+
+sl::support::optional<sl::io::span<char>> fs_exists(sl::io::span<const char> data);
+
+sl::support::optional<sl::io::span<char>> fs_mkdir(sl::io::span<const char> data);
+
+sl::support::optional<sl::io::span<char>> fs_readdir(sl::io::span<const char> data);
+
 sl::support::optional<sl::io::span<char>> fs_read_file(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char> data);
+sl::support::optional<sl::io::span<char>> fs_rename(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_list_directory(sl::io::span<const char> data);
+sl::support::optional<sl::io::span<char>> fs_rmdir(sl::io::span<const char> data);
+
+sl::support::optional<sl::io::span<char>> fs_stat(sl::io::span<const char> data);
+
+sl::support::optional<sl::io::span<char>> fs_unlink(sl::io::span<const char> data);
+
+sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char> data);
 
 } // namespace
 

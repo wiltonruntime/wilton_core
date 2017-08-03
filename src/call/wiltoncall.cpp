@@ -109,9 +109,16 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("thread_wait_for_signal", wilton::thread::thread_wait_for_signal);
         reg.put("thread_fire_signal", wilton::thread::thread_fire_signal);
         // fs
+        reg.put("fs_append_file", wilton::fs::fs_append_file);
+        reg.put("fs_exists", wilton::fs::fs_exists);
+        reg.put("fs_mkdir", wilton::fs::fs_mkdir);
+        reg.put("fs_readdir", wilton::fs::fs_readdir);
         reg.put("fs_read_file", wilton::fs::fs_read_file);
+        reg.put("fs_rename", wilton::fs::fs_rename);
+        reg.put("fs_rmdir", wilton::fs::fs_rmdir);
+        reg.put("fs_stat", wilton::fs::fs_stat);
+        reg.put("fs_unlink", wilton::fs::fs_unlink);
         reg.put("fs_write_file", wilton::fs::fs_write_file);
-        reg.put("fs_list_directory", wilton::fs::fs_list_directory);
         // load
         reg.put("load_module_resource", wilton::load::load_module_resource);
         reg.put("load_module_script", wilton::load::load_module_script);
