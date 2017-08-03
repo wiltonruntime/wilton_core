@@ -233,7 +233,7 @@ sl::support::optional<sl::io::span<char>> fs_stat(sl::io::span<const char> data)
     try {
         auto tpath = sl::tinydir::path(path);
         return support::json_span({
-            { "size", tpath.open_read().size() },
+            { "size", tpath.is_regular_file() ? tpath.open_read().size() : 0 },
             { "isFile", tpath.is_regular_file() },
             { "isDirectory", tpath.is_directory() }
         });
