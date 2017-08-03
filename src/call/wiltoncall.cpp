@@ -10,6 +10,7 @@
 #include <atomic>
 
 #include "staticlib/config.hpp"
+#include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
 #include "common/wilton_internal_exception.hpp"
@@ -62,8 +63,8 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         auto modpath = cf["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl");
         if (sl::utils::starts_with(modpath, wilton::internal::zip_proto_prefix)) {
             auto zippath = modpath.substr(wilton::internal::zip_proto_prefix.length());
-            wilton::common::normalize_path(zippath);
-            wilton::internal::static_modules_idx(new sl::unzip::file_index(zippath));
+            auto zippath_norm = sl::tinydir::normalize_path(zippath);
+            wilton::internal::static_modules_idx(new sl::unzip::file_index(zippath_norm));
         }
         
         // registry

@@ -28,8 +28,6 @@ void check_json_callback_script(const sl::json::field& field);
 
 void dump_error(const std::string& directory, const std::string& msg);
 
-std::string& normalize_path(std::string& path);
-
 } //namespace
 }        
         

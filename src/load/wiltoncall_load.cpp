@@ -14,7 +14,7 @@ namespace load {
 
 namespace { // anonymous
 
-sl::io::span<char> read_zip_resource(std::string& path) {
+sl::io::span<char> read_zip_resource(const std::string& path) {
     // get modules.zip index
     auto idx_ptr = wilton::internal::static_modules_idx();
     if (!idx_ptr.has_value()) {
@@ -23,11 +23,11 @@ sl::io::span<char> read_zip_resource(std::string& path) {
     }
     auto& idx = *idx_ptr;
     // normalize path
-    wilton::common::normalize_path(path);
+    auto path_norm = sl::tinydir::normalize_path(path);
     // load zip entry
     auto& zippath = idx.get_zip_file_path();
-    if (path.length() > zippath.length() + 1 && sl::utils::starts_with(path, zippath)) {
-        auto en_path = path.substr(zippath.length() + 1);
+    if (path.length() > zippath.length() + 1 && sl::utils::starts_with(path_norm, zippath)) {
+        auto en_path = path_norm.substr(zippath.length() + 1);
         auto stream = sl::unzip::open_zip_entry(idx, en_path);
         auto src = sl::io::streambuf_source(stream.get());
         auto sink = sl::io::make_array_sink(wilton_alloc, wilton_free);
