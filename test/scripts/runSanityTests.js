@@ -38,7 +38,8 @@ define([
     "tape-compat",
     "unicode-escape",
     "util",
-    "validator/lib/isAlphanumeric"
+    "validator/lib/isAlphanumeric",
+    "wilton/Server"
 ], function() {
     return {
         main: function() {
