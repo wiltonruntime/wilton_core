@@ -235,6 +235,10 @@ if ( ${PROJECT_NAME}_SHARED )
     target_link_libraries ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_STATIC_LIBRARIES} )
 endif ( )
 
+if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
+    set_property ( TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
+endif ( )
+
 # version file
 configure_file ( ${CMAKE_CURRENT_LIST_DIR}/resources/wilton.version
         ${CMAKE_CURRENT_BINARY_DIR}/wilton.version )

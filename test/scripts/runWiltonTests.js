@@ -9,8 +9,15 @@ define([], function() {
 
     return {
         main: function() {
-            require(["wilton/test/core/index"], function(tests) {
-                tests.main();
+            require(["wilton/dyload", "wilton/test/core/index", "wilton/test/db/index"], function(dyload, coreTests, dbTests) {
+                coreTests.main();
+                dyload({
+                    path: "libwilton_db.so"
+                }, function(){ /* quiet */ });
+                dyload({
+                    path: "wilton_db.dll"
+                }, function(){ /* quiet */ });
+                dbTests.main();
             });
         }
     };
