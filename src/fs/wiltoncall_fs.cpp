@@ -303,5 +303,36 @@ sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char>
     }
 }
 
+sl::support::optional<sl::io::span<char>> fs_copy_file(sl::io::span<const char> data) {
+    // json parse
+    auto json = sl::json::load(data);
+    auto roldpath = std::ref(sl::utils::empty_string());
+    auto rnewpath = std::ref(sl::utils::empty_string());
+    for (const sl::json::field& fi : json.as_object()) {
+        auto& name = fi.name();
+        if ("oldPath" == name) {
+            roldpath = fi.as_string_nonempty_or_throw(name);
+        } else if ("newPath" == name) {
+            rnewpath = fi.as_string_nonempty_or_throw(name);
+        } else {
+            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+        }
+    }
+    if (roldpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'oldPath' not specified"));
+    if (rnewpath.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+            "Required parameter 'newPath' not specified"));
+    const std::string& oldpath = roldpath.get();
+    const std::string& newpath = rnewpath.get();
+    // call 
+    try {
+        auto old = sl::tinydir::path(oldpath);
+        old.copy_file(newpath);
+        return support::empty_span();
+    } catch (const std::exception& e) {
+        throw common::wilton_internal_exception(TRACEMSG(e.what()));
+    }
+}
+
 } // namespace
 }

@@ -119,6 +119,7 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("fs_stat", wilton::fs::fs_stat);
         reg.put("fs_unlink", wilton::fs::fs_unlink);
         reg.put("fs_write_file", wilton::fs::fs_write_file);
+        reg.put("fs_copy_file", wilton::fs::fs_copy_file);
         // load
         reg.put("load_module_resource", wilton::load::load_module_resource);
         reg.put("load_module_script", wilton::load::load_module_script);

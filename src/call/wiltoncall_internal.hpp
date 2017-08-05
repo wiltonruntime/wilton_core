@@ -147,6 +147,8 @@ sl::support::optional<sl::io::span<char>> fs_unlink(sl::io::span<const char> dat
 
 sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char> data);
 
+sl::support::optional<sl::io::span<char>> fs_copy_file(sl::io::span<const char> data);
+
 } // namespace
 
 // load
