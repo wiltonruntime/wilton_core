@@ -9,6 +9,7 @@
 #define	WILTON_SUPPORT_SPAN_OPERATIONS_HPP
 
 #include "staticlib/io.hpp"
+#include "staticlib/json.hpp"
 #include "staticlib/support.hpp"
 
 #include "wilton/wilton.h"
