@@ -15,7 +15,7 @@
 namespace wilton {
 namespace thread {
 
-sl::support::optional<sl::io::span<char>> thread_run(sl::io::span<const char> data) {
+support::buffer thread_run(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rcallback = std::ref(sl::json::null_value_ref());
@@ -57,10 +57,10 @@ sl::support::optional<sl::io::span<char>> thread_run(sl::io::span<const char> da
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::empty_span();
+    return support::make_empty_buffer();
 }
 
-sl::support::optional<sl::io::span<char>> thread_sleep_millis(sl::io::span<const char> data) {
+support::buffer thread_sleep_millis(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t millis = -1;
@@ -79,25 +79,25 @@ sl::support::optional<sl::io::span<char>> thread_sleep_millis(sl::io::span<const
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::empty_span();
+    return support::make_empty_buffer();
 }
 
-sl::support::optional<sl::io::span<char>> thread_wait_for_signal(sl::io::span<const char>) {
+support::buffer thread_wait_for_signal(sl::io::span<const char>) {
     // call wilton
     char* err = wilton_thread_wait_for_signal();
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::empty_span();
+    return support::make_empty_buffer();
 }
 
-sl::support::optional<sl::io::span<char>> thread_fire_signal(sl::io::span<const char>) {
+support::buffer thread_fire_signal(sl::io::span<const char>) {
     // call wilton
     char* err = wilton_thread_fire_signal();
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::empty_span();
+    return support::make_empty_buffer();
 }
 
 

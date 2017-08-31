@@ -21,7 +21,7 @@
 #include "wilton/wiltoncall.h"
 #include "wilton/support/handle_registry.hpp"
 #include "wilton/support/payload_handle_registry.hpp"
-#include "wilton/support/span_operations.hpp"
+#include "wilton/support/buffer.hpp"
 
 #include "common/wilton_internal_exception.hpp"
 #include "common/utils.hpp"
@@ -31,123 +31,123 @@ namespace wilton {
 // Server
 namespace server {
 
-sl::support::optional<sl::io::span<char>> server_create(sl::io::span<const char> data);
+support::buffer server_create(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> server_stop(sl::io::span<const char> data);
+support::buffer server_stop(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> request_get_metadata(sl::io::span<const char> data);
+support::buffer request_get_metadata(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> request_get_data(sl::io::span<const char> data);
+support::buffer request_get_data(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> request_get_data_filename(sl::io::span<const char> data);
+support::buffer request_get_data_filename(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> request_set_response_metadata(sl::io::span<const char> data);
+support::buffer request_set_response_metadata(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> request_send_response(sl::io::span<const char> data);
+support::buffer request_send_response(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> request_send_temp_file(sl::io::span<const char> data);
+support::buffer request_send_temp_file(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> request_send_mustache(sl::io::span<const char> data);
+support::buffer request_send_mustache(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> request_send_later(sl::io::span<const char> data);
+support::buffer request_send_later(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> request_send_with_response_writer(sl::io::span<const char> data);
+support::buffer request_send_with_response_writer(sl::io::span<const char> data);
 
 } // namespace
 
 // Logger
 namespace logging {
 
-sl::support::optional<sl::io::span<char>> logging_initialize(sl::io::span<const char> data);
+support::buffer logging_initialize(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> logging_log(sl::io::span<const char> data);
+support::buffer logging_log(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> logging_is_level_enabled(sl::io::span<const char> data);
+support::buffer logging_is_level_enabled(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> logging_shutdown(sl::io::span<const char> data);
+support::buffer logging_shutdown(sl::io::span<const char> data);
 
 } // namespace
 
 // Mustache
 namespace mustache {
 
-sl::support::optional<sl::io::span<char>> mustache_render(sl::io::span<const char> data);
+support::buffer mustache_render(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> mustache_render_file(sl::io::span<const char> data);
+support::buffer mustache_render_file(sl::io::span<const char> data);
 
 } // namespace
 
 // HttpClient
 namespace client {
 
-sl::support::optional<sl::io::span<char>> httpclient_send_request(sl::io::span<const char> data);
+support::buffer httpclient_send_request(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> httpclient_send_temp_file(sl::io::span<const char> data);
+support::buffer httpclient_send_temp_file(sl::io::span<const char> data);
 
 } // namespace
 
 // Cron
 namespace cron {
 
-sl::support::optional<sl::io::span<char>> cron_start(sl::io::span<const char> data);
+support::buffer cron_start(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> cron_stop(sl::io::span<const char> data);
+support::buffer cron_stop(sl::io::span<const char> data);
 
 } // namespace
 
 // shared
 namespace shared {
 
-sl::support::optional<sl::io::span<char>> shared_put(sl::io::span<const char> data);
+support::buffer shared_put(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> shared_get(sl::io::span<const char> data);
+support::buffer shared_get(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> shared_wait_change(sl::io::span<const char> data);
+support::buffer shared_wait_change(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> shared_remove(sl::io::span<const char> data);
+support::buffer shared_remove(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> shared_list_append(sl::io::span<const char> data);
+support::buffer shared_list_append(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> shared_dump(sl::io::span<const char> data);
+support::buffer shared_dump(sl::io::span<const char> data);
 
 } // namespace
 
 // thread
 namespace thread {
 
-sl::support::optional<sl::io::span<char>> thread_run(sl::io::span<const char> data);
+support::buffer thread_run(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> thread_sleep_millis(sl::io::span<const char> data);
+support::buffer thread_sleep_millis(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> thread_wait_for_signal(sl::io::span<const char> data);
+support::buffer thread_wait_for_signal(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> thread_fire_signal(sl::io::span<const char> data);
+support::buffer thread_fire_signal(sl::io::span<const char> data);
 
 } // namespace
 
 namespace fs {
 
-sl::support::optional<sl::io::span<char>> fs_append_file(sl::io::span<const char> data);
+support::buffer fs_append_file(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_exists(sl::io::span<const char> data);
+support::buffer fs_exists(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_mkdir(sl::io::span<const char> data);
+support::buffer fs_mkdir(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_readdir(sl::io::span<const char> data);
+support::buffer fs_readdir(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_read_file(sl::io::span<const char> data);
+support::buffer fs_read_file(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_rename(sl::io::span<const char> data);
+support::buffer fs_rename(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_rmdir(sl::io::span<const char> data);
+support::buffer fs_rmdir(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_stat(sl::io::span<const char> data);
+support::buffer fs_stat(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_unlink(sl::io::span<const char> data);
+support::buffer fs_unlink(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char> data);
+support::buffer fs_write_file(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> fs_copy_file(sl::io::span<const char> data);
+support::buffer fs_copy_file(sl::io::span<const char> data);
 
 } // namespace
 
@@ -155,9 +155,9 @@ sl::support::optional<sl::io::span<char>> fs_copy_file(sl::io::span<const char> 
 
 namespace load {
 
-sl::support::optional<sl::io::span<char>> load_module_resource(sl::io::span<const char> data);
+support::buffer load_module_resource(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> load_module_script(sl::io::span<const char> data);
+support::buffer load_module_script(sl::io::span<const char> data);
 
 }
 
@@ -165,18 +165,18 @@ sl::support::optional<sl::io::span<char>> load_module_script(sl::io::span<const 
 
 namespace dyload {
 
-sl::support::optional<sl::io::span<char>> dyload_shared_library(sl::io::span<const char> data);
+support::buffer dyload_shared_library(sl::io::span<const char> data);
 
 } // namespace
 
 // misc
 namespace misc {
 
-sl::support::optional<sl::io::span<char>> tcp_wait_for_connection(sl::io::span<const char> data);
+support::buffer tcp_wait_for_connection(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> process_spawn(sl::io::span<const char> data);
+support::buffer process_spawn(sl::io::span<const char> data);
 
-sl::support::optional<sl::io::span<char>> get_wiltoncall_config(sl::io::span<const char> data);
+support::buffer get_wiltoncall_config(sl::io::span<const char> data);
     
 } // namespace
 

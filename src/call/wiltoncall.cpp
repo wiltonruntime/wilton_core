@@ -178,7 +178,7 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
     try {
         uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
         std::string call_name_str{call_name, call_name_len_u16};
-        auto fun = [call_ctx, call_cb](sl::io::span<const char> data) -> sl::support::optional<sl::io::span<char>> {
+        auto fun = [call_ctx, call_cb](sl::io::span<const char> data) -> wilton::support::buffer {
             char* out = nullptr;
             int out_len = 0;
             auto err = call_cb(call_ctx, data.data(), static_cast<int>(data.size()), 
@@ -193,9 +193,9 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
                     throw wilton::common::wilton_internal_exception(TRACEMSG(
                             "Invalid result length value returned: [" + sl::support::to_string(out_len) + "]"));
                 }
-                return wilton::support::buffer_span(out, out_len);
+                return wilton::support::wrap_wilton_buffer(out, out_len);
             }
-            return wilton::support::empty_span();
+            return wilton::support::make_empty_buffer();
         };
         static_registry().put(call_name_str, fun);
         return nullptr;

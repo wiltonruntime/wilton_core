@@ -38,7 +38,7 @@ wilton_HttpClient* static_client() {
 
 } // namespace
 
-sl::support::optional<sl::io::span<char>> httpclient_send_request(sl::io::span<const char> data) {
+support::buffer httpclient_send_request(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rurl = std::ref(sl::utils::empty_string());
@@ -68,10 +68,10 @@ sl::support::optional<sl::io::span<char>> httpclient_send_request(sl::io::span<c
             metadata.c_str(), static_cast<int>(metadata.length()),
             std::addressof(out), std::addressof(out_len));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return support::buffer_span(out, out_len);
+    return support::wrap_wilton_buffer(out, out_len);
 }
 
-sl::support::optional<sl::io::span<char>> httpclient_send_temp_file(sl::io::span<const char> data) {
+support::buffer httpclient_send_temp_file(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rurl = std::ref(sl::utils::empty_string());
@@ -109,7 +109,7 @@ sl::support::optional<sl::io::span<char>> httpclient_send_temp_file(sl::io::span
                 delete filePath_passed;
             });
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
-    return support::buffer_span(out, out_len);
+    return support::wrap_wilton_buffer(out, out_len);
 }
 
 } // namespace

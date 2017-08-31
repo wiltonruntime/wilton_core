@@ -18,27 +18,39 @@
 namespace wilton {
 namespace support {
 
-inline sl::support::optional<sl::io::span<char>> empty_span() {
+using buffer = sl::support::optional<sl::io::span<char>>;
+
+inline buffer make_empty_buffer() {
     return sl::support::optional<sl::io::span<char>>();
 }
 
-inline sl::support::optional<sl::io::span<char>> json_span(const sl::json::value& val) {
+inline buffer make_array_buffer(const char* buf, int buf_len) {
+    if (nullptr != buf) {
+        auto span_src = sl::io::make_span(buf, buf_len);
+        auto span = alloc_copy_span(span_src);
+        return sl::support::make_optional(std::move(span));
+    } else {
+        return make_empty_buffer();
+    }
+}
+
+inline buffer make_string_buffer(const std::string& st) {
+    auto span = alloc_copy_span(st);
+    return sl::support::make_optional(std::move(span));
+}
+
+inline buffer make_json_buffer(const sl::json::value& val) {
     auto sink = sl::io::make_array_sink(wilton_alloc, wilton_free);
     val.dump(sink);
     return sl::support::make_optional(sink.release());
 }
 
-inline sl::support::optional<sl::io::span<char>> buffer_span(char* buf, int buf_len) {
+inline buffer wrap_wilton_buffer(char* buf, int buf_len) {
     if (nullptr != buf) {
         return sl::support::make_optional(sl::io::make_span(buf, buf_len));
     } else {
-        return empty_span();
+        return make_empty_buffer();
     }
-}
-
-inline sl::support::optional<sl::io::span<char>> string_span(const std::string& st) {
-    auto span = alloc_copy_span(st);
-    return sl::support::make_optional(std::move(span));
 }
 
 } // namespace

@@ -16,6 +16,7 @@
 #include "wilton/wiltoncall.h"
 
 #include "wilton/support/alloc_copy.hpp"
+#include "wilton/support/buffer.hpp"
 #include "wilton/support/wilton_support_exception.hpp"
 
 namespace wilton {
@@ -30,7 +31,7 @@ using cb_type = char* (*)(
         char** json_out,
         int* json_out_len);
 
-using fun_span_type = sl::support::optional<sl::io::span<char>>(*)(sl::io::span<const char>);
+using fun_span_type = support::buffer(*)(sl::io::span<const char>);
 
 inline char* cb_fun(void* call_ctx, const char* json_in, int json_in_len, char** json_out, int* json_out_len) {
     auto fun = reinterpret_cast<fun_span_type> (call_ctx);

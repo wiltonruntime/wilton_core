@@ -16,9 +16,10 @@
 namespace wilton {
 namespace support {
 
-inline sl::io::span<char> alloc_copy_span(const std::string& str) {
-    auto sink = sl::io::make_array_sink(wilton_alloc, wilton_free, str.size());
-    sink.write(str);
+template<typename Buffer>
+sl::io::span<char> alloc_copy_span(Buffer buf) {
+    auto sink = sl::io::make_array_sink(wilton_alloc, wilton_free, buf.size());
+    sink.write(buf);
     return sink.release();
 }
 

@@ -19,7 +19,7 @@
 namespace wilton {
 namespace fs {
 
-sl::support::optional<sl::io::span<char>> fs_append_file(sl::io::span<const char> data) {
+support::buffer fs_append_file(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -45,13 +45,13 @@ sl::support::optional<sl::io::span<char>> fs_append_file(sl::io::span<const char
         auto src = sl::io::string_source(contents);
         auto sink = sl::tinydir::file_sink(path, sl::tinydir::file_sink::open_mode::append);
         sl::io::copy_all(src, sink);
-        return support::empty_span();
+        return support::make_empty_buffer();
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_exists(sl::io::span<const char> data) {
+support::buffer fs_exists(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -69,7 +69,7 @@ sl::support::optional<sl::io::span<char>> fs_exists(sl::io::span<const char> dat
     // call 
     try {
         auto tpath = sl::tinydir::path(path);
-        return support::json_span({
+        return support::make_json_buffer({
             { "exists", tpath.exists() }
         });
     } catch (const std::exception& e) {
@@ -77,7 +77,7 @@ sl::support::optional<sl::io::span<char>> fs_exists(sl::io::span<const char> dat
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_mkdir(sl::io::span<const char> data) {
+support::buffer fs_mkdir(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -95,13 +95,13 @@ sl::support::optional<sl::io::span<char>> fs_mkdir(sl::io::span<const char> data
     // call 
     try {
         sl::tinydir::create_directory(path);
-        return support::empty_span();
+        return support::make_empty_buffer();
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_readdir(sl::io::span<const char> data) {
+support::buffer fs_readdir(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -122,13 +122,13 @@ sl::support::optional<sl::io::span<char>> fs_readdir(sl::io::span<const char> da
         auto ra = sl::ranges::transform(li, [](const sl::tinydir::path & pa) -> sl::json::value {
             return sl::json::value(pa.filename());
         });
-        return support::json_span(ra.to_vector());
+        return support::make_json_buffer(ra.to_vector());
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_read_file(sl::io::span<const char> data) {
+support::buffer fs_read_file(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -148,13 +148,13 @@ sl::support::optional<sl::io::span<char>> fs_read_file(sl::io::span<const char> 
         auto src = sl::tinydir::file_source(path);
         auto sink = sl::io::string_sink();
         sl::io::copy_all(src, sink);
-        return support::string_span(sink.get_string());
+        return support::make_string_buffer(sink.get_string());
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_rename(sl::io::span<const char> data) {
+support::buffer fs_rename(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto roldpath = std::ref(sl::utils::empty_string());
@@ -179,13 +179,13 @@ sl::support::optional<sl::io::span<char>> fs_rename(sl::io::span<const char> dat
     try {
         auto old = sl::tinydir::path(oldpath);
         old.rename(newpath);
-        return support::empty_span();
+        return support::make_empty_buffer();
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_rmdir(sl::io::span<const char> data) {
+support::buffer fs_rmdir(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -208,13 +208,13 @@ sl::support::optional<sl::io::span<char>> fs_rmdir(sl::io::span<const char> data
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Invalid directory path: [" + path + "]"));
         }
-        return support::empty_span();
+        return support::make_empty_buffer();
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_stat(sl::io::span<const char> data) {
+support::buffer fs_stat(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -232,7 +232,7 @@ sl::support::optional<sl::io::span<char>> fs_stat(sl::io::span<const char> data)
     // call
     try {
         auto tpath = sl::tinydir::path(path);
-        return support::json_span({
+        return support::make_json_buffer({
             { "size", tpath.is_regular_file() ? tpath.open_read().size() : 0 },
             { "isFile", tpath.is_regular_file() },
             { "isDirectory", tpath.is_directory() }
@@ -242,7 +242,7 @@ sl::support::optional<sl::io::span<char>> fs_stat(sl::io::span<const char> data)
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_unlink(sl::io::span<const char> data) {
+support::buffer fs_unlink(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -265,13 +265,13 @@ sl::support::optional<sl::io::span<char>> fs_unlink(sl::io::span<const char> dat
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Invalid file path: [" + path + "]"));
         }
-        return support::empty_span();
+        return support::make_empty_buffer();
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char> data) {
+support::buffer fs_write_file(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rpath = std::ref(sl::utils::empty_string());
@@ -297,13 +297,13 @@ sl::support::optional<sl::io::span<char>> fs_write_file(sl::io::span<const char>
         auto src = sl::io::string_source(contents);
         auto sink = sl::tinydir::file_sink(path);
         sl::io::copy_all(src, sink);
-        return support::empty_span();
+        return support::make_empty_buffer();
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }
 }
 
-sl::support::optional<sl::io::span<char>> fs_copy_file(sl::io::span<const char> data) {
+support::buffer fs_copy_file(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto roldpath = std::ref(sl::utils::empty_string());
@@ -328,7 +328,7 @@ sl::support::optional<sl::io::span<char>> fs_copy_file(sl::io::span<const char> 
     try {
         auto old = sl::tinydir::path(oldpath);
         old.copy_file(newpath);
-        return support::empty_span();
+        return support::make_empty_buffer();
     } catch (const std::exception& e) {
         throw common::wilton_internal_exception(TRACEMSG(e.what()));
     }

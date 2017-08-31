@@ -12,7 +12,7 @@
 namespace wilton {
 namespace misc {
 
-sl::support::optional<sl::io::span<char>> tcp_wait_for_connection(sl::io::span<const char> data) {
+support::buffer tcp_wait_for_connection(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t timeout = -1;
@@ -43,10 +43,10 @@ sl::support::optional<sl::io::span<char>> tcp_wait_for_connection(sl::io::span<c
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::empty_span();
+    return support::make_empty_buffer();
 }
 
-sl::support::optional<sl::io::span<char>> process_spawn(sl::io::span<const char> data) {
+support::buffer process_spawn(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rexecutable = std::ref(sl::utils::empty_string());
@@ -82,11 +82,11 @@ sl::support::optional<sl::io::span<char>> process_spawn(sl::io::span<const char>
     } else {
         pid = sl::utils::exec_async(executable, args, outfile);
     }
-    return support::json_span(sl::json::value(pid));
+    return support::make_json_buffer(sl::json::value(pid));
 }
 
-sl::support::optional<sl::io::span<char>> get_wiltoncall_config(sl::io::span<const char>) {
-    return support::json_span(internal::static_wiltoncall_config());
+support::buffer get_wiltoncall_config(sl::io::span<const char>) {
+    return support::make_json_buffer(internal::static_wiltoncall_config());
 }
 
 } // namespace

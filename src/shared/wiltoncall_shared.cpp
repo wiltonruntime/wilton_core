@@ -12,7 +12,7 @@
 namespace wilton {
 namespace shared {
 
-sl::support::optional<sl::io::span<char>> shared_put(sl::io::span<const char> data) {
+support::buffer shared_put(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rkey = std::ref(sl::utils::empty_string());
@@ -42,10 +42,10 @@ sl::support::optional<sl::io::span<char>> shared_put(sl::io::span<const char> da
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::buffer_span(out, out_len);
+    return support::wrap_wilton_buffer(out, out_len);
 }
 
-sl::support::optional<sl::io::span<char>> shared_get(sl::io::span<const char> data) {
+support::buffer shared_get(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rkey = std::ref(sl::utils::empty_string());
@@ -68,10 +68,10 @@ sl::support::optional<sl::io::span<char>> shared_get(sl::io::span<const char> da
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::buffer_span(out, out_len);
+    return support::wrap_wilton_buffer(out, out_len);
 }
 
-sl::support::optional<sl::io::span<char>> shared_wait_change(sl::io::span<const char> data) {
+support::buffer shared_wait_change(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     int64_t timeout_millis = -1;
@@ -107,10 +107,10 @@ sl::support::optional<sl::io::span<char>> shared_wait_change(sl::io::span<const 
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::buffer_span(out, out_len);
+    return support::wrap_wilton_buffer(out, out_len);
 }
 
-sl::support::optional<sl::io::span<char>> shared_remove(sl::io::span<const char> data) {
+support::buffer shared_remove(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rkey = std::ref(sl::utils::empty_string());
@@ -133,10 +133,10 @@ sl::support::optional<sl::io::span<char>> shared_remove(sl::io::span<const char>
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::buffer_span(out, out_len);
+    return support::wrap_wilton_buffer(out, out_len);
 }
 
-sl::support::optional<sl::io::span<char>> shared_list_append(sl::io::span<const char> data) {
+support::buffer shared_list_append(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rkey = std::ref(sl::utils::empty_string());
@@ -166,10 +166,10 @@ sl::support::optional<sl::io::span<char>> shared_list_append(sl::io::span<const 
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::buffer_span(out, out_len);
+    return support::wrap_wilton_buffer(out, out_len);
 }
 
-sl::support::optional<sl::io::span<char>> shared_dump(sl::io::span<const char>) {
+support::buffer shared_dump(sl::io::span<const char>) {
     // call wilton
     char* out = nullptr;
     int out_len = 0;
@@ -177,7 +177,7 @@ sl::support::optional<sl::io::span<char>> shared_dump(sl::io::span<const char>) 
     if (nullptr != err) {
         common::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::buffer_span(out, out_len);
+    return support::wrap_wilton_buffer(out, out_len);
 }
 
 } // namespace

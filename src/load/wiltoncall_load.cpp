@@ -76,13 +76,13 @@ std::string read_main_from_package_json(const std::string& url) {
 
 } // namespace
 
-sl::support::optional<sl::io::span<char>> load_module_resource(sl::io::span<const char> data) {
+support::buffer load_module_resource(sl::io::span<const char> data) {
     auto url = std::string(data.data(), data.size());
     auto res = read_zip_or_fs_resource(url);
     return sl::support::make_optional(std::move(res));
 }
 
-sl::support::optional<sl::io::span<char>> load_module_script(sl::io::span<const char> data) {
+support::buffer load_module_script(sl::io::span<const char> data) {
     try {
         return load_module_resource(data);
     } catch (const std::exception& epath) {

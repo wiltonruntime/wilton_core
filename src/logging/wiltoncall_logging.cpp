@@ -12,13 +12,13 @@
 namespace wilton {
 namespace logging {
 
-sl::support::optional<sl::io::span<char>> logging_initialize(sl::io::span<const char> data) {
+support::buffer logging_initialize(sl::io::span<const char> data) {
     char* err = wilton_logger_initialize(data.data(), static_cast<int>(data.size()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
-    return support::empty_span();
+    return support::make_empty_buffer();
 }
 
-sl::support::optional<sl::io::span<char>> logging_log(sl::io::span<const char> data) {
+support::buffer logging_log(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rlevel = std::ref(sl::utils::empty_string());
@@ -48,10 +48,10 @@ sl::support::optional<sl::io::span<char>> logging_log(sl::io::span<const char> d
             logger.c_str(), static_cast<int>(logger.length()),
             message.c_str(), static_cast<int>(message.length()));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
-    return support::empty_span();
+    return support::make_empty_buffer();
 }
 
-sl::support::optional<sl::io::span<char>> logging_is_level_enabled(sl::io::span<const char> data) {
+support::buffer logging_is_level_enabled(sl::io::span<const char> data) {
     // parse json
     auto json = sl::json::load(data);
     auto rlevel = std::ref(sl::utils::empty_string());
@@ -77,16 +77,16 @@ sl::support::optional<sl::io::span<char>> logging_is_level_enabled(sl::io::span<
     char* err = wilton_logger_is_level_enabled(logger.c_str(), static_cast<int>(logger.length()),
             level.c_str(), static_cast<int>(level.length()), std::addressof(out));
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
-    return support::json_span({
+    return support::make_json_buffer({
         { "enabled", out != 0 }
     });
 }
 
-sl::support::optional<sl::io::span<char>> logging_shutdown(sl::io::span<const char>) {
+support::buffer logging_shutdown(sl::io::span<const char>) {
     // call wilton
     char* err = wilton_logger_shutdown();
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(std::string(err)));
-    return support::empty_span();
+    return support::make_empty_buffer();
 }
 
 } // namespace
