@@ -71,12 +71,13 @@ support::buffer httpclient_send_request(sl::io::span<const char> data) {
     return support::wrap_wilton_buffer(out, out_len);
 }
 
-support::buffer httpclient_send_temp_file(sl::io::span<const char> data) {
+support::buffer httpclient_send_file(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);
     auto rurl = std::ref(sl::utils::empty_string());
     auto rfile = std::ref(sl::utils::empty_string());
     std::string metadata = sl::utils::empty_string();
+    auto rem = false;
     for (const sl::json::field& fi : json.as_object()) {
         auto& name = fi.name();
         if ("url" == name) {
@@ -85,6 +86,8 @@ support::buffer httpclient_send_temp_file(sl::io::span<const char> data) {
             rfile = fi.as_string_nonempty_or_throw(name);
         } else if ("metadata" == name) {
             metadata = fi.val().dumps();
+        } else if ("remove" == name) {
+            rem = fi.as_bool_or_throw(name);
         } else {
             throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
@@ -98,14 +101,17 @@ support::buffer httpclient_send_temp_file(sl::io::span<const char> data) {
     // call wilton
     char* out = nullptr;
     int out_len = 0;
+    std::string* pass_ctx = rem ? new std::string(file_path.data(), file_path.length()) : new std::string();
     char* err = wilton_HttpClient_send_file(static_client(), url.c_str(), static_cast<int>(url.length()),
             file_path.c_str(), static_cast<int>(file_path.length()), 
             metadata.c_str(), static_cast<int>(metadata.length()),
             std::addressof(out), std::addressof(out_len),
-            new std::string(file_path.data(), file_path.length()),
+            pass_ctx,
             [](void* ctx, int) {
                 std::string* filePath_passed = static_cast<std::string*> (ctx);
-                std::remove(filePath_passed->c_str());
+                if (!filePath_passed->empty()) {
+                    std::remove(filePath_passed->c_str());
+                }
                 delete filePath_passed;
             });
     if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));

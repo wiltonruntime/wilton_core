@@ -82,7 +82,7 @@ namespace client {
 
 support::buffer httpclient_send_request(sl::io::span<const char> data);
 
-support::buffer httpclient_send_temp_file(sl::io::span<const char> data);
+support::buffer httpclient_send_file(sl::io::span<const char> data);
 
 } // namespace
 

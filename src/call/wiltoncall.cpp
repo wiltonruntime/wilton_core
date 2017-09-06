@@ -92,7 +92,7 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("mustache_render_file", wilton::mustache::mustache_render_file);
         //client
         reg.put("httpclient_send_request", wilton::client::httpclient_send_request);
-        reg.put("httpclient_send_temp_file", wilton::client::httpclient_send_temp_file);
+        reg.put("httpclient_send_file", wilton::client::httpclient_send_file);
         // cron
         reg.put("cron_start", wilton::cron::cron_start);
         reg.put("cron_stop", wilton::cron::cron_stop);
