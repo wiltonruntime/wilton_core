@@ -177,6 +177,8 @@ support::buffer tcp_wait_for_connection(sl::io::span<const char> data);
 support::buffer process_spawn(sl::io::span<const char> data);
 
 support::buffer get_wiltoncall_config(sl::io::span<const char> data);
+
+support::buffer stdin_readline(sl::io::span<const char> data);
     
 } // namespace
 
