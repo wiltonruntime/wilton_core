@@ -28,7 +28,8 @@ std::string dlerr_str() {
 
 } // namespace
 
-std::function<char*()> dyload_platform(const std::string& absolute_path) {
+std::function<char*()> dyload_platform(const std::string& directory, const std::string& name) {
+    auto absolute_path = directory + "/lib" + name + ".so";
     auto handle = ::dlopen(absolute_path.c_str(), RTLD_LAZY);
     if (nullptr == handle) {
         throw common::wilton_internal_exception(TRACEMSG(

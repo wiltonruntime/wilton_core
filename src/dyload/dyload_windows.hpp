@@ -33,7 +33,8 @@
 namespace wilton {
 namespace dyload {
 
-std::function<char*()> dyload_platform(const std::string& absolute_path) {
+std::function<char*()> dyload_platform(const std::string& directory, const std::string& name) {
+    auto absolute_path = directory + "/" + name + ".dll";
     auto wpath = sl::utils::widen(absolute_path);
     auto handle = ::LoadLibraryW(wpath.c_str());
     if (nullptr == handle) {

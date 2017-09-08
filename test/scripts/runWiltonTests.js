@@ -9,14 +9,17 @@ define([], function() {
 
     return {
         main: function() {
-            require(["wilton/dyload", "wilton/test/core/index", "wilton/test/db/index"], function(dyload, coreTests, dbTests) {
+            require([
+                "wilton/dyload",
+                "wilton/misc",
+                "wilton/test/core/index",
+                "wilton/test/db/index"
+            ], function(dyload, misc, coreTests, dbTests) {
                 coreTests.main();
                 dyload({
-                    path: "libwilton_db.so"
-                }, function(){ /* quiet */ });
-                dyload({
-                    path: "wilton_db.dll"
-                }, function(){ /* quiet */ });
+                    name: "wilton_db",
+                    directory: misc.getWiltonConfig().applicationDirectory + "../../../build/bin"
+                });
                 dbTests.main();
             });
         }
