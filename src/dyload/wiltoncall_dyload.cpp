@@ -57,7 +57,7 @@ support::buffer dyload_shared_library(sl::io::span<const char> data) {
     if (rname.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
             "Required parameter 'path' not specified"));
     const std::string& name = rname.get();
-    const std::string directory = [&rdirectory] {
+    const std::string directory = [&rdirectory] () -> std::string {
         if (!rdirectory.get().empty()) {
             return rdirectory.get();
         }
