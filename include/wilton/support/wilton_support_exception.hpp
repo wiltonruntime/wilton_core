@@ -35,6 +35,11 @@ public:
 
 };
 
+void throw_wilton_error(char* err, const std::string& msg) {
+    wilton_free(err);
+    throw wilton_support_exception(msg);
+}
+
 } //namespace
 }
 
