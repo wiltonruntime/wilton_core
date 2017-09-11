@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SERVERCONF_SSL_CONFIG_HPP
-#define	WILTON_SERVERCONF_SSL_CONFIG_HPP
+#define WILTON_SERVERCONF_SSL_CONFIG_HPP
 
 #include <string>
 
@@ -81,5 +81,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_SERVERCONF_SSL_CONFIG_HPP */
+#endif /* WILTON_SERVERCONF_SSL_CONFIG_HPP */
 

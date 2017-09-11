@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_LOGGING_LOGGING_CONFIG_HPP
-#define	WILTON_LOGGING_LOGGING_CONFIG_HPP
+#define WILTON_LOGGING_LOGGING_CONFIG_HPP
 
 #include <string>
 #include <vector>
@@ -83,5 +83,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_LOGGING_LOGGING_CONFIG_HPP */
+#endif /* WILTON_LOGGING_LOGGING_CONFIG_HPP */
 

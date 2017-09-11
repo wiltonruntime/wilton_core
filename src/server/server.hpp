@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SERVER_SERVER_HPP
-#define	WILTON_SERVER_SERVER_HPP
+#define WILTON_SERVER_SERVER_HPP
 
 #include <vector>
 
@@ -42,5 +42,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_SERVER_SERVER_HPP */
+#endif /* WILTON_SERVER_SERVER_HPP */
 

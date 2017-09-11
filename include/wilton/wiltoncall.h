@@ -6,11 +6,11 @@
  */
 
 #ifndef WILTONCALL_H
-#define	WILTONCALL_H
+#define WILTONCALL_H
 
 #include "wilton/wilton.h"
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
     
@@ -63,9 +63,9 @@ char* wiltoncall_runscript_duktape(
         char** json_out,
         int* json_out_len);
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 
-#endif	/* WILTONCALL_H */
+#endif /* WILTONCALL_H */
 

@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_JNI_JNI_UTILS_HPP
-#define	WILTON_JNI_JNI_UTILS_HPP
+#define WILTON_JNI_JNI_UTILS_HPP
 
 #include <string>
 
@@ -28,5 +28,5 @@ jmethodID find_java_method_static(JNIEnv* env, jclass clazz, const std::string& 
 } // namespace
 }
 
-#endif	/* WILTON_JNI_JNI_UTILS_HPP */
+#endif /* WILTON_JNI_JNI_UTILS_HPP */
 

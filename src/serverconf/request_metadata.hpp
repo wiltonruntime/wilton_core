@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SERVERCONF_REQUEST_METADATA_HPP
-#define	WILTON_SERVERCONF_REQUEST_METADATA_HPP
+#define WILTON_SERVERCONF_REQUEST_METADATA_HPP
 
 #include <cstdint>
 #include <string>
@@ -104,5 +104,5 @@ private:
 } // namespace
 }
 
-#endif	/* WILTON_SERVERCONF_REQUEST_METADATA_HPP */
+#endif /* WILTON_SERVERCONF_REQUEST_METADATA_HPP */
 

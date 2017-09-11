@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_CRON_CRON_TASK_HPP
-#define	WILTON_CRON_CRON_TASK_HPP
+#define WILTON_CRON_CRON_TASK_HPP
 
 #include <functional>
 #include <string>
@@ -41,5 +41,5 @@ public:
 
 } // namespace
 }
-#endif	/* WILTON_CRON_CRON_TASK_HPP */
+#endif /* WILTON_CRON_CRON_TASK_HPP */
 

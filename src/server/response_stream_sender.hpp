@@ -22,7 +22,7 @@
  */
 
 #ifndef WILTON_SERVER_RESPONSE_STREAM_SENDER_HPP
-#define	WILTON_SERVER_RESPONSE_STREAM_SENDER_HPP
+#define WILTON_SERVER_RESPONSE_STREAM_SENDER_HPP
 
 #include <memory>
 #include <streambuf>
@@ -88,4 +88,4 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_SERVER_RESPONSE_STREAM_SENDER_HPP */
+#endif /* WILTON_SERVER_RESPONSE_STREAM_SENDER_HPP */

@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_CALL_WILTONCALL_INTERNAL_HPP
-#define	WILTON_CALL_WILTONCALL_INTERNAL_HPP
+#define WILTON_CALL_WILTONCALL_INTERNAL_HPP
 
 #include <cstdint>
 #include <thread>
@@ -200,5 +200,5 @@ void clean_duktape_thread_local(const std::thread::id& tid);
 
 } // namespace
 
-#endif	/* WILTON_CALL_WILTONCALL_INTERNAL_HPP */
+#endif /* WILTON_CALL_WILTONCALL_INTERNAL_HPP */
 

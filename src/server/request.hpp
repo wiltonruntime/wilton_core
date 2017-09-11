@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SERVER_REQUEST_HPP
-#define	WILTON_SERVER_REQUEST_HPP
+#define WILTON_SERVER_REQUEST_HPP
 
 #include <cstdint>
 #include <functional>
@@ -66,5 +66,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_SERVER_REQUEST_HPP */
+#endif /* WILTON_SERVER_REQUEST_HPP */
 

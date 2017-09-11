@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_CALL_WILTONCALL_REGISTRY_HPP
-#define	WILTON_CALL_WILTONCALL_REGISTRY_HPP
+#define WILTON_CALL_WILTONCALL_REGISTRY_HPP
 
 #include <cstdint>
 #include <mutex>
@@ -93,5 +93,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_CALL_WILTONCALL_REGISTRY_HPP */
+#endif /* WILTON_CALL_WILTONCALL_REGISTRY_HPP */
 

@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_CLIENT_CLIENT_REQUEST_CONFIG_HPP
-#define	WILTON_CLIENT_CLIENT_REQUEST_CONFIG_HPP
+#define WILTON_CLIENT_CLIENT_REQUEST_CONFIG_HPP
 
 #include <cstdint>
 #include <string>
@@ -180,5 +180,5 @@ public:
 } // namespace
 } 
 
-#endif	/* WILTON_CLIENT_CLIENT_REQUEST_CONFIG_HPP */
+#endif /* WILTON_CLIENT_CLIENT_REQUEST_CONFIG_HPP */
 

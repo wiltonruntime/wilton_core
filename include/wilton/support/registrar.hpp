@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SUPPORT_REGISTRAR_HPP
-#define	WILTON_SUPPORT_REGISTRAR_HPP
+#define WILTON_SUPPORT_REGISTRAR_HPP
 
 #include <functional>
 #include <memory>
@@ -69,5 +69,5 @@ inline void register_wiltoncall(const std::string& name, detail_registrar::fun_s
 } // namespace
 }
 
-#endif	/* WILTON_SUPPORT_REGISTRAR_HPP */
+#endif /* WILTON_SUPPORT_REGISTRAR_HPP */
 

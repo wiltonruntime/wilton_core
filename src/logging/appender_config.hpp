@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_LOGGING_APPENDER_CONFIG_HPP
-#define	WILTON_LOGGING_APPENDER_CONFIG_HPP
+#define WILTON_LOGGING_APPENDER_CONFIG_HPP
 
 #include <cstdint>
 #include <string>
@@ -93,5 +93,5 @@ public:
 } // namepspace
 }
 
-#endif	/* WILTON_LOGGING_APPENDER_CONFIG_HPP */
+#endif /* WILTON_LOGGING_APPENDER_CONFIG_HPP */
 

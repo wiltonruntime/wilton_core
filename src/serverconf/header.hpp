@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SERVERCONF_HEADER_HPP
-#define	WILTON_SERVERCONF_HEADER_HPP
+#define WILTON_SERVERCONF_HEADER_HPP
 
 #include <string>
 
@@ -70,5 +70,5 @@ public:
 } // namepspace
 }
 
-#endif	/* WILTON_SERVERCONF_HEADER_HPP */
+#endif /* WILTON_SERVERCONF_HEADER_HPP */
 

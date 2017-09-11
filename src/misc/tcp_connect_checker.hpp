@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_MISC_TCP_CONNECT_CHECKER_HPP
-#define	WILTON_MISC_TCP_CONNECT_CHECKER_HPP
+#define WILTON_MISC_TCP_CONNECT_CHECKER_HPP
 
 #include <cstdint>
 #include <chrono>
@@ -42,5 +42,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_MISC_TCP_CONNECT_CHECKER_HPP */
+#endif /* WILTON_MISC_TCP_CONNECT_CHECKER_HPP */
 

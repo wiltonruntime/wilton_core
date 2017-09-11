@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SERVER_HTTP_PATH_HPP
-#define	WILTON_SERVER_HTTP_PATH_HPP
+#define WILTON_SERVER_HTTP_PATH_HPP
 
 #include <cstdint>
 #include <string>
@@ -58,5 +58,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_SERVER_HTTP_PATH_HPP */
+#endif /* WILTON_SERVER_HTTP_PATH_HPP */
 

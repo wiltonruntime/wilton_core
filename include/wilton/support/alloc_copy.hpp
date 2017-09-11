@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SUPPORT_ALLOC_COPY_HPP
-#define	WILTON_SUPPORT_ALLOC_COPY_HPP
+#define WILTON_SUPPORT_ALLOC_COPY_HPP
 
 #include "staticlib/io.hpp"
 #include "staticlib/support.hpp"
@@ -38,5 +38,5 @@ inline char* alloc_copy(const std::string& str) STATICLIB_NOEXCEPT {
 } // namespace
 }
 
-#endif	/* WILTON_SUPPORT_ALLOC_COPY_HPP */
+#endif /* WILTON_SUPPORT_ALLOC_COPY_HPP */
 

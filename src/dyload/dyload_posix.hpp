@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_DYLOAD_POSIX_HPP
-#define	WILTON_DYLOAD_POSIX_HPP
+#define WILTON_DYLOAD_POSIX_HPP
 
 #include <functional>
 
@@ -51,5 +51,5 @@ std::function<char*()> dyload_platform(const std::string& directory, const std::
 } // namespace
 }
 
-#endif	/* WILTON_DYLOAD_POSIX_HPP */
+#endif /* WILTON_DYLOAD_POSIX_HPP */
 

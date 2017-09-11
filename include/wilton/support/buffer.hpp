@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SUPPORT_SPAN_OPERATIONS_HPP
-#define	WILTON_SUPPORT_SPAN_OPERATIONS_HPP
+#define WILTON_SUPPORT_SPAN_OPERATIONS_HPP
 
 #include "staticlib/io.hpp"
 #include "staticlib/json.hpp"
@@ -57,5 +57,5 @@ inline buffer wrap_wilton_buffer(char* buf, int buf_len) {
 } // namespace
 }
 
-#endif	/* WILTON_SUPPORT_SPAN_OPERATIONS_HPP */
+#endif /* WILTON_SUPPORT_SPAN_OPERATIONS_HPP */
 

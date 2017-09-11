@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SUPPORT_HANDLE_REGISTRY_HPP
-#define	WILTON_SUPPORT_HANDLE_REGISTRY_HPP
+#define WILTON_SUPPORT_HANDLE_REGISTRY_HPP
 
 #include <cstdint>
 #include <functional>
@@ -76,5 +76,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_SUPPORT_HANDLE_REGISTRY_HPP */
+#endif /* WILTON_SUPPORT_HANDLE_REGISTRY_HPP */
 

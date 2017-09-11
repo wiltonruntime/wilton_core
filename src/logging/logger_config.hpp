@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_LOGGING_LOGGER_CONFIG_HPP
-#define	WILTON_LOGGING_LOGGER_CONFIG_HPP
+#define WILTON_LOGGING_LOGGER_CONFIG_HPP
 
 #include <string>
 
@@ -68,5 +68,5 @@ public:
 } // namepspace
 }
 
-#endif	/* WILTON_LOGGING_LOGGER_CONFIG_HPP */
+#endif /* WILTON_LOGGING_LOGGER_CONFIG_HPP */
 

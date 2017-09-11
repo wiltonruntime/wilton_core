@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SUPPORT_WILTON_SUPPORT_EXCEPTION_HPP
-#define	WILTON_SUPPORT_WILTON_SUPPORT_EXCEPTION_HPP
+#define WILTON_SUPPORT_WILTON_SUPPORT_EXCEPTION_HPP
 
 #include <string>
 
@@ -43,5 +43,5 @@ void throw_wilton_error(char* err, const std::string& msg) {
 } //namespace
 }
 
-#endif	/* WILTON_SUPPORT_WILTON_SUPPORT_EXCEPTION_HPP */
+#endif /* WILTON_SUPPORT_WILTON_SUPPORT_EXCEPTION_HPP */
 

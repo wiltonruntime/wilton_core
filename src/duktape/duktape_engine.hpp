@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_DUKTAPE_ENGINE_HPP
-#define	WILTON_DUKTAPE_ENGINE_HPP
+#define WILTON_DUKTAPE_ENGINE_HPP
 
 #include <string>
 
@@ -40,5 +40,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_DUKTAPE_ENGINE_HPP */
+#endif /* WILTON_DUKTAPE_ENGINE_HPP */
 

@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SERVER_ZIP_HANDLER_HPP
-#define	WILTON_SERVER_ZIP_HANDLER_HPP
+#define WILTON_SERVER_ZIP_HANDLER_HPP
 
 #include <cstdint>
 #include <memory>
@@ -84,4 +84,4 @@ private:
 } // namespace
 }
 
-#endif	/* WILTON_SERVER_ZIP_HANDLER_HPP */
+#endif /* WILTON_SERVER_ZIP_HANDLER_HPP */

@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SERVERCONF_SERVER_CONFIG_HPP
-#define	WILTON_SERVERCONF_SERVER_CONFIG_HPP
+#define WILTON_SERVERCONF_SERVER_CONFIG_HPP
 
 #include <cstdint>
 #include <string>
@@ -106,5 +106,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_SERVERCONF_SERVER_CONFIG_HPP */
+#endif /* WILTON_SERVERCONF_SERVER_CONFIG_HPP */
 

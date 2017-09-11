@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_SERVER_RESPONSE_WRITER_HPP
-#define	WILTON_SERVER_RESPONSE_WRITER_HPP
+#define WILTON_SERVER_RESPONSE_WRITER_HPP
 
 #include <cstdint>
 
@@ -40,5 +40,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_SERVER_RESPONSE_WRITER_HPP */
+#endif /* WILTON_SERVER_RESPONSE_WRITER_HPP */
 

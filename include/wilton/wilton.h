@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_H
-#define	WILTON_H
+#define WILTON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -512,4 +512,4 @@ char* wilton_tcp_wait_for_connection(
 }
 #endif
 
-#endif	/* WILTON_H */
+#endif /* WILTON_H */

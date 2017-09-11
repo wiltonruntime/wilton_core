@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_CLIENT_CLIENT_RESPONSE_HPP
-#define	WILTON_CLIENT_CLIENT_RESPONSE_HPP
+#define WILTON_CLIENT_CLIENT_RESPONSE_HPP
 
 #include <cstdint>
 #include <string>
@@ -59,5 +59,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_CLIENT_CLIENT_RESPONSE_HPP */
+#endif /* WILTON_CLIENT_CLIENT_RESPONSE_HPP */
 

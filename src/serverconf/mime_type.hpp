@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_MIME_TYPE_HPP
-#define	WILTON_MIME_TYPE_HPP
+#define WILTON_MIME_TYPE_HPP
 
 #include <string>
 #include <vector>
@@ -76,5 +76,5 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_MIME_TYPE_HPP */
+#endif /* WILTON_MIME_TYPE_HPP */
 

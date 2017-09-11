@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_LOGGING_LOGGING_INTERNAL_HPP
-#define	WILTON_LOGGING_LOGGING_INTERNAL_HPP
+#define WILTON_LOGGING_LOGGING_INTERNAL_HPP
 
 // shouldn't be called before logging is initialized by app
 
@@ -18,5 +18,5 @@ inline void log_error(const std::string& logger, const std::string& message) {
             message.c_str(), static_cast<int>(message.length()));
 }
 
-#endif	/* WILTON_LOGGING_LOGGING_INTERNAL_HPP */
+#endif /* WILTON_LOGGING_LOGGING_INTERNAL_HPP */
 

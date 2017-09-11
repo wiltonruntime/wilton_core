@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_LOGGING_WILTON_LOGGER_HPP
-#define	WILTON_LOGGING_WILTON_LOGGER_HPP
+#define WILTON_LOGGING_WILTON_LOGGER_HPP
 
 #include <string>
 
@@ -45,4 +45,4 @@ public:
 } // namespace
 }
 
-#endif	/* WILTON_LOGGING_WILTON_LOGGER_HPP */
+#endif /* WILTON_LOGGING_WILTON_LOGGER_HPP */

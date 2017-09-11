@@ -6,7 +6,7 @@
  */
 
 #ifndef WILTON_COMMON_UTILS_HPP
-#define	WILTON_COMMON_UTILS_HPP
+#define WILTON_COMMON_UTILS_HPP
 
 #include <cstdint>
 #include <mutex>
@@ -31,5 +31,5 @@ void dump_error(const std::string& directory, const std::string& msg);
 } //namespace
 }        
         
-#endif	/* WILTON_COMMON_UTILS_HPP */
+#endif /* WILTON_COMMON_UTILS_HPP */
 
