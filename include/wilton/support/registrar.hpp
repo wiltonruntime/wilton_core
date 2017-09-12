@@ -17,7 +17,7 @@
 
 #include "wilton/support/alloc_copy.hpp"
 #include "wilton/support/buffer.hpp"
-#include "wilton/support/wilton_support_exception.hpp"
+#include "wilton/support/exception.hpp"
 
 namespace wilton {
 namespace support {
@@ -54,7 +54,7 @@ inline char* cb_fun(void* call_ctx, const char* json_in, int json_in_len, char**
 
 inline void register_wiltoncall(const std::string& name, detail_registrar::fun_span_type fun) {
     if (nullptr == fun) {
-        throw wilton_support_exception(TRACEMSG("Registrar error, invalid empty function specified," +
+        throw exception(TRACEMSG("Registrar error, invalid empty function specified," +
                 " name: [" + name + "]"));
     }
     auto err = wiltoncall_register(name.c_str(), static_cast<int> (name.length()), 
@@ -62,7 +62,7 @@ inline void register_wiltoncall(const std::string& name, detail_registrar::fun_s
     if (nullptr != err) {
         auto msg = TRACEMSG(err);
         wilton_free(err);
-        throw wilton_support_exception(msg);
+        throw exception(msg);
     }
 }
 
