@@ -132,7 +132,8 @@ define([
     "dom-serializer/test",
     "cheerio/test/cheerio",
     "cheerio/test/parse",
-    "cheerio/test/xml"
+    "cheerio/test/xml",
+    "utf8/tests/tests"
 ], function() {
     return {
         main: function() { }
