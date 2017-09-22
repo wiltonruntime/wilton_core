@@ -12,8 +12,7 @@
 
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
 
 namespace wilton {
 namespace serverconf {
@@ -42,7 +41,7 @@ public:
             if ("partialsDirs" == name) {
                 for (const sl::json::value& va : fi.as_array_or_throw(name)) {
                     if (sl::json::type::string != va.json_type() || va.as_string().empty()) {
-                        throw common::wilton_internal_exception(TRACEMSG(
+                        throw support::exception(TRACEMSG(
                                 "Invalid 'mustache.partialsDirs.el' value,"
                                 " type: [" + sl::json::stringify_json_type(va.json_type()) + "]," +
                                 " value: [" + va.dumps() + "]"));
@@ -50,7 +49,7 @@ public:
                     partialsDirs.emplace_back(va.as_string());
                 }
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'mustache' field: [" + name + "]"));
+                throw support::exception(TRACEMSG("Unknown 'mustache' field: [" + name + "]"));
             }
         }
     }

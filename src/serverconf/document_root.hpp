@@ -16,8 +16,8 @@
 #include "staticlib/ranges.hpp"
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "serverconf/mime_type.hpp"
 
 namespace wilton {
@@ -85,12 +85,12 @@ public:
                     mimeTypes.emplace_back(std::move(ja));
                 }
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'documentRoot' field: [" + name + "]"));
+                throw support::exception(TRACEMSG("Unknown 'documentRoot' field: [" + name + "]"));
             }
         }
-        if (0 == resource.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == resource.length()) throw support::exception(TRACEMSG(
                     "Invalid 'documentRoot.resource' field: []"));
-        if (0 == dirPath.length() && 0 == zipPath.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == dirPath.length() && 0 == zipPath.length()) throw support::exception(TRACEMSG(
                     "Invalid 'documentRoot.dirPath' and 'documentRoot.zipPath' fields: [], []"));
     }
        

@@ -16,7 +16,8 @@
 #include "staticlib/pimpl.hpp"
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "server/response_writer.hpp"
 #include "serverconf/response_metadata.hpp"
 #include "serverconf/request_metadata.hpp"

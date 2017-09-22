@@ -115,7 +115,7 @@ private:
     
 };
 PIMPL_FORWARD_METHOD_STATIC(tcp_connect_checker, std::string, wait_for_connection, 
-        (std::chrono::milliseconds)(const std::string&)(uint16_t), (), common::wilton_internal_exception)
+        (std::chrono::milliseconds)(const std::string&)(uint16_t), (), support::exception)
 
 } // namespace
 }

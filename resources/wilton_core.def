@@ -32,12 +32,6 @@ EXPORTS
     wilton_CronTask_start
     wilton_CronTask_stop
     
-    wilton_shared_put
-    wilton_shared_get
-    wilton_shared_wait_change
-    wilton_shared_remove
-    wilton_shared_list_append
-    wilton_shared_dump
     wilton_thread_run
     wilton_thread_sleep_millis
     wilton_thread_initialize_signals

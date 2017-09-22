@@ -26,8 +26,8 @@ public:
     }
     
 };
-PIMPL_FORWARD_CONSTRUCTOR(response_writer, (void*), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(response_writer, void, send, (const char*)(uint32_t), (), common::wilton_internal_exception)
+PIMPL_FORWARD_CONSTRUCTOR(response_writer, (void*), (), support::exception)
+PIMPL_FORWARD_METHOD(response_writer, void, send, (const char*)(uint32_t), (), support::exception)
 
 } // namespace
 }

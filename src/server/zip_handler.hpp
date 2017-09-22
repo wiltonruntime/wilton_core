@@ -16,8 +16,9 @@
 #include "staticlib/io.hpp"
 #include "staticlib/unzip.hpp"
 
+#include "wilton/support/exception.hpp"
+
 #include "response_stream_sender.hpp"
-#include "common/wilton_internal_exception.hpp"
 
 #include "serverconf/document_root.hpp"
 

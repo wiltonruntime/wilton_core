@@ -11,8 +11,8 @@
 #include <string>
 #include <vector>
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "staticlib/json.hpp"
 
 namespace wilton {
@@ -51,12 +51,12 @@ public:
             } else if ("mime" == name) {
                 this->mime = fi.as_string_nonempty_or_throw(name);
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'mimeType' field: [" + name + "]"));
+                throw support::exception(TRACEMSG("Unknown 'mimeType' field: [" + name + "]"));
             }
         }
-        if (0 == extension.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == extension.length()) throw support::exception(TRACEMSG(
                 "Invalid 'mimeType.extension' field: []"));
-        if (0 == mime.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == mime.length()) throw support::exception(TRACEMSG(
                 "Invalid 'mimeType.mime' field: []"));
     }
     

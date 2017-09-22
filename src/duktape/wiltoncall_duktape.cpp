@@ -29,8 +29,8 @@ std::mutex& static_engines_mutex() {
 }
 
 // cleaned up manually due to lack of portable TLS
-std::unordered_map<std::thread::id, std::shared_ptr<wilton::duktape::duktape_engine>>& static_engines() {
-    static std::unordered_map<std::thread::id, std::shared_ptr<wilton::duktape::duktape_engine>> engines;
+std::unordered_map<std::string, std::shared_ptr<wilton::duktape::duktape_engine>>& static_engines() {
+    static std::unordered_map<std::string, std::shared_ptr<wilton::duktape::duktape_engine>> engines;
     return engines;
 }
 
@@ -39,7 +39,7 @@ std::shared_ptr<wilton::duktape::duktape_engine> thread_local_engine(
         const std::string& requirejs_dir_path) {
     std::lock_guard<std::mutex> guard{static_engines_mutex()};
     auto& map = static_engines();
-    auto tid = std::this_thread::get_id();
+    auto tid = sl::support::to_string_any(std::this_thread::get_id());
     auto it = map.find(tid);
     if (map.end() == it) {
         auto se = std::make_shared<wilton::duktape::duktape_engine>(requirejs_dir_path);
@@ -84,7 +84,7 @@ namespace wilton {
 namespace internal {
 
 // race condition with registry destructor is here
-void clean_duktape_thread_local(const std::thread::id& tid) {
+void clean_duktape_thread_local(const std::string& tid) {
     std::lock_guard<std::mutex> guard{static_engines_mutex()};
     auto& map = static_engines();
     map.erase(tid);

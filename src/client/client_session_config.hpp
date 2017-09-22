@@ -14,8 +14,7 @@
 #include "staticlib/http.hpp"
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
 
 namespace wilton {
 namespace client {
@@ -62,7 +61,7 @@ public:
             } else if ("maxconnects" == name) {
                 this->options.maxconnects = fi.as_uint32_positive_or_throw(name);
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'ClientSession' field: [" + name + "]"));
+                throw support::exception(TRACEMSG("Unknown 'ClientSession' field: [" + name + "]"));
             }
         }
     }

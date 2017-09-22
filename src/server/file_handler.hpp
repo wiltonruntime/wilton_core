@@ -19,8 +19,9 @@
 #include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
+#include "wilton/support/exception.hpp"
+
 #include "response_stream_sender.hpp"
-#include "common/wilton_internal_exception.hpp"
 #include "serverconf/document_root.hpp"
 
 namespace wilton {
@@ -42,7 +43,7 @@ public:
     // todo: path leading slash check
     file_handler(const serverconf::document_root& conf) :
     conf(std::make_shared<serverconf::document_root>(conf.clone())) {
-        if (0 == this->conf->dirPath.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == this->conf->dirPath.length()) throw support::exception(TRACEMSG(
                 "Invalid empty 'dirPath' specified"));
     }
     

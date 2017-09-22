@@ -15,8 +15,8 @@
 #include "staticlib/ranges.hpp"
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "serverconf/document_root.hpp"
 #include "serverconf/mustache_config.hpp"
 #include "serverconf/request_payload_config.hpp"
@@ -80,7 +80,7 @@ public:
             } else if ("mustache" == name) {
                 this->mustache = mustache_config(fi.val());
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown field: [" + name + "]"));
+                throw support::exception(TRACEMSG("Unknown field: [" + name + "]"));
             }
         }
     }

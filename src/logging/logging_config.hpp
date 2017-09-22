@@ -14,8 +14,8 @@
 #include "staticlib/ranges.hpp"
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "logging/appender_config.hpp"
 #include "logging/logger_config.hpp"
 
@@ -57,7 +57,7 @@ public:
                     loggers.emplace_back(std::move(jl));
                 }
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'logging' field: [" + name + "]"));
+                throw support::exception(TRACEMSG("Unknown 'logging' field: [" + name + "]"));
             }
         }
     }

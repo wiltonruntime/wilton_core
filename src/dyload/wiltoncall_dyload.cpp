@@ -51,10 +51,10 @@ support::buffer dyload_shared_library(sl::io::span<const char> data) {
         } else if ("directory" == name) {
             rdirectory = fi.as_string_nonempty_or_throw(name);
         } else {
-            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw support::exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (rname.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+    if (rname.get().empty()) throw support::exception(TRACEMSG(
             "Required parameter 'path' not specified"));
     const std::string& name = rname.get();
     const std::string directory = [&rdirectory] () -> std::string {
@@ -65,16 +65,15 @@ support::buffer dyload_shared_library(sl::io::span<const char> data) {
         auto exedir_raw = sl::utils::strip_filename(exepath);
         return sl::tinydir::normalize_path(exedir_raw);
     } ();
-    auto key = directory + "/" + name;    
     // call
     std::lock_guard<std::mutex> guard{static_mutex()};
-    if (0 == static_registry().count(key)) {
+    if (0 == static_registry().count(name)) {
         std::function<char*()> initializer = dyload_platform(directory, name);
         auto err = initializer();
         if (nullptr != err) {
-            common::throw_wilton_error(err, TRACEMSG(err));
+            support::throw_wilton_error(err, TRACEMSG(err));
         }
-        static_registry().insert(key);
+        static_registry().insert(name);
     }
     return support::make_empty_buffer();
 }

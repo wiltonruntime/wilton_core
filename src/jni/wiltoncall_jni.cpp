@@ -15,12 +15,13 @@
 
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
+#include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
 #include "wilton/wilton.h"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "jni/jni_config.hpp"
 #include "jni_utils.hpp"
 
@@ -81,7 +82,7 @@ public:
         JNIEnv* env;
         auto err = vm->GetEnv(reinterpret_cast<void**> (std::addressof(env)), WILTON_JNI_VERSION);
         if (JNI_OK != err) {
-            throw wilton::common::wilton_internal_exception(TRACEMSG("Cannot obtain JNI environment"));
+            throw wilton::support::exception(TRACEMSG("Cannot obtain JNI environment"));
         }
         // jni class
         this->wiltonJniClass = std::unique_ptr<_jclass, global_ref_deleter>(
@@ -104,7 +105,7 @@ public:
         auto ptr = std::unique_ptr<_jobject, global_ref_deleter>(
                 static_cast<jobject> (env->NewGlobalRef(gateway)), global_ref_deleter());
         if (nullptr == ptr.get()) {
-            throw wilton::common::wilton_internal_exception(TRACEMSG("Cannot create global ref for specified gateway object"));
+            throw wilton::support::exception(TRACEMSG("Cannot create global ref for specified gateway object"));
         }
         this->wiltonGatewayObject = std::move(ptr);
     }
@@ -129,7 +130,7 @@ JNIEnv* get_jni_env() {
         }
         // fall-through to report error to client
     default:
-        throw wilton::common::wilton_internal_exception(TRACEMSG("System error: cannot obtain JNI environment"));
+        throw wilton::support::exception(TRACEMSG("System error: cannot obtain JNI environment"));
     }
 }
 
@@ -146,6 +147,18 @@ std::string describe_java_exception(JNIEnv* env, jthrowable exc) {
     }
 }
 
+void dump_error(const std::string& directory, const std::string& msg) {
+    try {
+        // random postfix
+        std::string id = sl::utils::random_string_generator().generate(12);
+        auto errfile = directory + "wilton_ERROR_" + id + ".txt";
+        auto fd = sl::tinydir::file_sink(errfile);
+        sl::io::write_all(fd, msg);
+    } catch (...) {
+        // give up
+    }
+}
+
 } // namespace
 
 extern "C" {
@@ -158,7 +171,7 @@ jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
         static_jvm_active().store(true);
         return WILTON_JNI_VERSION;
     } catch (const std::exception& e) {
-        wilton::common::dump_error(WILTON_STARTUP_ERR_DIR_STR, TRACEMSG(e.what() + "\nInitialization error"));
+        dump_error(WILTON_STARTUP_ERR_DIR_STR, TRACEMSG(e.what() + "\nInitialization error"));
         return -1;
     }
 }
@@ -190,7 +203,7 @@ void JNICALL WILTON_JNI_FUNCTION(wiltoninit)
         conf = wilton::jni::jstring_to_str(env, config);
         auto err_init = wiltoncall_init(conf.c_str(), static_cast<int>(conf.length()));
         if (nullptr != err_init) {
-            wilton::common::throw_wilton_error(err_init, TRACEMSG(err_init));
+            wilton::support::throw_wilton_error(err_init, TRACEMSG(err_init));
         }
     } catch (const std::exception& e) {
         env->ThrowNew(static_jni_ctx().wiltonExceptionClass.get(),

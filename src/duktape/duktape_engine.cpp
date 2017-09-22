@@ -22,8 +22,9 @@
 
 #include "wilton/wiltoncall.h"
 
+#include "wilton/support/exception.hpp"
+
 #include "call/wiltoncall_internal.hpp"
-#include "common/wilton_internal_exception.hpp"
 
 namespace wilton {
 namespace duktape {
@@ -31,7 +32,7 @@ namespace duktape {
 namespace { // anonymous
 
 void fatal_handler(duk_context*, duk_errcode_t code, const char* msg) {
-    throw common::wilton_internal_exception(TRACEMSG("Duktape fatal error,"
+    throw support::exception(TRACEMSG("Duktape fatal error,"
             " code: [" + sl::support::to_string(code) + "], message: [" + msg + "]"));
 }
 
@@ -66,13 +67,13 @@ duk_ret_t load_func(duk_context* ctx) {
         size_t path_len;
         const char* path_ptr = duk_get_lstring(ctx, 0, std::addressof(path_len));
         if (nullptr == path_ptr) {
-            throw common::wilton_internal_exception(TRACEMSG("Invalid 'load' arguments"));
+            throw support::exception(TRACEMSG("Invalid 'load' arguments"));
         }    
         path = std::string(path_ptr, path_len);
         // read file
         auto code = load::load_module_script({path.c_str(), path.length()});
         if (!code) {
-            throw common::wilton_internal_exception(TRACEMSG(
+            throw support::exception(TRACEMSG(
                     "\nInvalid empty source code loaded, path: [" + path + "]").c_str());
         }
         // compile source
@@ -86,17 +87,17 @@ duk_ret_t load_func(duk_context* ctx) {
         if (DUK_EXEC_SUCCESS != err) {
             std::string msg = format_error(ctx);
             duk_pop(ctx);
-            throw common::wilton_internal_exception(TRACEMSG(msg + "\nCall error"));
+            throw support::exception(TRACEMSG(msg + "\nCall error"));
         } else {
             duk_pop(ctx);
             duk_push_true(ctx);
         }
         return 1;
     } catch (const std::exception& e) {
-        throw common::wilton_internal_exception(TRACEMSG(e.what() + 
+        throw support::exception(TRACEMSG(e.what() + 
                 "\nError loading script, path: [" + path + "]").c_str());
     } catch (...) {
-        throw common::wilton_internal_exception(TRACEMSG(
+        throw support::exception(TRACEMSG(
                 "Error loading script, path: [" + path + "]").c_str());
     }    
 }
@@ -129,7 +130,7 @@ duk_ret_t wiltoncall_func(duk_context* ctx) {
     } else {
         auto msg = TRACEMSG(err + "\n'wiltoncall' error for name: [" + name + "]");
         wilton_free(err);
-        throw common::wilton_internal_exception(msg);
+        throw support::exception(msg);
     }
 }
 
@@ -143,7 +144,7 @@ void register_c_func(duk_context* ctx, const std::string& name, duk_c_function f
 void eval_js(duk_context* ctx, const std::string& code) {
     auto err = duk_peval_lstring(ctx, code.c_str(), code.length());
     if (DUK_EXEC_SUCCESS != err) {
-        throw common::wilton_internal_exception(TRACEMSG(format_error(ctx) +
+        throw support::exception(TRACEMSG(format_error(ctx) +
                 "\nDuktape engine eval error"));
     }
 }
@@ -184,7 +185,7 @@ public:
     impl(const std::string& requirejs_dir_path) :
     dukctx(duk_create_heap(nullptr, nullptr, nullptr, nullptr, fatal_handler), ctx_deleter) {
         auto ctx = dukctx.get();
-        if (nullptr == ctx) throw common::wilton_internal_exception(TRACEMSG(
+        if (nullptr == ctx) throw support::exception(TRACEMSG(
                 "Error creating Duktape context"));
         auto def = sl::support::defer([ctx]() STATICLIB_NOEXCEPT {
             pop_stack(ctx);
@@ -193,7 +194,7 @@ public:
         register_c_func(ctx, "WILTON_wiltoncall", wiltoncall_func, 2);
         auto code_path = requirejs_dir_path + "/wilton-require.js";
         auto code = load::load_module_script(sl::io::make_span(code_path.c_str(), code_path.length()));
-        if (!code) throw common::wilton_internal_exception(TRACEMSG(
+        if (!code) throw support::exception(TRACEMSG(
                 "Error loading requirejs, path: [" + code_path + "]"));
         eval_js(ctx, std::string(code.value().data(), code.value().size()));
         wilton_free(code.value().data());
@@ -208,7 +209,7 @@ public:
         duk_push_string(ctx, callback_script_json.c_str());
         auto err = duk_pcall(ctx, 1);
         if (DUK_EXEC_SUCCESS != err) {                        
-            throw common::wilton_internal_exception(TRACEMSG(format_stacktrace(ctx)));
+            throw support::exception(TRACEMSG(format_stacktrace(ctx)));
         }
         if (DUK_TYPE_STRING == duk_get_type(ctx, -1)) {
             size_t len;
@@ -221,8 +222,8 @@ public:
     }    
 };
 
-PIMPL_FORWARD_CONSTRUCTOR(duktape_engine, (const std::string&), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(duktape_engine, std::string, run_script, (const std::string&), (), common::wilton_internal_exception)
+PIMPL_FORWARD_CONSTRUCTOR(duktape_engine, (const std::string&), (), support::exception)
+PIMPL_FORWARD_METHOD(duktape_engine, std::string, run_script, (const std::string&), (), support::exception)
 
 
 } // namespace

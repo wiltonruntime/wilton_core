@@ -38,7 +38,8 @@
 #include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
-#include "common/wilton_internal_exception.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "serverconf/request_payload_config.hpp"
 
 namespace wilton {
@@ -109,13 +110,13 @@ public:
 
     static const std::string& get_data_string(sl::pion::http_request_ptr& request) {
         auto ph = request->get_payload_handler<request_payload_handler>();
-        if (!ph) throw common::wilton_internal_exception(TRACEMSG("System error in payload handler access"));
+        if (!ph) throw support::exception(TRACEMSG("System error in payload handler access"));
         return ph->get_data_as_string();
     }
 
     static const std::string& get_data_filename(sl::pion::http_request_ptr& request) {
         auto ph = request->get_payload_handler<request_payload_handler>();
-        if (!ph) throw common::wilton_internal_exception(TRACEMSG("System error in payload handler access"));
+        if (!ph) throw support::exception(TRACEMSG("System error in payload handler access"));
         return ph->get_data_as_filename();
     }
     
@@ -126,7 +127,7 @@ public:
                 data->buffer.append(s, n);
                 return;
             } else if (data->conf.tmpDirPath.empty()) {
-                throw common::wilton_internal_exception(TRACEMSG("Request body exceeds" +
+                throw support::exception(TRACEMSG("Request body exceeds" +
                         " limit (bytes): [" + sl::support::to_string(data->conf.memoryLimitBytes) + "]"));
             } else {
                 data->state = payload_state::file;
@@ -141,10 +142,10 @@ public:
         case payload_state::file:
             if (nullptr != data->file.get()) {
                 sl::io::write_all(*data->file, {s, n});
-            } else throw common::wilton_internal_exception(TRACEMSG("Invalid payload handler data state"));
+            } else throw support::exception(TRACEMSG("Invalid payload handler data state"));
             return;
         default:
-            throw common::wilton_internal_exception(TRACEMSG("Invalid payload handler state"));
+            throw support::exception(TRACEMSG("Invalid payload handler state"));
         }
     }
 
@@ -176,7 +177,7 @@ private:
         case payload_state::memory:
             return data->buffer;               
         default:
-            throw common::wilton_internal_exception(TRACEMSG("Invalid payload handler state"));
+            throw support::exception(TRACEMSG("Invalid payload handler state"));
         }
     }
     
@@ -194,7 +195,7 @@ private:
         case payload_state::file:
             return data->filename;
         default:
-            throw common::wilton_internal_exception(TRACEMSG("Invalid payload handler state"));
+            throw support::exception(TRACEMSG("Invalid payload handler state"));
         }
     }
 

@@ -18,7 +18,7 @@ sl::io::span<char> read_zip_resource(const std::string& path) {
     // get modules.zip index
     auto idx_ptr = wilton::internal::static_modules_idx();
     if (!idx_ptr.has_value()) {
-        throw wilton::common::wilton_internal_exception(TRACEMSG(
+        throw wilton::support::exception(TRACEMSG(
                 "Modules index not loaded, requested zip path: [" + path + "]"));
     }
     auto& idx = *idx_ptr;
@@ -34,7 +34,7 @@ sl::io::span<char> read_zip_resource(const std::string& path) {
         sl::io::copy_all(src, sink);
         return sink.release();
     }
-    throw wilton::common::wilton_internal_exception(TRACEMSG("Error loading zip entry," +
+    throw wilton::support::exception(TRACEMSG("Error loading zip entry," +
             " path: [" + path + "], zip file: [" + zippath + "]"));
 }
 
@@ -52,7 +52,7 @@ sl::io::span<char> read_zip_or_fs_resource(const std::string& url) {
         auto zpath = url.substr(wilton::internal::zip_proto_prefix.length());
         return read_zip_resource(zpath);
     } else {
-        throw common::wilton_internal_exception(TRACEMSG("Unknown protocol prefix, path: [" + url + "]"));
+        throw support::exception(TRACEMSG("Unknown protocol prefix, path: [" + url + "]"));
     }
 }
 
@@ -98,7 +98,7 @@ support::buffer load_module_script(sl::io::span<const char> data) {
         try {
             return load_module_resource(url);
         } catch (const std::exception& etpath) {
-            throw common::wilton_internal_exception(TRACEMSG(epath.what() + "\n" + etpath.what()));
+            throw support::exception(TRACEMSG(epath.what() + "\n" + etpath.what()));
         }
     }
 }

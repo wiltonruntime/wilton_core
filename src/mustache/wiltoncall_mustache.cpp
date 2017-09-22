@@ -24,10 +24,10 @@ support::buffer mustache_render(sl::io::span<const char> data) {
         } else if ("values" == name) {
             values = fi.val().dumps();
         } else {
-            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw support::exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (rtemplate.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+    if (rtemplate.get().empty()) throw support::exception(TRACEMSG(
             "Required parameter 'template' not specified"));
     const std::string& templade = rtemplate.get();
     if (values.empty()) {
@@ -38,7 +38,7 @@ support::buffer mustache_render(sl::io::span<const char> data) {
     int out_len = 0;
     char* err = wilton_render_mustache(templade.c_str(), static_cast<int>(templade.length()),
             values.c_str(), static_cast<int>(values.length()), std::addressof(out), std::addressof(out_len));
-    if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
+    if (nullptr != err) support::throw_wilton_error(err, TRACEMSG(err));
     return support::wrap_wilton_buffer(out, out_len);
 }
 
@@ -54,10 +54,10 @@ support::buffer mustache_render_file(sl::io::span<const char> data) {
         } else if ("values" == name) {
             values = fi.val().dumps();
         } else {
-            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw support::exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (rfile.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+    if (rfile.get().empty()) throw support::exception(TRACEMSG(
             "Required parameter 'file' not specified"));
     const std::string& file = rfile.get();
     if (values.empty()) {
@@ -68,7 +68,7 @@ support::buffer mustache_render_file(sl::io::span<const char> data) {
     int out_len = 0;
     char* err = wilton_render_mustache_file(file.c_str(), static_cast<int>(file.length()),
             values.c_str(), static_cast<int>(values.length()), std::addressof(out), std::addressof(out_len));
-    if (nullptr != err) common::throw_wilton_error(err, TRACEMSG(err));
+    if (nullptr != err) support::throw_wilton_error(err, TRACEMSG(err));
     return support::wrap_wilton_buffer(out, out_len);
 }
 

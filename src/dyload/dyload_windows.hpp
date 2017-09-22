@@ -38,13 +38,13 @@ std::function<char*()> dyload_platform(const std::string& directory, const std::
     auto wpath = sl::utils::widen(absolute_path);
     auto handle = ::LoadLibraryW(wpath.c_str());
     if (nullptr == handle) {
-        throw common::wilton_internal_exception(TRACEMSG(
+        throw support::exception(TRACEMSG(
             "Error loading shared library on path: [" + absolute_path + "],"
             " error: [" + sl::utils::errcode_to_string(::GetLastError()) + "]"));
     }
     auto initter = ::GetProcAddress(handle, "wilton_module_init");
     if (nullptr == initter) {
-        throw common::wilton_internal_exception(TRACEMSG(
+        throw support::exception(TRACEMSG(
             "Error loading 'wilton_module_init' from shared library on path: [" + absolute_path + "],"
             " error: [" + sl::utils::errcode_to_string(::GetLastError()) + "]"));
     }

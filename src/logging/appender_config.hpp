@@ -14,8 +14,7 @@
 #include "staticlib/config.hpp"
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
 
 namespace wilton {
 namespace logging {
@@ -69,11 +68,11 @@ public:
             } else if ("maxBackupIndex" == name) {
                 this->maxBackupIndex = fi.as_uint16_positive_or_throw(name);                
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'logging.appenders' field: [" + name + "]"));
+                throw support::exception(TRACEMSG("Unknown 'logging.appenders' field: [" + name + "]"));
             }
         }
         if (("FILE" == appenderType || "DAILY_ROLLING_FILE" == appenderType) &&
-                filePath.empty()) throw common::wilton_internal_exception(TRACEMSG(
+                filePath.empty()) throw support::exception(TRACEMSG(
                 "Invalid 'logging.appenders.filePath' field: []"));
     }
 

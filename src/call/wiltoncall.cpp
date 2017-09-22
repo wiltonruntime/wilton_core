@@ -13,7 +13,8 @@
 #include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
-#include "common/wilton_internal_exception.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "call/wiltoncall_registry.hpp"
 #include "call/wiltoncall_internal.hpp"
 
@@ -52,7 +53,7 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         bool the_false = false;
         static std::atomic<bool> initilized{false};
         if (!initilized.compare_exchange_strong(the_false, true)) {
-            throw wilton::common::wilton_internal_exception(TRACEMSG("'wiltoncall' registry is already initialized"));
+            throw wilton::support::exception(TRACEMSG("'wiltoncall' registry is already initialized"));
         }
         // set static config
         auto config_json_str = std::string(config_json, static_cast<uint16_t> (config_json_len));
@@ -93,38 +94,14 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         //client
         reg.put("httpclient_send_request", wilton::client::httpclient_send_request);
         reg.put("httpclient_send_file", wilton::client::httpclient_send_file);
-        // cron
-        reg.put("cron_start", wilton::cron::cron_start);
-        reg.put("cron_stop", wilton::cron::cron_stop);
-        // shared
-        reg.put("shared_put", wilton::shared::shared_put);
-        reg.put("shared_get", wilton::shared::shared_get);
-        reg.put("shared_wait_change", wilton::shared::shared_wait_change);
-        reg.put("shared_remove", wilton::shared::shared_remove);
-        reg.put("shared_list_append", wilton::shared::shared_list_append);
-        reg.put("shared_dump", wilton::shared::shared_dump);
-        // thread
-        reg.put("thread_run", wilton::thread::thread_run);
-        reg.put("thread_sleep_millis", wilton::thread::thread_sleep_millis);
-        reg.put("thread_wait_for_signal", wilton::thread::thread_wait_for_signal);
-        reg.put("thread_fire_signal", wilton::thread::thread_fire_signal);
-        // fs
-        reg.put("fs_append_file", wilton::fs::fs_append_file);
-        reg.put("fs_exists", wilton::fs::fs_exists);
-        reg.put("fs_mkdir", wilton::fs::fs_mkdir);
-        reg.put("fs_readdir", wilton::fs::fs_readdir);
-        reg.put("fs_read_file", wilton::fs::fs_read_file);
-        reg.put("fs_rename", wilton::fs::fs_rename);
-        reg.put("fs_rmdir", wilton::fs::fs_rmdir);
-        reg.put("fs_stat", wilton::fs::fs_stat);
-        reg.put("fs_unlink", wilton::fs::fs_unlink);
-        reg.put("fs_write_file", wilton::fs::fs_write_file);
-        reg.put("fs_copy_file", wilton::fs::fs_copy_file);
         // load
         reg.put("load_module_resource", wilton::load::load_module_resource);
         reg.put("load_module_script", wilton::load::load_module_script);
         // dyload
         reg.put("dyload_shared_library", wilton::dyload::dyload_shared_library);
+        // signal
+        reg.put("signal_await", wilton::signal::signal_await);
+        reg.put("signal_fire", wilton::signal::signal_fire);
         // misc
         reg.put("tcp_wait_for_connection", wilton::misc::tcp_wait_for_connection);
         reg.put("process_spawn", wilton::misc::process_spawn);
@@ -187,11 +164,11 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
             if (nullptr != err) {
                 std::string msg = TRACEMSG(std::string(err));
                 wilton_free(err);
-                throw wilton::common::wilton_internal_exception(msg);
+                throw wilton::support::exception(msg);
             }
             if (nullptr != out) {
                 if (!sl::support::is_uint32(out_len)) {
-                    throw wilton::common::wilton_internal_exception(TRACEMSG(
+                    throw wilton::support::exception(TRACEMSG(
                             "Invalid result length value returned: [" + sl::support::to_string(out_len) + "]"));
                 }
                 return wilton::support::wrap_wilton_buffer(out, out_len);

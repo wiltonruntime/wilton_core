@@ -12,8 +12,7 @@
 
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
 
 namespace wilton {
 namespace serverconf {
@@ -58,7 +57,7 @@ public:
             } else if ("verifySubjectSubstr" == name) {
                 this->verifySubjectSubstr = fi.as_string_nonempty_or_throw(name);
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'ssl' field: [" + name + "]"));                
+                throw support::exception(TRACEMSG("Unknown 'ssl' field: [" + name + "]"));                
             }
         }
     }

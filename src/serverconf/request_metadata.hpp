@@ -16,7 +16,8 @@
 #include "staticlib/ranges.hpp"
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "serverconf/header.hpp"
 
 namespace wilton {

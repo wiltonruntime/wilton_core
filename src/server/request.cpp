@@ -23,7 +23,8 @@
 #include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
-#include "common/wilton_internal_exception.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "server/response_stream_sender.hpp"
 #include "server/request_payload_handler.hpp"
 #include "server/server.hpp"
@@ -94,7 +95,7 @@ public:
     }
 
     void send_response(request&, const char* data, uint32_t data_len) {
-        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw common::wilton_internal_exception(TRACEMSG(
+        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw support::exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         resp->write(data, data_len);
         resp->send();
@@ -102,7 +103,7 @@ public:
 
     void send_file(request&, std::string file_path, std::function<void(bool)> finalizer) {
         auto fd = sl::tinydir::file_source(file_path);
-        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw common::wilton_internal_exception(TRACEMSG(
+        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw support::exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         auto fd_ptr = std::unique_ptr<std::streambuf>(sl::io::make_unbuffered_istreambuf_ptr(std::move(fd)));
         auto sender = std::make_shared<response_stream_sender>(resp, std::move(fd_ptr), std::move(finalizer));
@@ -110,7 +111,7 @@ public:
     }
 
     void send_mustache(request&, std::string mustache_file_path, sl::json::value json) {
-        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw common::wilton_internal_exception(TRACEMSG(
+        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw support::exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         auto mp = sl::mustache::source(mustache_file_path, std::move(json), mustache_partials);
         auto mp_ptr = std::unique_ptr<std::streambuf>(sl::io::make_unbuffered_istreambuf_ptr(std::move(mp)));
@@ -119,7 +120,7 @@ public:
     }
     
     response_writer send_later(request&) {
-        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw common::wilton_internal_exception(TRACEMSG(
+        if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw support::exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
         sl::pion::http_response_writer_ptr writer = this->resp;
         return response_writer{static_cast<void*>(std::addressof(writer))};
@@ -184,16 +185,16 @@ private:
     }
 
 };
-PIMPL_FORWARD_CONSTRUCTOR(request, (void*)(void*)(partmap_type), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(request, serverconf::request_metadata, get_request_metadata, (), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(request, const std::string&, get_request_data, (), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(request, const std::string&, get_request_data_filename, (), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(request, void, set_response_metadata, (serverconf::response_metadata), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(request, void, send_response, (const char*)(uint32_t), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(request, void, send_file, (std::string)(std::function<void(bool)>), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(request, void, send_mustache, (std::string)(sl::json::value), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(request, response_writer, send_later, (), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(request, void, finish, (), (), common::wilton_internal_exception)
+PIMPL_FORWARD_CONSTRUCTOR(request, (void*)(void*)(partmap_type), (), support::exception)
+PIMPL_FORWARD_METHOD(request, serverconf::request_metadata, get_request_metadata, (), (), support::exception)
+PIMPL_FORWARD_METHOD(request, const std::string&, get_request_data, (), (), support::exception)
+PIMPL_FORWARD_METHOD(request, const std::string&, get_request_data_filename, (), (), support::exception)
+PIMPL_FORWARD_METHOD(request, void, set_response_metadata, (serverconf::response_metadata), (), support::exception)
+PIMPL_FORWARD_METHOD(request, void, send_response, (const char*)(uint32_t), (), support::exception)
+PIMPL_FORWARD_METHOD(request, void, send_file, (std::string)(std::function<void(bool)>), (), support::exception)
+PIMPL_FORWARD_METHOD(request, void, send_mustache, (std::string)(sl::json::value), (), support::exception)
+PIMPL_FORWARD_METHOD(request, response_writer, send_later, (), (), support::exception)
+PIMPL_FORWARD_METHOD(request, void, finish, (), (), support::exception)
 
 } // namespace
 }

@@ -14,7 +14,7 @@
 
 #include "staticlib/pimpl.hpp"
 
-#include "common/wilton_internal_exception.hpp"
+#include "wilton/support/exception.hpp"
 
 namespace wilton {
 namespace misc {

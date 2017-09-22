@@ -30,21 +30,21 @@ support::buffer tcp_wait_for_connection(sl::io::span<const char> data) {
         } else if ("timeoutMillis" == name) {
             timeout = fi.as_int64_or_throw(name);
         } else {
-            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw support::exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (-1 == timeout) throw common::wilton_internal_exception(TRACEMSG(
+    if (-1 == timeout) throw support::exception(TRACEMSG(
             "Required parameter 'timeoutMillis' not specified"));
-    if (rip.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+    if (rip.get().empty()) throw support::exception(TRACEMSG(
             "Required parameter 'ipAddress' not specified"));
-    if (-1 == port) throw common::wilton_internal_exception(TRACEMSG(
+    if (-1 == port) throw support::exception(TRACEMSG(
             "Required parameter 'tcpPort' not specified"));
     const std::string& ip = rip.get();
     // call wilton
     char* err = wilton_tcp_wait_for_connection(ip.c_str(), static_cast<int>(ip.length()),
             static_cast<int> (port), static_cast<int> (timeout));
     if (nullptr != err) {
-        common::throw_wilton_error(err, TRACEMSG(err));
+        support::throw_wilton_error(err, TRACEMSG(err));
     }
     return support::make_empty_buffer();
 }
@@ -69,12 +69,12 @@ support::buffer process_spawn(sl::io::span<const char> data) {
         } else if ("awaitExit" == name) {
             await_exit = fi.as_bool_or_throw(name);
         } else {
-            throw common::wilton_internal_exception(TRACEMSG("Unknown data field: [" + name + "]"));
+            throw support::exception(TRACEMSG("Unknown data field: [" + name + "]"));
         }
     }
-    if (rexecutable.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+    if (rexecutable.get().empty()) throw support::exception(TRACEMSG(
             "Required parameter 'executable' not specified"));
-    if (routfile.get().empty()) throw common::wilton_internal_exception(TRACEMSG(
+    if (routfile.get().empty()) throw support::exception(TRACEMSG(
             "Required parameter 'outFile' not specified"));    
     const std::string& executable = rexecutable.get();
     const std::string& outfile = routfile.get();

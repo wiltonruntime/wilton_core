@@ -21,8 +21,9 @@
 #include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
+#include "wilton/support/exception.hpp"
+
 #include "call/wiltoncall_internal.hpp"
-#include "common/wilton_internal_exception.hpp"
 #include "logging/wilton_logger.hpp"
 #include "server/file_handler.hpp"
 #include "server/request.hpp"
@@ -76,11 +77,12 @@ public:
                 server_ptr->add_handler("GET", dr.resource, file_handler(dr));
             } else if (dr.zipPath.length() > 0) {
                 server_ptr->add_handler("GET", dr.resource, zip_handler(dr));
-            } else throw common::wilton_internal_exception(TRACEMSG(
+            } else throw support::exception(TRACEMSG(
                     "Invalid 'documentRoot': [" + dr.to_json().dumps() + "]"));
         }
         server_ptr->get_scheduler().set_thread_stop_hook([](const std::thread::id& tid) STATICLIB_NOEXCEPT {
-            wilton::internal::clean_duktape_thread_local(tid);
+            auto tid_str = sl::support::to_string_any(tid);
+            wilton::internal::clean_duktape_thread_local(tid_str);
         });
         server_ptr->start();
     }
@@ -132,7 +134,7 @@ private:
                 std::string name = std::string(tf.filename().data(), tf.filename().length() - MUSTACHE_EXT.length());
                 std::string val = read_file(tf);
                 auto pa = res.insert(std::make_pair(std::move(name), std::move(val)));
-                if (!pa.second) throw common::wilton_internal_exception(TRACEMSG(
+                if (!pa.second) throw support::exception(TRACEMSG(
                         "Invalid duplicate 'mustache.partialsDirs' element," +
                         " dirpath: [" + dirpath + "], path: [" + tf.filepath() + "]"));
             }
@@ -148,8 +150,8 @@ private:
     }
     
 };
-PIMPL_FORWARD_CONSTRUCTOR(server, (serverconf::server_config)(std::vector<sl::support::observer_ptr<http_path>>), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD(server, void, stop, (), (), common::wilton_internal_exception)
+PIMPL_FORWARD_CONSTRUCTOR(server, (serverconf::server_config)(std::vector<sl::support::observer_ptr<http_path>>), (), support::exception)
+PIMPL_FORWARD_METHOD(server, void, stop, (), (), support::exception)
 
 } // namespace
 }

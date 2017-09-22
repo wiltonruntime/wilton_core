@@ -15,8 +15,8 @@
 #include "staticlib/ranges.hpp"
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "serverconf/header.hpp"
 
 namespace wilton {
@@ -57,7 +57,7 @@ public:
                     this->headers.emplace_back(hf.name(), std::move(val));
                 }
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown field: [" + name + "]"));
+                throw support::exception(TRACEMSG("Unknown field: [" + name + "]"));
             }
         }
     }

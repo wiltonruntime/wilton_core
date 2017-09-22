@@ -13,8 +13,7 @@
 #include "staticlib/config.hpp"
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
 
 namespace wilton {
 namespace serverconf {
@@ -52,12 +51,12 @@ public:
             } else if ("value" == fname) {
                 this->value = fi.as_string_nonempty_or_throw(fname);
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'header' field: [" + fname + "]"));
+                throw support::exception(TRACEMSG("Unknown 'header' field: [" + fname + "]"));
             }
         }
-        if (0 == name.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == name.length()) throw support::exception(TRACEMSG(
                 "Invalid 'header.name' field: []"));
-        if (0 == value.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == value.length()) throw support::exception(TRACEMSG(
                 "Invalid 'header.value' field: []"));
     }
 

@@ -20,7 +20,8 @@
 #include "staticlib/pimpl/forward_macros.hpp"
 #include "staticlib/utils.hpp"
 
-#include "common/wilton_internal_exception.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "logging/appender_config.hpp"
 #include "logging/logger_config.hpp"
 #include "logging/logging_config.hpp"
@@ -117,7 +118,7 @@ private:
             }
             return new log4cplus::DailyRollingFileAppender(props);
         } else {
-            throw common::wilton_internal_exception(TRACEMSG(
+            throw support::exception(TRACEMSG(
                     "Invalid 'logging.appender.appenderType': [" + conf.appenderType + "]"));
         }
     }
@@ -134,10 +135,10 @@ private:
     }
 
 };
-PIMPL_FORWARD_METHOD_STATIC(wilton_logger, void, log, (const std::string&)(const std::string&)(const std::string&), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD_STATIC(wilton_logger, void, apply_config, (const logging_config&), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD_STATIC(wilton_logger, bool, is_enabled_for_level, (const std::string&)(const std::string&), (), common::wilton_internal_exception)
-PIMPL_FORWARD_METHOD_STATIC(wilton_logger, void, shutdown, (), (), common::wilton_internal_exception)
+PIMPL_FORWARD_METHOD_STATIC(wilton_logger, void, log, (const std::string&)(const std::string&)(const std::string&), (), support::exception)
+PIMPL_FORWARD_METHOD_STATIC(wilton_logger, void, apply_config, (const logging_config&), (), support::exception)
+PIMPL_FORWARD_METHOD_STATIC(wilton_logger, bool, is_enabled_for_level, (const std::string&)(const std::string&), (), support::exception)
+PIMPL_FORWARD_METHOD_STATIC(wilton_logger, void, shutdown, (), (), support::exception)
 
 } // namespace
 }

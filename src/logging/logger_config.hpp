@@ -13,8 +13,7 @@
 #include "staticlib/config.hpp"
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
 
 namespace wilton {
 namespace logging {
@@ -48,12 +47,12 @@ public:
             } else if ("level" == fname) {
                 this->level = fi.as_string_nonempty_or_throw(name);
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'logging.loggers' field: [" + fname + "]"));
+                throw support::exception(TRACEMSG("Unknown 'logging.loggers' field: [" + fname + "]"));
             }
         }
-        if (0 == name.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == name.length()) throw support::exception(TRACEMSG(
                 "Invalid 'logging.loggers.name' field: []"));
-        if (0 == level.length()) throw common::wilton_internal_exception(TRACEMSG(
+        if (0 == level.length()) throw support::exception(TRACEMSG(
                 "Invalid 'logging.loggers.level' field: []"));
     }
 

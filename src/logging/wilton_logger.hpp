@@ -12,7 +12,8 @@
 
 #include "staticlib/pimpl.hpp"
 
-#include "common/wilton_internal_exception.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "logging/logging_config.hpp"
 
 namespace wilton {

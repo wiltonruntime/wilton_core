@@ -418,81 +418,17 @@ char* wilton_HttpClient_send_file(
                 int sent_successfully));
 
 
-// Cron
+// signal
 
-struct wilton_CronTask;
-typedef struct wilton_CronTask wilton_CronTask;
+char* wilton_signal_initialize();
 
-char* wilton_CronTask_start(
-        wilton_CronTask** cron_out,
-        const char* cronexpr,
-        int cronexpr_len,
-        void* task_ctx,
-        void (*task_cb)(
-                void* task_ctx));
+char* wilton_signal_await();
 
-
-char* wilton_CronTask_stop(
-        wilton_CronTask* cron);
-
-// shared
-
-char* wilton_shared_put(
-        const char* key,
-        int key_len,
-        const char* value,
-        int value_len,
-        char** prev_value_out,
-        int* prev_value_out_len);
-
-char* wilton_shared_get(
-        const char* key,
-        int key_len,
-        char** value_out,
-        int* value_out_len);
-
-char* wilton_shared_wait_change(
-        int timeout_millis,
-        const char* key,
-        int key_len,
-        const char* current_value,
-        int current_value_len,
-        char** changed_value_out,
-        int* changed_value_out_len);
-
-char* wilton_shared_remove(
-        const char* key,
-        int key_len,
-        char** value_out,
-        int* value_out_len);
-
-char* wilton_shared_list_append(
-        const char* key,
-        int key_len,
-        const char* value,
-        int value_len,
-        char** updated_value_out,
-        int* updated_value_out_len);
-
-char* wilton_shared_dump(
-        char** dump_out,
-        int* dump_out_len);
+char* wilton_signal_fire();
 
 // thread
 
-char* wilton_thread_run(
-        void* cb_ctx,
-        void (*cb)(
-                void* cb_ctx));
 
-char* wilton_thread_sleep_millis(
-        int millis);
-
-char* wilton_thread_initialize_signals();
-
-char* wilton_thread_wait_for_signal();
-
-char* wilton_thread_fire_signal();
 
 // misc
 
@@ -501,6 +437,10 @@ char* wilton_alloc(
 
 void wilton_free(
         char* buffer);
+
+char* wilton_clean_tls(
+        const char* thread_id,
+        int thread_id_len);
 
 char* wilton_tcp_wait_for_connection(
         const char* ip_addr,

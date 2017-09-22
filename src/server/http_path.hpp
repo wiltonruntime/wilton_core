@@ -17,7 +17,8 @@
 #include "staticlib/config.hpp"
 #include "staticlib/utils.hpp"
 
-#include "common/wilton_internal_exception.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "server/request.hpp"
 
 

@@ -15,6 +15,8 @@
 
 #include "wilton/support/alloc_copy.hpp"
 
+#include "call/wiltoncall_internal.hpp"
+
 #include "tcp_connect_checker.hpp"
 
 char* wilton_alloc(int size_bytes) /* noexcept */ {
@@ -26,6 +28,20 @@ char* wilton_alloc(int size_bytes) /* noexcept */ {
 
 void wilton_free(char* buffer) /* noexcept */ {
     std::free(buffer);
+}
+
+char* wilton_clean_tls(const char* thread_id, int thread_id_len) {
+    if (nullptr == thread_id) return wilton::support::alloc_copy(TRACEMSG("Null 'thread_id' parameter specified"));
+    if (!sl::support::is_uint16_positive(thread_id_len)) return wilton::support::alloc_copy(TRACEMSG(
+            "Invalid 'thread_id_len' parameter specified: [" + sl::support::to_string(thread_id_len) + "]"));
+    try {
+        uint16_t thread_id_len_u16 = static_cast<uint16_t> (thread_id_len);
+        auto tid = std::string(thread_id, thread_id_len_u16);
+        wilton::internal::clean_duktape_thread_local(tid);
+        return nullptr;
+    } catch (const std::exception& e) {
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
 }
 
 char* wilton_tcp_wait_for_connection(const char* ip_addr, int ip_addr_len, 

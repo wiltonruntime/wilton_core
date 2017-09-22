@@ -16,8 +16,7 @@
 #include "staticlib/ranges.hpp"
 #include "staticlib/json.hpp"
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
 
 namespace wilton {
 namespace client {
@@ -124,7 +123,7 @@ public:
             } else if ("responseDataFilePath" == name) {
                 respone_data_file_path = fi.as_string_nonempty_or_throw(name);
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'ClientRequest' field: [" + name + "]"));
+                throw support::exception(TRACEMSG("Unknown 'ClientRequest' field: [" + name + "]"));
             }
         }
     }

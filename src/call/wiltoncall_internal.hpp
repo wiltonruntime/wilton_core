@@ -19,12 +19,11 @@
 #include "staticlib/utils.hpp"
 
 #include "wilton/wiltoncall.h"
+
+#include "wilton/support/buffer.hpp"
+#include "wilton/support/exception.hpp"
 #include "wilton/support/handle_registry.hpp"
 #include "wilton/support/payload_handle_registry.hpp"
-#include "wilton/support/buffer.hpp"
-
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
 
 namespace wilton {
 
@@ -86,71 +85,6 @@ support::buffer httpclient_send_file(sl::io::span<const char> data);
 
 } // namespace
 
-// Cron
-namespace cron {
-
-support::buffer cron_start(sl::io::span<const char> data);
-
-support::buffer cron_stop(sl::io::span<const char> data);
-
-} // namespace
-
-// shared
-namespace shared {
-
-support::buffer shared_put(sl::io::span<const char> data);
-
-support::buffer shared_get(sl::io::span<const char> data);
-
-support::buffer shared_wait_change(sl::io::span<const char> data);
-
-support::buffer shared_remove(sl::io::span<const char> data);
-
-support::buffer shared_list_append(sl::io::span<const char> data);
-
-support::buffer shared_dump(sl::io::span<const char> data);
-
-} // namespace
-
-// thread
-namespace thread {
-
-support::buffer thread_run(sl::io::span<const char> data);
-
-support::buffer thread_sleep_millis(sl::io::span<const char> data);
-
-support::buffer thread_wait_for_signal(sl::io::span<const char> data);
-
-support::buffer thread_fire_signal(sl::io::span<const char> data);
-
-} // namespace
-
-namespace fs {
-
-support::buffer fs_append_file(sl::io::span<const char> data);
-
-support::buffer fs_exists(sl::io::span<const char> data);
-
-support::buffer fs_mkdir(sl::io::span<const char> data);
-
-support::buffer fs_readdir(sl::io::span<const char> data);
-
-support::buffer fs_read_file(sl::io::span<const char> data);
-
-support::buffer fs_rename(sl::io::span<const char> data);
-
-support::buffer fs_rmdir(sl::io::span<const char> data);
-
-support::buffer fs_stat(sl::io::span<const char> data);
-
-support::buffer fs_unlink(sl::io::span<const char> data);
-
-support::buffer fs_write_file(sl::io::span<const char> data);
-
-support::buffer fs_copy_file(sl::io::span<const char> data);
-
-} // namespace
-
 // load
 
 namespace load {
@@ -166,6 +100,16 @@ support::buffer load_module_script(sl::io::span<const char> data);
 namespace dyload {
 
 support::buffer dyload_shared_library(sl::io::span<const char> data);
+
+} // namespace
+
+// signal
+
+namespace signal {
+
+support::buffer signal_await(sl::io::span<const char>);
+
+support::buffer signal_fire(sl::io::span<const char>);
 
 } // namespace
 
@@ -194,7 +138,7 @@ const sl::json::value& static_wiltoncall_config(const std::string& cf_json = "")
 
 sl::support::observer_ptr<sl::unzip::file_index> static_modules_idx(sl::unzip::file_index* = nullptr);
 
-void clean_duktape_thread_local(const std::thread::id& tid);
+void clean_duktape_thread_local(const std::string& tid);
 
 } // namespace
 

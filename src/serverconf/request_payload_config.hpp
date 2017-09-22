@@ -11,8 +11,8 @@
 #include <cstdint>
 #include <string>
 
-#include "common/wilton_internal_exception.hpp"
-#include "common/utils.hpp"
+#include "wilton/support/exception.hpp"
+
 #include "staticlib/json.hpp"
 
 namespace wilton {
@@ -57,7 +57,7 @@ public:
             } else if ("memoryLimitBytes" == name) {
                 this->memoryLimitBytes = fi.as_uint32_or_throw(name);
             } else {
-                throw common::wilton_internal_exception(TRACEMSG("Unknown 'requestPayload' field: [" + name + "]"));
+                throw support::exception(TRACEMSG("Unknown 'requestPayload' field: [" + name + "]"));
             }
         }
     }

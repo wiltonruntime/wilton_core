@@ -18,9 +18,7 @@
 #include "staticlib/support.hpp"
 
 #include "wilton/support/buffer.hpp"
-
-#include "common/utils.hpp"
-#include "common/wilton_internal_exception.hpp"
+#include "wilton/support/exception.hpp"
 
 namespace wilton {
 namespace call {
@@ -40,12 +38,12 @@ public:
     void put(const std::string& name, fun_type callback) {
         std::lock_guard<std::mutex> guard{mutex};
         if (name.empty()) {
-            throw common::wilton_internal_exception(TRACEMSG("Invalid empty wilton_function name specified"));
+            throw support::exception(TRACEMSG("Invalid empty wilton_function name specified"));
         }
         // todo: check override
         auto pa = registry.emplace(name, callback);
         if (!pa.second) {
-            throw common::wilton_internal_exception(TRACEMSG(
+            throw support::exception(TRACEMSG(
                     "Invalid duplicate wilton_function name specified: [" + name + "]"));
         }
     }
@@ -53,18 +51,18 @@ public:
     void remove(const std::string& name) {
         std::lock_guard<std::mutex> guard{mutex};
         if (name.empty()) {
-            throw common::wilton_internal_exception(TRACEMSG("Invalid empty wilton_function name specified"));
+            throw support::exception(TRACEMSG("Invalid empty wilton_function name specified"));
         }
         auto res = registry.erase(name);
         if (0 == res) {
-            throw common::wilton_internal_exception(TRACEMSG(
+            throw support::exception(TRACEMSG(
                     "Invalid unknown wilton_function name specified: [" + name + "]"));
         }
     }
     
     support::buffer invoke(const std::string& name, sl::io::span<const char> data) {
         if (name.empty()) {
-            throw common::wilton_internal_exception(TRACEMSG("Invalid empty wilton_function name specified"));
+            throw support::exception(TRACEMSG("Invalid empty wilton_function name specified"));
         }
         try {
             // get function
@@ -75,7 +73,7 @@ public:
                 std::lock_guard<std::mutex> guard{mutex};
                 auto it = registry.find(name);
                 if (registry.end() == it) {
-                    throw common::wilton_internal_exception(TRACEMSG(
+                    throw support::exception(TRACEMSG(
                             "Invalid unknown wilton_function name specified: [" + name + "]"));
                 }
                 fun = it->second;
@@ -83,7 +81,7 @@ public:
             // invoke
             return fun(data);
         } catch (const std::exception& e) {
-            throw common::wilton_internal_exception(TRACEMSG(e.what() + 
+            throw support::exception(TRACEMSG(e.what() + 
                     "\n'wiltoncall' error for function: [" + name + "]"));
         }
     }
