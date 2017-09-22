@@ -24,23 +24,19 @@ EXPORTS
     wilton_render_mustache
     wilton_render_mustache_file
     
+    wilton_signal_initialize
+    wilton_signal_await
+    wilton_signal_fire
+    
     wilton_HttpClient_create
     wilton_HttpClient_close
     wilton_HttpClient_execute
     wilton_HttpClient_send_file
-    
-    wilton_CronTask_start
-    wilton_CronTask_stop
-    
-    wilton_thread_run
-    wilton_thread_sleep_millis
-    wilton_thread_initialize_signals
-    wilton_thread_wait_for_signal
-    wilton_thread_fire_signal
-    
+       
     wilton_alloc
     wilton_free
     wilton_tcp_wait_for_connection
+    wilton_clean_tls
     
     wiltoncall
     wiltoncall_register
@@ -55,3 +51,27 @@ EXPORTS
     Java_net_wiltontoolkit_WiltonJni_wiltoncall
     Java_net_wiltontoolkit_WiltonJni_wiltoninit
     
+    json_object
+    json_array
+    json_string
+    json_integer
+    json_real
+    json_true
+    json_false
+    json_null
+    json_delete
+    json_delete
+    json_object_set_new
+    json_array_append_new
+    json_object_size
+    json_object_get
+    json_object_iter
+    json_object_iter_next
+    json_object_iter_key
+    json_array_size
+    json_array_get
+    json_string_value
+    json_integer_value
+    json_real_value
+    json_load_callback
+    json_dump_callback
