@@ -28,9 +28,25 @@ std::mutex& static_engines_mutex() {
     return mutex;
 }
 
+bool& static_running_flag() {
+    static bool flag = true;
+    return flag;
+}
+
+class destruction_watcher {
+public:
+    ~destruction_watcher() STATICLIB_NOEXCEPT {
+        std::lock_guard<std::mutex> guard{static_engines_mutex()};
+        bool& flag = static_running_flag();
+        flag = false;
+    }
+};
+
 // cleaned up manually due to lack of portable TLS
 std::unordered_map<std::string, std::shared_ptr<wilton::duktape::duktape_engine>>& static_engines() {
+    static_running_flag(); // will be destroyed last
     static std::unordered_map<std::string, std::shared_ptr<wilton::duktape::duktape_engine>> engines;
+    static destruction_watcher watcher;
     return engines;
 }
 
@@ -84,10 +100,13 @@ namespace wilton {
 namespace internal {
 
 // race condition with registry destructor is here
+// band-aid-like solution with destruction_watched seems to work here
 void clean_duktape_thread_local(const std::string& tid) {
     std::lock_guard<std::mutex> guard{static_engines_mutex()};
-    auto& map = static_engines();
-    map.erase(tid);
+    if (static_running_flag()) {
+        auto& map = static_engines();
+        map.erase(tid);
+    }
 }
 
 } // namespace

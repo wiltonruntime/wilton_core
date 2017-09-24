@@ -22,7 +22,7 @@ namespace support {
 template<typename T, typename P>
 class payload_handle_registry {
     std::unordered_map<T*, P> registry;
-    std::mutex mutex;
+    std::mutex mtx;
     std::function<void(T*)> destoyer;
 
 public:
@@ -44,7 +44,7 @@ public:
     payload_handle_registry& operator=(const payload_handle_registry&) = delete;
 
     ~payload_handle_registry() STATICLIB_NOEXCEPT {
-        std::lock_guard<std::mutex> lock{mutex};
+        std::lock_guard<std::mutex> lock{mtx};
         if (destoyer) {
             for (auto& pa : registry) {
                 destoyer(pa.first);
@@ -54,13 +54,13 @@ public:
     }
     
     int64_t put(T* ptr, P&& ctx) {
-        std::lock_guard<std::mutex> lock(mutex);
+        std::lock_guard<std::mutex> lock(mtx);
         auto pair = registry.emplace(ptr, std::move(ctx));
         return pair.second ? reinterpret_cast<int64_t> (ptr) : 0;
     }
 
     std::pair<T*, P> remove(int64_t handle) {
-        std::lock_guard<std::mutex> lock(mutex);
+        std::lock_guard<std::mutex> lock(mtx);
         T* ptr = reinterpret_cast<T*> (handle);
         auto it = registry.find(ptr);
         if (registry.end() != it) {
@@ -70,6 +70,16 @@ public:
         } else {
             return std::make_pair(nullptr, P());
         }
+    }
+
+    std::mutex& mutex() {
+        return mtx;
+    }
+
+    // must be used only with external locking on mutex()
+    int64_t put_nolock(T* ptr, P&& ctx) {
+        auto pair = registry.emplace(ptr, std::move(ctx));
+        return pair.second ? reinterpret_cast<int64_t> (ptr) : 0;
     }
 };
 

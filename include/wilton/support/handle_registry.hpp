@@ -21,7 +21,7 @@ namespace support {
 template<typename T>
 class handle_registry {
     std::unordered_set<T*> registry;
-    std::mutex mutex;
+    std::mutex mtx;
     std::function<void(T*)> destoyer;
 
 public:
@@ -43,7 +43,7 @@ public:
     handle_registry& operator=(const handle_registry&) = delete;
     
     ~handle_registry() STATICLIB_NOEXCEPT {
-        std::lock_guard<std::mutex> lock{mutex};
+        std::lock_guard<std::mutex> lock{mtx};
         if (destoyer) {
             for (T* ptr : registry) {
                 destoyer(ptr);
@@ -53,23 +53,33 @@ public:
     }
     
     int64_t put(T* ptr) {
-        std::lock_guard<std::mutex> lock{mutex};
+        std::lock_guard<std::mutex> lock{mtx};
         auto pair = registry.insert(ptr);
         return pair.second ? reinterpret_cast<int64_t> (ptr) : 0;
     }
 
     T* remove(int64_t handle) {
-        std::lock_guard<std::mutex> lock{mutex};
+        std::lock_guard<std::mutex> lock{mtx};
         T* ptr = reinterpret_cast<T*> (handle);
         auto erased = registry.erase(ptr);
         return 1 == erased ? ptr : nullptr;
     }
 
     T* peek(int64_t handle) {
-        std::lock_guard<std::mutex> lock{mutex};
+        std::lock_guard<std::mutex> lock{mtx};
         T* ptr = reinterpret_cast<T*> (handle);
         auto exists = registry.count(ptr);
         return 1 == exists ? ptr : nullptr;
+    }
+
+    std::mutex& mutex() {
+        return mtx;
+    }
+
+    // must be used only with external locking on mutex()
+    int64_t put_nolock(T* ptr) {
+        auto pair = registry.insert(ptr);
+        return pair.second ? reinterpret_cast<int64_t> (ptr) : 0;
     }
 };
 
