@@ -28,13 +28,16 @@ set ( staticlib_pion_USE_LOG4CPLUS ON CACHE BOOL "Use log4cplus lib for logging"
 set ( staticlib_pion_USE_OPENSSL ON CACHE BOOL "Use OpenSSL lib for https" )
 
 # dependencies add
-staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_asio )
-if ( NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Linux" ) # system dependencies implied on Linux    
+if ( STATICLIB_TOOLCHAIN MATCHES "windows_[^_]+_[^_]+" )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_zlib )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_openssl )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_asio )
+endif ( )
+if ( WILTON_BUILD_FLAVOUR MATCHES "wheezy" )
+    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_asio )
 endif ( )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_duktape )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
