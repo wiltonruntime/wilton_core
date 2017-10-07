@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "asio.hpp"
+#include "openssl/x509.h"
 
 #include "staticlib/config.hpp"
 #include "staticlib/pion.hpp"
@@ -99,9 +100,21 @@ private:
     }
 
     static std::string extract_subject(asio::ssl::verify_context& ctx) {
-        if (ctx.native_handle() && ctx.native_handle()->current_cert && ctx.native_handle()->current_cert->name) {
-            return std::string(ctx.native_handle()->current_cert->name);
-        } else return "";
+        if (nullptr == ctx.native_handle()) return "";
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L)
+        auto cert = ctx.native_handle()->current_cert;
+#else
+        auto cert = X509_STORE_CTX_get0_cert(ctx.native_handle());
+#endif
+        // X509_NAME_oneline
+        auto name_struct_ptr = X509_get_subject_name(cert);
+        if (nullptr == name_struct_ptr) return "";
+        auto name_ptr = X509_NAME_oneline(name_struct_ptr, nullptr, 0);
+        if (nullptr == name_ptr) return "";
+        auto deferred = sl::support::defer([name_ptr]() STATICLIB_NOEXCEPT {
+            OPENSSL_free(name_ptr);
+        });
+        return std::string(name_ptr);
     }
 
     static std::function<bool(bool, asio::ssl::verify_context&)> create_verifier_cb(const std::string& subject_part) {
@@ -111,7 +124,8 @@ private:
                 return false;
             }
             // not the leaf certificate
-            if (ctx.native_handle()->error_depth > 0) {
+            auto error_depth = X509_STORE_CTX_get_error_depth(ctx.native_handle());
+            if (error_depth > 0) {
                 return true;
             }
             // no subject restrictions

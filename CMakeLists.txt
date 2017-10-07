@@ -182,7 +182,7 @@ target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE
         ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
 target_compile_options ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_CFLAGS_OTHER} )
 if ( ${PROJECT_NAME}_SHARED )
-    target_link_libraries ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_STATIC_LIBRARIES} )
+    target_link_libraries ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_LIBRARIES} )
 endif ( )
 
 if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
