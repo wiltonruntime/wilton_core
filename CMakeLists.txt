@@ -160,11 +160,13 @@ endif ( )
 # library
 set ( ${PROJECT_NAME}_RESFILE )
 set ( ${PROJECT_NAME}_DEFFILE )
-if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
+set ( ${PROJECT_NAME}_ADDITIONAL_LIBS )
+if ( STATICLIB_TOOLCHAIN MATCHES "windows_[^_]+_[^_]+" )
     configure_file ( ${WILTON_DIR}/resources/buildres/wilton_module.rc
             ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc )
     set ( ${PROJECT_NAME}_RESFILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc )
     set ( ${PROJECT_NAME}_DEFFILE ${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME}.def )
+    set ( ${PROJECT_NAME}_ADDITIONAL_LIBS wtsapi32 )
 endif ( )
 
 add_library ( ${PROJECT_NAME} ${${PROJECT_NAME}_LIBTYPE}
@@ -183,10 +185,12 @@ target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE
         ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
 target_compile_options ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_CFLAGS_OTHER} )
 if ( ${PROJECT_NAME}_SHARED )
-    target_link_libraries ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_LIBRARIES} )
+    target_link_libraries ( ${PROJECT_NAME} PRIVATE
+            ${${PROJECT_NAME}_DEPS_PC_LIBRARIES}
+            ${${PROJECT_NAME}_ADDITIONAL_LIBS} )
 endif ( )
 
-if ( ${CMAKE_SYSTEM_NAME} STREQUAL "Windows" )
+if ( STATICLIB_TOOLCHAIN MATCHES "windows_[^_]+_[^_]+" )
     set_property ( TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
 endif ( )
 
