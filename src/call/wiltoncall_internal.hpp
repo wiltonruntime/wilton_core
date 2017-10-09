@@ -38,6 +38,8 @@ support::buffer request_get_metadata(sl::io::span<const char> data);
 
 support::buffer request_get_data(sl::io::span<const char> data);
 
+support::buffer request_get_form_data(sl::io::span<const char> data);
+
 support::buffer request_get_data_filename(sl::io::span<const char> data);
 
 support::buffer request_set_response_metadata(sl::io::span<const char> data);

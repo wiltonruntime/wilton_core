@@ -15,6 +15,7 @@
 #include "staticlib/utils.hpp"
 
 #include "wilton/support/alloc_copy.hpp"
+#include "wilton/support/buffer.hpp"
 
 #include "server/http_path.hpp"
 #include "server/request.hpp"
@@ -185,6 +186,22 @@ char* wilton_Request_get_request_data(wilton_Request* request, char** data_out,
         const std::string& res = request->impl().get_request_data();
         *data_out = wilton::support::alloc_copy(res);
         *data_len_out = static_cast<int>(res.length());
+        return nullptr;
+    } catch (const std::exception& e) {
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}
+
+char* wilton_Request_get_request_form_data(wilton_Request* request, char** data_out,
+        int* data_len_out) /* noexcept */ {
+    if (nullptr == request) return wilton::support::alloc_copy(TRACEMSG("Null 'request' parameter specified"));
+    if (nullptr == data_out) return wilton::support::alloc_copy(TRACEMSG("Null 'data_out' parameter specified"));
+    if (nullptr == data_len_out) return wilton::support::alloc_copy(TRACEMSG("Null 'data_len_out' parameter specified"));
+    try {
+        sl::json::value json = request->impl().get_request_form_data();
+        wilton::support::buffer res = wilton::support::make_json_buffer(json);
+        *data_out = res.value().data();
+        *data_len_out = static_cast<int>(res.value().size());
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));

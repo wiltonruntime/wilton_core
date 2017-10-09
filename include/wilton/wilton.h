@@ -116,6 +116,11 @@ char* wilton_Request_get_request_data(
         char** data_out,
         int* data_len_out);
 
+char* wilton_Request_get_request_form_data(
+        wilton_Request* request,
+        char** data_out,
+        int* data_len_out);
+
 char* wilton_Request_get_request_data_filename(
         wilton_Request* request,
         char** filename_out,

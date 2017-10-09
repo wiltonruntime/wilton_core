@@ -76,6 +76,7 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("server_stop", wilton::server::server_stop);
         reg.put("request_get_metadata", wilton::server::request_get_metadata);
         reg.put("request_get_data", wilton::server::request_get_data);
+        reg.put("request_get_form_data", wilton::server::request_get_form_data);
         reg.put("request_get_data_filename", wilton::server::request_get_data_filename);
         reg.put("request_set_response_metadata", wilton::server::request_set_response_metadata);
         reg.put("request_send_response", wilton::server::request_send_response);

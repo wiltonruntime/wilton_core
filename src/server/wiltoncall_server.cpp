@@ -330,6 +330,34 @@ support::buffer request_get_data(sl::io::span<const char> data) {
     return support::wrap_wilton_buffer(out, out_len);
 }
 
+support::buffer request_get_form_data(sl::io::span<const char> data) {
+    // json parse
+    auto json = sl::json::load(data);
+    int64_t handle = -1;
+    for (const sl::json::field& fi : json.as_object()) {
+        auto& name = fi.name();
+        if ("requestHandle" == name) {
+            handle = fi.as_int64_or_throw(name);
+        } else {
+            throw support::exception(TRACEMSG("Unknown data field: [" + name + "]"));
+        }
+    }
+    if (-1 == handle) throw support::exception(TRACEMSG(
+            "Required parameter 'requestHandle' not specified"));
+    // get handle
+    wilton_Request* request = static_request_registry().remove(handle);
+    if (nullptr == request) throw support::exception(TRACEMSG(
+            "Invalid 'requestHandle' parameter specified"));
+    // call wilton
+    char* out = nullptr;
+    int out_len = 0;
+    char* err = wilton_Request_get_request_form_data(request,
+            std::addressof(out), std::addressof(out_len));
+    static_request_registry().put(request);
+    if (nullptr != err) support::throw_wilton_error(err, TRACEMSG(err));
+    return support::wrap_wilton_buffer(out, out_len);
+}
+
 support::buffer request_get_data_filename(sl::io::span<const char> data) {
     // json parse
     auto json = sl::json::load(data);

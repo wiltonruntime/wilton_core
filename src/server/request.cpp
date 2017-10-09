@@ -17,6 +17,7 @@
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
 #include "staticlib/pion.hpp"
+#include "staticlib/pion/http_parser.hpp"
 #include "staticlib/mustache.hpp"
 #include "staticlib/pimpl/forward_macros.hpp"
 #include "staticlib/json.hpp"
@@ -82,6 +83,19 @@ public:
 
     const std::string& get_request_data(request&) {
         return request_payload_handler::get_data_string(req);
+    }
+
+    sl::json::value get_request_form_data(request&) {
+        const std::string& data = request_payload_handler::get_data_string(req);
+        auto dict = std::unordered_multimap<std::string, std::string, sl::pion::algorithm::ihash, sl::pion::algorithm::iequal_to>();
+        auto err = sl::pion::http_parser::parse_url_encoded(dict, data);
+        if (!err) throw support::exception(TRACEMSG(
+                "Error parsing request body as 'application/x-www-form-urlencoded'"));
+        auto res = std::vector<sl::json::field>();
+        for (auto& en : dict) {
+            res.emplace_back(en.first, en.second);
+        }
+        return sl::json::value(std::move(res));
     }
 
     const std::string& get_request_data_filename(request&) {
@@ -196,6 +210,7 @@ private:
 PIMPL_FORWARD_CONSTRUCTOR(request, (void*)(void*)(partmap_type), (), support::exception)
 PIMPL_FORWARD_METHOD(request, serverconf::request_metadata, get_request_metadata, (), (), support::exception)
 PIMPL_FORWARD_METHOD(request, const std::string&, get_request_data, (), (), support::exception)
+PIMPL_FORWARD_METHOD(request, sl::json::value, get_request_form_data, (), (), support::exception)
 PIMPL_FORWARD_METHOD(request, const std::string&, get_request_data_filename, (), (), support::exception)
 PIMPL_FORWARD_METHOD(request, void, set_response_metadata, (serverconf::response_metadata), (), support::exception)
 PIMPL_FORWARD_METHOD(request, void, send_response, (const char*)(uint32_t), (), support::exception)

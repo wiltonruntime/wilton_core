@@ -42,6 +42,8 @@ public:
     serverconf::request_metadata get_request_metadata();
     
     const std::string& get_request_data();
+
+    sl::json::value get_request_form_data();
     
     const std::string& get_request_data_filename();
     
