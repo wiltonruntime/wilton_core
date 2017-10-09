@@ -25,6 +25,8 @@
 
 #include "wilton/support/exception.hpp"
 
+#include "call/wiltoncall_internal.hpp"
+
 #include "server/response_stream_sender.hpp"
 #include "server/request_payload_handler.hpp"
 #include "server/server.hpp"
@@ -113,7 +115,13 @@ public:
     void send_mustache(request&, std::string mustache_file_path, sl::json::value json) {
         if (!state.compare_exchange_strong(request_state::created, request_state::committed)) throw support::exception(TRACEMSG(
                 "Invalid request lifecycle operation, request is already committed"));
-        auto mp = sl::mustache::source(mustache_file_path, std::move(json), mustache_partials);
+        std::string mpath = [&mustache_file_path] () -> std::string {
+            if (sl::utils::starts_with(mustache_file_path, internal::file_proto_prefix)) {
+                return mustache_file_path.substr(internal::file_proto_prefix.length());
+            }
+            return mustache_file_path;
+        } ();
+        auto mp = sl::mustache::source(mpath, std::move(json), mustache_partials);
         auto mp_ptr = std::unique_ptr<std::streambuf>(sl::io::make_unbuffered_istreambuf_ptr(std::move(mp)));
         auto sender = std::make_shared<response_stream_sender>(resp, std::move(mp_ptr));
         sender->send();
