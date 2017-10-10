@@ -69,7 +69,8 @@ char* wilton_HttpPath_destroy(
         },
         "mustache": {
             "partialsDirs": ["path/to/dir1", "path/to/dir2" ...]
-        }
+        },
+        "rootRedirectLocation": "http://some/url"
     }
  */
 char* wilton_Server_create(

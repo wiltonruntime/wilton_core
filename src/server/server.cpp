@@ -73,6 +73,18 @@ public:
                 return request_payload_handler{*conf_ptr};
             });
         }
+        if (!conf.root_redirect_location.empty()) {
+            std::string location = conf.root_redirect_location;
+            server_ptr->add_handler("GET", "/", 
+                    [location](sl::pion::http_request_ptr& req, sl::pion::tcp_connection_ptr& conn) {
+                auto writer = sl::pion::http_response_writer::create(conn, req);
+                auto& resp = writer->get_response();
+                resp.set_status_code(301);
+                resp.set_status_message("Moved Permanently");
+                resp.change_header("Location", location);
+                writer->send();
+            });
+        }
         for (const auto& dr : conf.documentRoots) {
             if (dr.dirPath.length() > 0) {
                 server_ptr->add_handler("GET", dr.resource, file_handler(dr));

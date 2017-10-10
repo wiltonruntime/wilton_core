@@ -34,6 +34,7 @@ public:
     std::vector<document_root> documentRoots;
     request_payload_config requestPayload;
     mustache_config mustache;
+    std::string root_redirect_location;
 
     server_config(const server_config&) = delete;
 
@@ -46,7 +47,8 @@ public:
     ssl(std::move(other.ssl)),
     documentRoots(std::move(other.documentRoots)),
     requestPayload(std::move(other.requestPayload)),
-    mustache(std::move(other.mustache)) { }
+    mustache(std::move(other.mustache)),
+    root_redirect_location(std::move(other.root_redirect_location)) { }
 
     server_config& operator=(server_config&& other) {
         this->numberOfThreads = other.numberOfThreads;
@@ -56,6 +58,7 @@ public:
         this->documentRoots = std::move(other.documentRoots);
         this->requestPayload = std::move(other.requestPayload);
         this->mustache = std::move(other.mustache);
+        this->root_redirect_location = std::move(other.root_redirect_location);
         return *this;
     }
 
@@ -79,6 +82,8 @@ public:
                 this->requestPayload = serverconf::request_payload_config(fi.val());
             } else if ("mustache" == name) {
                 this->mustache = mustache_config(fi.val());
+            } else if ("rootRedirectLocation" == name) {
+                this->root_redirect_location = fi.as_string_nonempty_or_throw(name);
             } else {
                 throw support::exception(TRACEMSG("Unknown field: [" + name + "]"));
             }
@@ -98,7 +103,8 @@ public:
                 return drs.to_vector();
             }()},
             {"requestPayload", requestPayload.to_json()},
-            {"mustache", mustache.to_json()}
+            {"mustache", mustache.to_json()},
+            {"rootRedirectLocation", root_redirect_location},
         };
     }
 };
