@@ -131,7 +131,8 @@ private:
         std::string execpath = sl::utils::current_executable_path();
         std::string dirpath = sl::utils::strip_filename(execpath);
         std::replace(dirpath.begin(), dirpath.end(), '\\', '/');
-        return dirpath + path;
+        std::string appdir = dirpath + "../";
+        return appdir + path;
     }
 
 };

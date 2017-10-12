@@ -41,6 +41,24 @@ namespace { // anonymous
 
 using partmap_type = const std::map<std::string, std::string>&;
 
+void handle_not_found_request(sl::pion::http_request_ptr& req, sl::pion::tcp_connection_ptr& conn) {
+    static const std::string NOT_FOUND_MSG_START = R"({
+    "code": 404,
+    "message": "Not Found",
+    "description": "The requested URL: [)";
+    static const std::string NOT_FOUND_MSG_FINISH = R"(] was not found on this server."
+})";
+    auto writer = sl::pion::http_response_writer::create(conn, req);
+    writer->get_response().set_status_code(404);
+    writer->get_response().set_status_message("Not Found");
+    writer->write_no_copy(NOT_FOUND_MSG_START);
+    auto res = req->get_resource();
+    std::replace(res.begin(), res.end(), '"', '\'');
+    writer->write_move(std::move(res));
+    writer->write_no_copy(NOT_FOUND_MSG_FINISH);
+    writer->send();
+}
+
 } // namespace
 
 class server::impl : public sl::pimpl::object::impl {
@@ -77,12 +95,16 @@ public:
             std::string location = conf.root_redirect_location;
             server_ptr->add_handler("GET", "/", 
                     [location](sl::pion::http_request_ptr& req, sl::pion::tcp_connection_ptr& conn) {
-                auto writer = sl::pion::http_response_writer::create(conn, req);
-                auto& resp = writer->get_response();
-                resp.set_status_code(301);
-                resp.set_status_message("Moved Permanently");
-                resp.change_header("Location", location);
-                writer->send();
+                if("/" == req->get_resource()) {
+                    auto writer = sl::pion::http_response_writer::create(conn, req);
+                    auto& resp = writer->get_response();
+                    resp.set_status_code(301);
+                    resp.set_status_message("Moved Permanently");
+                    resp.change_header("Location", location);
+                    writer->send();
+                } else {
+                    handle_not_found_request(req, conn);
+                }
             });
         }
         for (const auto& dr : conf.documentRoots) {
