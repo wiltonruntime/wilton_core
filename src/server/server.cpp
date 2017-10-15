@@ -109,8 +109,10 @@ public:
         }
         for (const auto& dr : conf.documentRoots) {
             if (dr.dirPath.length() > 0) {
+                check_dir_path(dr.dirPath);
                 server_ptr->add_handler("GET", dr.resource, file_handler(dr));
             } else if (dr.zipPath.length() > 0) {
+                check_zip_path(dr.zipPath);
                 server_ptr->add_handler("GET", dr.resource, zip_handler(dr));
             } else throw support::exception(TRACEMSG(
                     "Invalid 'documentRoot': [" + dr.to_json().dumps() + "]"));
@@ -195,6 +197,18 @@ private:
         sl::io::string_sink sink{};
         sl::io::copy_all(fd, sink);
         return std::move(sink.get_string());
+    }
+
+    static void check_dir_path(const std::string& dir) {
+        auto path = sl::tinydir::path(dir);
+        if (!(path.exists() && path.is_directory())) throw support::exception(TRACEMSG(
+                "Invalid non-existing 'dirPath' specified, path: [" + dir + "]"));
+    }
+
+    static void check_zip_path(const std::string& zip) {
+        auto path = sl::tinydir::path(zip);
+        if (!(path.exists() && path.is_regular_file())) throw support::exception(TRACEMSG(
+                "Invalid non-existing 'zipPath' specified, path: [" + zip + "]"));
     }
     
 };

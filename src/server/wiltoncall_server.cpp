@@ -15,6 +15,7 @@
 #include "wilton/wiltoncall.h"
 
 #include "wilton/support/misc.hpp"
+#include "wilton/support/logging.hpp"
 
 namespace wilton {
 namespace server {

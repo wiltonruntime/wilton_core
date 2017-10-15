@@ -63,14 +63,6 @@ inline void check_json_callback_script(const sl::json::field& field) {
     }
 }
 
-inline void log_error(const std::string& logger, const std::string& message) {
-    static std::string level = "ERROR";
-    // call wilton
-    wilton_logger_log(level.c_str(), static_cast<int>(level.length()), 
-            logger.c_str(), static_cast<int>(logger.length()),
-            message.c_str(), static_cast<int>(message.length()));
-}
-
 } // namespace
 }
 
