@@ -97,6 +97,7 @@ list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_LOAD} )
 
 # dyload
 set ( ${PROJECT_NAME}_SRC_DYLOAD
+        ${CMAKE_CURRENT_LIST_DIR}/src/dyload/wilton_dyload.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/dyload/wiltoncall_dyload.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_DYLOAD} )
 

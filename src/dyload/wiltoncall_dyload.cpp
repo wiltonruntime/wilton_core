@@ -10,34 +10,14 @@
 #include <unordered_set>
 
 #include "staticlib/config.hpp"
+#include "staticlib/utils.hpp"
 
-#ifdef STATICLIB_WINDOWS
-#include "dyload/dyload_windows.hpp"
-#else // !STATICLIB_WINDOWS
-#include "dyload/dyload_posix.hpp"
-#endif // STATICLIB_WINDOWS
+#include "wilton/wilton.h"
 
 #include "call/wiltoncall_internal.hpp"
 
-#include "staticlib/utils.hpp"
-#include "staticlib/tinydir/operations.hpp"
-
 namespace wilton {
 namespace dyload {
-
-namespace { // anonymous
-
-std::mutex& static_mutex() {
-    static std::mutex mutex;
-    return mutex;
-}
-
-std::unordered_set<std::string>& static_registry() {
-    static std::unordered_set<std::string> set;
-    return set;
-}
-
-} // namespace
 
 support::buffer dyload_shared_library(sl::io::span<const char> data) {
     // json parse
@@ -57,23 +37,12 @@ support::buffer dyload_shared_library(sl::io::span<const char> data) {
     if (rname.get().empty()) throw support::exception(TRACEMSG(
             "Required parameter 'path' not specified"));
     const std::string& name = rname.get();
-    const std::string directory = [&rdirectory] () -> std::string {
-        if (!rdirectory.get().empty()) {
-            return rdirectory.get();
-        }
-        auto exepath = sl::utils::current_executable_path();
-        auto exedir_raw = sl::utils::strip_filename(exepath);
-        return sl::tinydir::normalize_path(exedir_raw);
-    } ();
-    // call
-    std::lock_guard<std::mutex> guard{static_mutex()};
-    if (0 == static_registry().count(name)) {
-        std::function<char*()> initializer = dyload_platform(directory, name);
-        auto err = initializer();
-        if (nullptr != err) {
-            support::throw_wilton_error(err, TRACEMSG(err));
-        }
-        static_registry().insert(name);
+    const std::string& directory = rdirectory.get();
+    // call wilton
+    auto err = wilton_dyload(name.c_str(), static_cast<int>(name.length()),
+            directory.c_str(), static_cast<int>(directory.length()));
+    if (nullptr != err) {
+        support::throw_wilton_error(err, TRACEMSG(err));
     }
     return support::make_empty_buffer();
 }

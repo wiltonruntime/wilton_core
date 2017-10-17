@@ -432,8 +432,13 @@ char* wilton_signal_await();
 
 char* wilton_signal_fire();
 
-// thread
 
+// dyload
+char* wilton_dyload(
+        const char* name,
+        int name_len,
+        const char* directory,
+        int directory_len);
 
 
 // misc
