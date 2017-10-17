@@ -127,7 +127,6 @@ set ( ${PROJECT_NAME}_SRC_LOGGING
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_LOGGING} )
 # misc
 set ( ${PROJECT_NAME}_SRC_MISC
-        ${CMAKE_CURRENT_LIST_DIR}/src/misc/tcp_connect_checker.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/misc/wilton_misc.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/misc/wiltoncall_misc.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_MISC} )

@@ -104,7 +104,6 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("signal_await", wilton::signal::signal_await);
         reg.put("signal_fire", wilton::signal::signal_fire);
         // misc
-        reg.put("tcp_wait_for_connection", wilton::misc::tcp_wait_for_connection);
         reg.put("process_spawn", wilton::misc::process_spawn);
         reg.put("get_wiltoncall_config", wilton::misc::get_wiltoncall_config);
         reg.put("stdin_readline", wilton::misc::stdin_readline);

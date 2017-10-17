@@ -35,7 +35,6 @@ EXPORTS
        
     wilton_alloc
     wilton_free
-    wilton_tcp_wait_for_connection
     wilton_clean_tls
     
     wiltoncall

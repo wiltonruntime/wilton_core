@@ -453,12 +453,6 @@ char* wilton_clean_tls(
         const char* thread_id,
         int thread_id_len);
 
-char* wilton_tcp_wait_for_connection(
-        const char* ip_addr,
-        int ip_addr_len,
-        int tcp_port,
-        int timeout_millis);
-
 #ifdef __cplusplus
 }
 #endif
