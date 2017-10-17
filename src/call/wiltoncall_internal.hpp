@@ -118,8 +118,6 @@ support::buffer signal_fire(sl::io::span<const char>);
 // misc
 namespace misc {
 
-support::buffer process_spawn(sl::io::span<const char> data);
-
 support::buffer get_wiltoncall_config(sl::io::span<const char> data);
 
 support::buffer stdin_readline(sl::io::span<const char> data);
