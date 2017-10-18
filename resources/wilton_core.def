@@ -1,33 +1,9 @@
 
 EXPORTS
-    wilton_HttpPath_create
-    wilton_HttpPath_destroy
-
-    wilton_Server_create
-    wilton_Server_stop
-
-    wilton_Request_get_request_metadata
-    wilton_Request_get_request_data
-    wilton_Request_get_request_data_filename
-    wilton_Request_set_response_metadata
-    wilton_Request_send_response
-    wilton_Request_send_file
-    wilton_Request_send_mustache
-    wilton_Request_send_later
-    wilton_ResponseWriter_send
-
     wilton_logger_initialize
     wilton_logger_log
     wilton_logger_is_level_enabled
     wilton_logger_shutdown
-
-    wilton_render_mustache
-    wilton_render_mustache_file
-
-    wilton_HttpClient_create
-    wilton_HttpClient_close
-    wilton_HttpClient_execute
-    wilton_HttpClient_send_file
 
     wilton_dyload
 

@@ -17,6 +17,7 @@
 #include "staticlib/utils.hpp"
 
 #include "wilton/support/alloc_copy.hpp"
+#include "wilton/support/misc.hpp"
 
 #include "call/wiltoncall_internal.hpp"
 
@@ -54,10 +55,10 @@ sl::io::span<char> read_fs_resource(const std::string& path) {
 }
 
 sl::io::span<char> read_zip_or_fs_resource(const std::string& url) {
-    if (sl::utils::starts_with(url, wilton::internal::file_proto_prefix)) {
-        return read_fs_resource(url.substr(wilton::internal::file_proto_prefix.length()));
-    } else if (sl::utils::starts_with(url, wilton::internal::zip_proto_prefix)) {
-        auto zurl = url.substr(wilton::internal::zip_proto_prefix.length());
+    if (sl::utils::starts_with(url, wilton::support::file_proto_prefix)) {
+        return read_fs_resource(url.substr(wilton::support::file_proto_prefix.length()));
+    } else if (sl::utils::starts_with(url, wilton::support::zip_proto_prefix)) {
+        auto zurl = url.substr(wilton::support::zip_proto_prefix.length());
         return read_zip_resource(zurl);
     } else {
         throw wilton::support::exception(TRACEMSG("Unknown protocol prefix, url: [" + url + "]"));

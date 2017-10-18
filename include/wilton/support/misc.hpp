@@ -18,6 +18,9 @@
 namespace wilton {
 namespace support {
 
+const std::string file_proto_prefix = "file://";
+const std::string zip_proto_prefix = "zip://";
+
 inline void check_json_callback_script(const sl::json::field& field) {
     if (sl::json::type::object != field.json_type()) {
         throw support::exception(TRACEMSG("Invalid '" + field.name() + "' field,"

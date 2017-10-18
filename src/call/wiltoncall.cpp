@@ -14,6 +14,7 @@
 #include "staticlib/utils.hpp"
 
 #include "wilton/support/exception.hpp"
+#include "wilton/support/misc.hpp"
 
 #include "call/wiltoncall_registry.hpp"
 #include "call/wiltoncall_internal.hpp"
@@ -62,8 +63,8 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         // init static modules index
         auto cf = sl::json::loads(config_json_str);
         auto modpath = cf["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl");
-        if (sl::utils::starts_with(modpath, wilton::internal::zip_proto_prefix)) {
-            auto zippath = modpath.substr(wilton::internal::zip_proto_prefix.length());
+        if (sl::utils::starts_with(modpath, wilton::support::zip_proto_prefix)) {
+            auto zippath = modpath.substr(wilton::support::zip_proto_prefix.length());
             auto zippath_norm = sl::tinydir::normalize_path(zippath);
             wilton::internal::static_modules_idx(new sl::unzip::file_index(zippath_norm));
         }
@@ -71,30 +72,11 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         // registry
         auto& reg = static_registry();
         
-        // server
-        reg.put("server_create", wilton::server::server_create);
-        reg.put("server_stop", wilton::server::server_stop);
-        reg.put("request_get_metadata", wilton::server::request_get_metadata);
-        reg.put("request_get_data", wilton::server::request_get_data);
-        reg.put("request_get_form_data", wilton::server::request_get_form_data);
-        reg.put("request_get_data_filename", wilton::server::request_get_data_filename);
-        reg.put("request_set_response_metadata", wilton::server::request_set_response_metadata);
-        reg.put("request_send_response", wilton::server::request_send_response);
-        reg.put("request_send_temp_file", wilton::server::request_send_temp_file);
-        reg.put("request_send_mustache", wilton::server::request_send_mustache);
-        reg.put("request_send_later", wilton::server::request_send_later);
-        reg.put("request_send_with_response_writer", wilton::server::request_send_with_response_writer);
         // logging
         reg.put("logging_initialize", wilton::logging::logging_initialize);
         reg.put("logging_log", wilton::logging::logging_log);
         reg.put("logging_is_level_enabled", wilton::logging::logging_is_level_enabled);
         reg.put("logging_shutdown", wilton::logging::logging_shutdown);
-        // mustache
-        reg.put("mustache_render", wilton::mustache::mustache_render);
-        reg.put("mustache_render_file", wilton::mustache::mustache_render_file);
-        //client
-        reg.put("httpclient_send_request", wilton::client::httpclient_send_request);
-        reg.put("httpclient_send_file", wilton::client::httpclient_send_file);
         // load
         reg.put("load_module_resource", wilton::load::load_module_resource);
         reg.put("load_module_script", wilton::load::load_module_script);

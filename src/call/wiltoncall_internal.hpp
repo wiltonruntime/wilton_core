@@ -27,35 +27,6 @@
 
 namespace wilton {
 
-// Server
-namespace server {
-
-support::buffer server_create(sl::io::span<const char> data);
-
-support::buffer server_stop(sl::io::span<const char> data);
-
-support::buffer request_get_metadata(sl::io::span<const char> data);
-
-support::buffer request_get_data(sl::io::span<const char> data);
-
-support::buffer request_get_form_data(sl::io::span<const char> data);
-
-support::buffer request_get_data_filename(sl::io::span<const char> data);
-
-support::buffer request_set_response_metadata(sl::io::span<const char> data);
-
-support::buffer request_send_response(sl::io::span<const char> data);
-
-support::buffer request_send_temp_file(sl::io::span<const char> data);
-
-support::buffer request_send_mustache(sl::io::span<const char> data);
-
-support::buffer request_send_later(sl::io::span<const char> data);
-
-support::buffer request_send_with_response_writer(sl::io::span<const char> data);
-
-} // namespace
-
 // Logger
 namespace logging {
 
@@ -66,24 +37,6 @@ support::buffer logging_log(sl::io::span<const char> data);
 support::buffer logging_is_level_enabled(sl::io::span<const char> data);
 
 support::buffer logging_shutdown(sl::io::span<const char> data);
-
-} // namespace
-
-// Mustache
-namespace mustache {
-
-support::buffer mustache_render(sl::io::span<const char> data);
-
-support::buffer mustache_render_file(sl::io::span<const char> data);
-
-} // namespace
-
-// HttpClient
-namespace client {
-
-support::buffer httpclient_send_request(sl::io::span<const char> data);
-
-support::buffer httpclient_send_file(sl::io::span<const char> data);
 
 } // namespace
 
@@ -118,9 +71,6 @@ support::buffer stdin_readline(sl::io::span<const char> data);
 // internal api
 
 namespace internal {
-
-const std::string file_proto_prefix = "file://";
-const std::string zip_proto_prefix = "zip://";
 
 const sl::json::value& static_wiltoncall_config(const std::string& cf_json = "");
 

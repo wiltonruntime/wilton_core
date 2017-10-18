@@ -23,22 +23,11 @@ set ( ${PROJECT_NAME}_URL https://github.com/wilton-web-toolkit/wilton_core )
 #options
 option ( ${PROJECT_NAME}_SHARED "Build shared library instead of a static one" ON )
 
-# dep options
-set ( staticlib_pion_USE_LOG4CPLUS ON CACHE BOOL "Use log4cplus lib for logging" )
-set ( staticlib_pion_USE_OPENSSL ON CACHE BOOL "Use OpenSSL lib for https" )
-
 # dependencies add
 if ( STATICLIB_TOOLCHAIN MATCHES "windows_[^_]+_[^_]+" )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_zlib )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
-    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_openssl )
-    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
-    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_asio )
-elseif ( WILTON_BUILD_FLAVOUR MATCHES "wheezy" )
-    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_asio )
-elseif ( WILTON_BUILD_FLAVOUR MATCHES "el7" )
-    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
 endif ( )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )
@@ -48,13 +37,10 @@ staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_crypto )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_endian )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
-staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pion )    
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_json )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
-staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_http )
-staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_mustache )
 
 # dependencies check
 set ( ${PROJECT_NAME}_DEPS
@@ -63,18 +49,13 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_io
         staticlib_crypto
         staticlib_ranges
-        staticlib_pion
         staticlib_json
         staticlib_unzip
-        staticlib_http
         staticlib_utils
-        staticlib_mustache
         staticlib_tinydir
         staticlib_pimpl
         jansson
         log4cplus
-        libcurl
-        openssl
         zlib )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
@@ -98,35 +79,18 @@ set ( ${PROJECT_NAME}_SRC_DYLOAD
         ${CMAKE_CURRENT_LIST_DIR}/src/dyload/wiltoncall_dyload.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_DYLOAD} )
 
-# client
-set ( ${PROJECT_NAME}_SRC_CLIENT 
-        ${CMAKE_CURRENT_LIST_DIR}/src/client/wilton_client.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/client/wiltoncall_client.cpp )
-list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_CLIENT} )
 # logging
 set ( ${PROJECT_NAME}_SRC_LOGGING
         ${CMAKE_CURRENT_LIST_DIR}/src/logging/wilton_logger.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/logging/wilton_logging.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/logging/wiltoncall_logging.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_LOGGING} )
+
 # misc
 set ( ${PROJECT_NAME}_SRC_MISC
         ${CMAKE_CURRENT_LIST_DIR}/src/misc/wilton_misc.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/misc/wiltoncall_misc.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_MISC} )
-# mustache
-set ( ${PROJECT_NAME}_SRC_MUSTACHE
-        ${CMAKE_CURRENT_LIST_DIR}/src/mustache/wilton_mustache.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/mustache/wiltoncall_mustache.cpp )
-list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_MUSTACHE} )
-# server
-set ( ${PROJECT_NAME}_SRC_SERVER
-        ${CMAKE_CURRENT_LIST_DIR}/src/server/request.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/server/response_writer.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/server/server.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/server/wilton_server.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/server/wiltoncall_server.cpp )
-list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_SERVER} )
 
 set ( ${PROJECT_NAME}_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/wilton/wilton.h )
 file ( GLOB_RECURSE ${PROJECT_NAME}_HEADERS_PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src/*.hpp )
