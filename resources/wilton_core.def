@@ -32,7 +32,10 @@ EXPORTS
     wilton_HttpClient_close
     wilton_HttpClient_execute
     wilton_HttpClient_send_file
-       
+
+    wilton_load_resource
+    wilton_load_script
+
     wilton_alloc
     wilton_free
     wilton_clean_tls
@@ -43,13 +46,6 @@ EXPORTS
     wiltoncall_remove
     wiltoncall_init
     wiltoncall_runscript
-    wiltoncall_runscript_jni
-    wiltoncall_runscript_duktape
-    
-    JNI_OnLoad
-    JNI_OnUnload
-    Java_net_wiltontoolkit_WiltonJni_wiltoncall
-    Java_net_wiltontoolkit_WiltonJni_wiltoninit
     
     json_object
     json_array

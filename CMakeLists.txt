@@ -43,7 +43,6 @@ endif ( )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_concurrent )
-staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_jni )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_crypto )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
@@ -64,7 +63,6 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_io
         staticlib_crypto
         staticlib_ranges
-        staticlib_jni
         staticlib_pion
         staticlib_json
         staticlib_unzip
