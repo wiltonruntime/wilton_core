@@ -33,11 +33,14 @@ EXPORTS
     wilton_HttpClient_execute
     wilton_HttpClient_send_file
 
+    wilton_dyload
+
     wilton_load_resource
     wilton_load_script
 
     wilton_alloc
     wilton_free
+    wilton_config
     wilton_clean_tls
     wilton_register_tls_cleaner
     
