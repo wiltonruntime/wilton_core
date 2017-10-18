@@ -200,20 +200,32 @@ char* wiltoncall_remove(const char* call_name, int call_name_len) {
 char* wiltoncall_runscript(const char* script_engine_name, int script_engine_name_len,
         const char* json_in, int json_in_len, char** json_out, int* json_out_len) {
     static std::string default_engine = wilton::internal::static_wiltoncall_config()["defaultScriptEngine"]
-            .as_string("duktape");
+            .as_string_nonempty_or_throw("defaultScriptEngine");
     if (nullptr == script_engine_name) return wilton::support::alloc_copy(TRACEMSG("Null 'script_engine_name' parameter specified"));
     if (!sl::support::is_uint16(script_engine_name_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'script_engine_name_len' parameter specified: [" + sl::support::to_string(script_engine_name_len) + "]"));
-    auto engine = std::ref(sl::utils::empty_string());
-    uint16_t script_engine_name_len_u16 = static_cast<uint16_t> (script_engine_name_len);
-    auto specified_engine = std::string(script_engine_name, script_engine_name_len_u16);
-    engine = !specified_engine.empty() ? specified_engine : default_engine;
-    if ("duktape" == engine.get()) {
-        return wiltoncall_runscript_duktape(json_in, json_in_len, json_out, json_out_len);
-    } else if ("jni" == engine.get()) {
-        return wiltoncall_runscript_jni(json_in, json_in_len, json_out, json_out_len);
+    //if (nullptr == json_in) return wilton::support::alloc_copy(TRACEMSG("Null 'json_in' parameter specified"));
+    //if (!sl::support::is_uint32_positive(json_in_len)) return wilton::support::alloc_copy(TRACEMSG(
+    //        "Invalid 'json_in_len' parameter specified: [" + sl::support::to_string(json_in_len) + "]"));
+    if (nullptr == json_out) return wilton::support::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
+    if (nullptr == json_out_len) return wilton::support::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
+    try {
+        auto engine = std::ref(sl::utils::empty_string());
+        auto specified_engine = std::string(script_engine_name, static_cast<uint16_t> (script_engine_name_len));
+        engine = !specified_engine.empty() ? specified_engine : default_engine;
+        auto callname = "runscript_" + engine.get();
+        
+        // call engine
+        auto err = wiltoncall(callname.c_str(), static_cast<int>(callname.length()),
+                json_in, json_in_len, json_out, json_out_len);
+        if (nullptr != err) {
+            wilton::support::throw_wilton_error(err, TRACEMSG(err));
+        }
+
+        return nullptr;
+    } catch (const std::exception& e) {
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
-    return wilton::support::alloc_copy(TRACEMSG("Unsupported engine: [" + engine.get() + "]"));
 }
 
 #endif // WILTON_DISABLE_DEFAULT_RUNSCRIPT

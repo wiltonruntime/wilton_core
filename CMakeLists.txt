@@ -40,7 +40,6 @@ elseif ( WILTON_BUILD_FLAVOUR MATCHES "wheezy" )
 elseif ( WILTON_BUILD_FLAVOUR MATCHES "el7" )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_curl )
 endif ( )
-staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_duktape )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_concurrent )
@@ -76,7 +75,6 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_pimpl
         jansson
         log4cplus
-        duktape
         libcurl
         openssl
         zlib )
@@ -92,6 +90,7 @@ set ( ${PROJECT_NAME}_SRC_CALL
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_CALL} )
 # load
 set ( ${PROJECT_NAME}_SRC_LOAD
+        ${CMAKE_CURRENT_LIST_DIR}/src/load/wilton_load.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/load/wiltoncall_load.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_LOAD} )
 
@@ -101,19 +100,6 @@ set ( ${PROJECT_NAME}_SRC_DYLOAD
         ${CMAKE_CURRENT_LIST_DIR}/src/dyload/wiltoncall_dyload.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_DYLOAD} )
 
-# engines
-# duktape
-set ( ${PROJECT_NAME}_SRC_DUKTAPE
-        ${CMAKE_CURRENT_LIST_DIR}/src/duktape/duktape_engine.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/duktape/wiltoncall_duktape.cpp )
-list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_DUKTAPE} )
-# jni
-set ( ${PROJECT_NAME}_SRC_JNI
-        ${CMAKE_CURRENT_LIST_DIR}/src/jni/jni_utils.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/jni/wiltoncall_jni.cpp )
-list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_JNI} )
-
-# modules
 # client
 set ( ${PROJECT_NAME}_SRC_CLIENT 
         ${CMAKE_CURRENT_LIST_DIR}/src/client/wilton_client.cpp

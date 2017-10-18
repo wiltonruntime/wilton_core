@@ -119,7 +119,7 @@ public:
         }
         server_ptr->get_scheduler().set_thread_stop_hook([](const std::thread::id& tid) STATICLIB_NOEXCEPT {
             auto tid_str = sl::support::to_string_any(tid);
-            wilton::internal::clean_duktape_thread_local(tid_str);
+            wilton_clean_tls(tid_str.c_str(), static_cast<int>(tid_str.length()));
         });
         server_ptr->start();
     }

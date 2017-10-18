@@ -51,18 +51,6 @@ char* wiltoncall_runscript(
         char** json_out,
         int* json_out_len);
 
-char* wiltoncall_runscript_jni(
-        const char* json_in,
-        int json_in_len,
-        char** json_out,
-        int* json_out_len);
-
-char* wiltoncall_runscript_duktape(
-        const char* json_in,
-        int json_in_len,
-        char** json_out,
-        int* json_out_len);
-
 #ifdef __cplusplus
 }
 #endif

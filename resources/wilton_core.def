@@ -36,6 +36,7 @@ EXPORTS
     wilton_alloc
     wilton_free
     wilton_clean_tls
+    wilton_register_tls_cleaner
     
     wiltoncall
     wiltoncall_register

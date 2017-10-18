@@ -136,8 +136,6 @@ const sl::json::value& static_wiltoncall_config(const std::string& cf_json = "")
 
 sl::support::observer_ptr<sl::unzip::file_index> static_modules_idx(sl::unzip::file_index* = nullptr);
 
-void clean_duktape_thread_local(const std::string& tid);
-
 } // namespace
 
 } // namespace

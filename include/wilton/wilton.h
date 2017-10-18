@@ -434,11 +434,27 @@ char* wilton_signal_fire();
 
 
 // dyload
+
 char* wilton_dyload(
         const char* name,
         int name_len,
         const char* directory,
         int directory_len);
+
+
+// load
+
+char* wilton_load_resource(
+        const char* url,
+        int url_len,
+        char** contents_out,
+        int* contents_out_len);
+
+char* wilton_load_script(
+        const char* url,
+        int url_len,
+        char** contents_out,
+        int* contents_out_len);
 
 
 // misc
@@ -449,9 +465,21 @@ char* wilton_alloc(
 void wilton_free(
         char* buffer);
 
+char* wilton_config(
+        char** conf_json_out,
+        int* conf_json_len_out);
+
+
 char* wilton_clean_tls(
         const char* thread_id,
         int thread_id_len);
+
+char* wilton_register_tls_cleaner(
+        void* cleaner_ctx,
+        void (*cleaner_cb)(
+                void* cleaner_ctx,
+                const char* thread_id,
+                int thread_id_len));
 
 #ifdef __cplusplus
 }
