@@ -2,10 +2,10 @@
 EXPORTS
     wilton_HttpPath_create
     wilton_HttpPath_destroy
-    
+
     wilton_Server_create
     wilton_Server_stop
-    
+
     wilton_Request_get_request_metadata
     wilton_Request_get_request_data
     wilton_Request_get_request_data_filename
@@ -15,19 +15,15 @@ EXPORTS
     wilton_Request_send_mustache
     wilton_Request_send_later
     wilton_ResponseWriter_send
-    
+
     wilton_logger_initialize
     wilton_logger_log
     wilton_logger_is_level_enabled
     wilton_logger_shutdown
-    
+
     wilton_render_mustache
     wilton_render_mustache_file
-    
-    wilton_signal_initialize
-    wilton_signal_await
-    wilton_signal_fire
-    
+
     wilton_HttpClient_create
     wilton_HttpClient_close
     wilton_HttpClient_execute
@@ -43,13 +39,13 @@ EXPORTS
     wilton_config
     wilton_clean_tls
     wilton_register_tls_cleaner
-    
+
     wiltoncall
     wiltoncall_register
     wiltoncall_remove
     wiltoncall_init
     wiltoncall_runscript
-    
+
     json_object
     json_array
     json_string

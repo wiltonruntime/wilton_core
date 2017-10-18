@@ -100,9 +100,6 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         reg.put("load_module_script", wilton::load::load_module_script);
         // dyload
         reg.put("dyload_shared_library", wilton::dyload::dyload_shared_library);
-        // signal
-        reg.put("signal_await", wilton::signal::signal_await);
-        reg.put("signal_fire", wilton::signal::signal_fire);
         // misc
         reg.put("get_wiltoncall_config", wilton::misc::get_wiltoncall_config);
         reg.put("stdin_readline", wilton::misc::stdin_readline);

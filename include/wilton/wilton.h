@@ -424,15 +424,6 @@ char* wilton_HttpClient_send_file(
                 int sent_successfully));
 
 
-// signal
-
-char* wilton_signal_initialize();
-
-char* wilton_signal_await();
-
-char* wilton_signal_fire();
-
-
 // dyload
 
 char* wilton_dyload(

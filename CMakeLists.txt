@@ -127,11 +127,6 @@ set ( ${PROJECT_NAME}_SRC_SERVER
         ${CMAKE_CURRENT_LIST_DIR}/src/server/wilton_server.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/server/wiltoncall_server.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_SERVER} )
-# signal
-set ( ${PROJECT_NAME}_SRC_SIGNAL
-        ${CMAKE_CURRENT_LIST_DIR}/src/signal/wilton_signal.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/signal/wiltoncall_signal.cpp )
-list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_SIGNAL} )
 
 set ( ${PROJECT_NAME}_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/wilton/wilton.h )
 file ( GLOB_RECURSE ${PROJECT_NAME}_HEADERS_PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src/*.hpp )

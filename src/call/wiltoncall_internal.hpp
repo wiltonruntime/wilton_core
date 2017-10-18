@@ -105,16 +105,6 @@ support::buffer dyload_shared_library(sl::io::span<const char> data);
 
 } // namespace
 
-// signal
-
-namespace signal {
-
-support::buffer signal_await(sl::io::span<const char>);
-
-support::buffer signal_fire(sl::io::span<const char>);
-
-} // namespace
-
 // misc
 namespace misc {
 
