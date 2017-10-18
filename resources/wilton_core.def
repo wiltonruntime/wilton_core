@@ -1,20 +1,16 @@
 
 EXPORTS
-    wilton_logger_initialize
-    wilton_logger_log
-    wilton_logger_is_level_enabled
-    wilton_logger_shutdown
+    wilton_alloc
+    wilton_free
+    wilton_config
+    wilton_clean_tls
+    wilton_register_tls_cleaner
 
     wilton_dyload
 
     wilton_load_resource
     wilton_load_script
 
-    wilton_alloc
-    wilton_free
-    wilton_config
-    wilton_clean_tls
-    wilton_register_tls_cleaner
 
     wiltoncall
     wiltoncall_register

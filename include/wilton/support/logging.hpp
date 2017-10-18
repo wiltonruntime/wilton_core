@@ -8,7 +8,7 @@
 #ifndef WILTON_SUPPORT_LOGGING_HPP
 #define WILTON_SUPPORT_LOGGING_HPP
 
-#include "wilton/wilton.h"
+#include "wilton/wilton_logging.h"
 
 namespace wilton {
 namespace support {

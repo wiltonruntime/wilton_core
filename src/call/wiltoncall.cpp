@@ -72,11 +72,6 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         // registry
         auto& reg = static_registry();
         
-        // logging
-        reg.put("logging_initialize", wilton::logging::logging_initialize);
-        reg.put("logging_log", wilton::logging::logging_log);
-        reg.put("logging_is_level_enabled", wilton::logging::logging_is_level_enabled);
-        reg.put("logging_shutdown", wilton::logging::logging_shutdown);
         // load
         reg.put("load_module_resource", wilton::load::load_module_resource);
         reg.put("load_module_script", wilton::load::load_module_script);

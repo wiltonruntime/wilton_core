@@ -27,7 +27,6 @@ option ( ${PROJECT_NAME}_SHARED "Build shared library instead of a static one" O
 if ( STATICLIB_TOOLCHAIN MATCHES "windows_[^_]+_[^_]+" )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_zlib )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
-    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_log4cplus )
 endif ( )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )
@@ -55,7 +54,6 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_tinydir
         staticlib_pimpl
         jansson
-        log4cplus
         zlib )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
@@ -78,13 +76,6 @@ set ( ${PROJECT_NAME}_SRC_DYLOAD
         ${CMAKE_CURRENT_LIST_DIR}/src/dyload/wilton_dyload.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/dyload/wiltoncall_dyload.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_DYLOAD} )
-
-# logging
-set ( ${PROJECT_NAME}_SRC_LOGGING
-        ${CMAKE_CURRENT_LIST_DIR}/src/logging/wilton_logger.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/logging/wilton_logging.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/logging/wiltoncall_logging.cpp )
-list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_LOGGING} )
 
 # misc
 set ( ${PROJECT_NAME}_SRC_MISC
@@ -110,6 +101,8 @@ if ( STATICLIB_TOOLCHAIN MATCHES "windows_[^_]+_[^_]+" )
     set ( ${PROJECT_NAME}_RESFILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc )
     set ( ${PROJECT_NAME}_DEFFILE ${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME}.def )
     set ( ${PROJECT_NAME}_ADDITIONAL_LIBS wtsapi32 )
+elseif ( STATICLIB_TOOLCHAIN MATCHES "linux_[^_]+_[^_]+" )
+    set ( ${PROJECT_NAME}_ADDITIONAL_LIBS pthread dl )
 endif ( )
 
 add_library ( ${PROJECT_NAME} ${${PROJECT_NAME}_LIBTYPE}
@@ -140,7 +133,7 @@ endif ( )
 # pkg-config
 set ( ${PROJECT_NAME}_PC_CFLAGS "-I${CMAKE_CURRENT_LIST_DIR}/include" )
 set ( ${PROJECT_NAME}_PC_LIBS "-L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} -l${PROJECT_NAME}" )
-if ( CMAKE_SYSTEM_NAME STREQUAL "Linux" )
+if ( STATICLIB_TOOLCHAIN MATCHES "linux_[^_]+_[^_]+" )
     set ( ${PROJECT_NAME}_PC_LIBS "${${PROJECT_NAME}_PC_LIBS} -lpthread -ldl" )
 endif ( )
 staticlib_list_to_string ( ${PROJECT_NAME}_PC_REQUIRES_PRIVATE "" ${PROJECT_NAME}_DEPS )

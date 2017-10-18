@@ -12,44 +12,6 @@
 extern "C" {
 #endif
     
-// logging
-
-/*
-    "logging": {
-        "appenders": [{
-            "appenderType": "NULL | CONSOLE | FILE | DAILY_ROLLING_FILE",
-            "filePath": "path/to/log/file",
-            "layout": "%d{%Y-%m-%d %H:%M:%S,%q} [%-5p %-5.5t %-20.20c] %m%n",
-            "thresholdLevel": "TRACE | DEBUG | INFO | WARN | ERROR | FATAL"
-        }, ... ],
-        "loggers": [{
-            "name": "my.logger.name",
-            "level": "TRACE | DEBUG | INFO | WARN | ERROR | FATAL"
-        }, ...]
-    }
- */
-char* wilton_logger_initialize(
-        const char* conf_json,
-        int conf_json_len);
-
-char* wilton_logger_log(
-        const char* level_name,
-        int level_name_len,
-        const char* logger_name,
-        int logger_name_len,
-        const char* message,
-        int message_len);
-
-char* wilton_logger_is_level_enabled(
-        const char* logger_name,
-        int logger_name_len,
-        const char* level_name,
-        int level_name_len,
-        int* res_out
-);
-
-char* wilton_logger_shutdown();
-
 
 // dyload
 
