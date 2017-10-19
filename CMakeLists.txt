@@ -32,7 +32,6 @@ staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_support )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_concurrent )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_io )
-staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_crypto )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_ranges )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_endian )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
@@ -46,7 +45,6 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_config
         staticlib_support
         staticlib_io
-        staticlib_crypto
         staticlib_ranges
         staticlib_json
         staticlib_unzip
