@@ -11,7 +11,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
 
 // dyload
 
@@ -20,22 +19,6 @@ char* wilton_dyload(
         int name_len,
         const char* directory,
         int directory_len);
-
-
-// load
-
-char* wilton_load_resource(
-        const char* url,
-        int url_len,
-        char** contents_out,
-        int* contents_out_len);
-
-char* wilton_load_script(
-        const char* url,
-        int url_len,
-        char** contents_out,
-        int* contents_out_len);
-
 
 // misc
 
@@ -48,7 +31,6 @@ void wilton_free(
 char* wilton_config(
         char** conf_json_out,
         int* conf_json_len_out);
-
 
 char* wilton_clean_tls(
         const char* thread_id,

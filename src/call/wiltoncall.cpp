@@ -36,11 +36,6 @@ const sl::json::value& static_wiltoncall_config(const std::string& cf_json) {
     return cf;
 }
 
-sl::support::observer_ptr<sl::unzip::file_index> static_modules_idx(sl::unzip::file_index* index) {
-    static std::unique_ptr<sl::unzip::file_index> idx = std::unique_ptr<sl::unzip::file_index>(index);
-    return sl::support::make_observer_ptr(idx.get());
-}
-
 } // namespace
 }
 
@@ -60,21 +55,9 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         auto config_json_str = std::string(config_json, static_cast<uint16_t> (config_json_len));
         wilton::internal::static_wiltoncall_config(config_json_str);
                 
-        // init static modules index
-        auto cf = sl::json::loads(config_json_str);
-        auto modpath = cf["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl");
-        if (sl::utils::starts_with(modpath, wilton::support::zip_proto_prefix)) {
-            auto zippath = modpath.substr(wilton::support::zip_proto_prefix.length());
-            auto zippath_norm = sl::tinydir::normalize_path(zippath);
-            wilton::internal::static_modules_idx(new sl::unzip::file_index(zippath_norm));
-        }
-        
         // registry
         auto& reg = static_registry();
         
-        // load
-        reg.put("load_module_resource", wilton::load::load_module_resource);
-        reg.put("load_module_script", wilton::load::load_module_script);
         // dyload
         reg.put("dyload_shared_library", wilton::dyload::dyload_shared_library);
         // misc

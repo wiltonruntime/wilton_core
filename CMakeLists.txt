@@ -25,7 +25,6 @@ option ( ${PROJECT_NAME}_SHARED "Build shared library instead of a static one" O
 
 # dependencies add
 if ( STATICLIB_TOOLCHAIN MATCHES "windows_[^_]+_[^_]+" )
-    staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_zlib )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
 endif ( )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
@@ -38,7 +37,6 @@ staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_utils )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_json )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_pimpl )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_tinydir )
-staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_unzip )
 
 # dependencies check
 set ( ${PROJECT_NAME}_DEPS
@@ -47,12 +45,10 @@ set ( ${PROJECT_NAME}_DEPS
         staticlib_io
         staticlib_ranges
         staticlib_json
-        staticlib_unzip
         staticlib_utils
         staticlib_tinydir
         staticlib_pimpl
-        jansson
-        zlib )
+        jansson )
 staticlib_pkg_check_modules ( ${PROJECT_NAME}_DEPS_PC REQUIRED ${PROJECT_NAME}_DEPS )
 
 # build steps
@@ -63,11 +59,6 @@ set ( ${PROJECT_NAME}_SRC )
 set ( ${PROJECT_NAME}_SRC_CALL
         ${CMAKE_CURRENT_LIST_DIR}/src/call/wiltoncall.cpp )
 list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_CALL} )
-# load
-set ( ${PROJECT_NAME}_SRC_LOAD
-        ${CMAKE_CURRENT_LIST_DIR}/src/load/wilton_load.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/load/wiltoncall_load.cpp )
-list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_LOAD} )
 
 # dyload
 set ( ${PROJECT_NAME}_SRC_DYLOAD

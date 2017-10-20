@@ -15,7 +15,6 @@
 #include "staticlib/json.hpp"
 #include "staticlib/io.hpp"
 #include "staticlib/support.hpp"
-#include "staticlib/unzip.hpp"
 #include "staticlib/utils.hpp"
 
 #include "wilton/wiltoncall.h"
@@ -26,29 +25,6 @@
 #include "wilton/support/payload_handle_registry.hpp"
 
 namespace wilton {
-
-// Logger
-namespace logging {
-
-support::buffer logging_initialize(sl::io::span<const char> data);
-
-support::buffer logging_log(sl::io::span<const char> data);
-
-support::buffer logging_is_level_enabled(sl::io::span<const char> data);
-
-support::buffer logging_shutdown(sl::io::span<const char> data);
-
-} // namespace
-
-// load
-
-namespace load {
-
-support::buffer load_module_resource(sl::io::span<const char> data);
-
-support::buffer load_module_script(sl::io::span<const char> data);
-
-}
 
 // dyload
 
@@ -73,8 +49,6 @@ support::buffer stdin_readline(sl::io::span<const char> data);
 namespace internal {
 
 const sl::json::value& static_wiltoncall_config(const std::string& cf_json = "");
-
-sl::support::observer_ptr<sl::unzip::file_index> static_modules_idx(sl::unzip::file_index* = nullptr);
 
 } // namespace
 

@@ -8,8 +8,6 @@ EXPORTS
 
     wilton_dyload
 
-    wilton_load_resource
-    wilton_load_script
 
 
     wiltoncall
