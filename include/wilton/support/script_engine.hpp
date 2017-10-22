@@ -1,0 +1,101 @@
+/* 
+ * File:   script_engine.hpp
+ * Author: alex
+ *
+ * Created on October 22, 2017, 7:55 PM
+ */
+
+#ifndef WILTON_SUPPORT_SCRIPT_ENGINE_HPP
+#define WILTON_SUPPORT_SCRIPT_ENGINE_HPP
+
+#include <mutex>
+#include <string>
+#include <thread>
+#include <unordered_map>
+
+#include "staticlib/config.hpp"
+#include "staticlib/io.hpp"
+#include "staticlib/json.hpp"
+#include "staticlib/utils.hpp"
+
+#include "wilton/wilton.h"
+#include "wilton/wilton_loader.h"
+
+#include "wilton/support/buffer.hpp"
+#include "wilton/support/exception.hpp"
+
+namespace wilton {
+namespace support {
+
+namespace script_engine_detail {
+
+inline sl::io::span<const char> load_init_code() {
+    static const std::string code = [] {
+        char* conf = nullptr;
+        int conf_len = 0;
+        auto err = wilton_config(std::addressof(conf), std::addressof(conf_len));
+        if (nullptr != err) support::throw_wilton_error(err, TRACEMSG(err));
+        const char* cconf = const_cast<const char*>(conf);
+        auto json = sl::json::load({cconf, conf_len});
+        wilton_free(conf);
+        auto requirejs_dir_path = json["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl") + "/wilton-requirejs";
+        auto code_path = requirejs_dir_path + "/wilton-require.js";
+        char* code = nullptr;
+        int code_len = 0;
+        auto err_load = wilton_load_script(code_path.c_str(), static_cast<int>(code_path.length()),
+                std::addressof(code), std::addressof(code_len));
+        if (nullptr != err_load) {
+            support::throw_wilton_error(err_load, TRACEMSG(err_load));
+        }
+        auto res = std::string(code, code_len);
+        wilton_free(code);
+        return res;
+    }();
+    return sl::io::make_span(code.data(), code.length());
+}
+
+} // namespace
+
+template<typename Engine>
+class script_engine {
+    std::mutex mutex;
+    std::unordered_map<std::string, Engine> engines;
+    
+public:
+    support::buffer run_script(sl::io::span<const char> callback_script_json) {
+        auto& en = thread_local_engine();
+        return en.run_callback_script(callback_script_json);
+    }
+
+    void clean_thread_local(const char* thread_id, int thread_id_len) STATICLIB_NOEXCEPT {
+        std::lock_guard<std::mutex> guard{mutex};
+        if (nullptr != thread_id && sl::support::is_uint16_positive(thread_id_len)) {
+            auto tid = std::string(thread_id, thread_id_len);
+            engines.erase(tid);
+        }
+    }
+
+private:
+
+    // no TLS in vs2013
+    Engine& thread_local_engine() {
+        std::lock_guard<std::mutex> guard{mutex};
+        auto tid = sl::support::to_string_any(std::this_thread::get_id());
+        auto it = engines.find(tid);
+        if (engines.end() == it) {
+            auto code = script_engine_detail::load_init_code();
+            auto se = Engine(code);
+            auto pa = engines.emplace(tid, std::move(se));
+            it = pa.first;
+        }
+        return it->second;
+    }
+
+};
+
+} // namespace
+}
+
+
+#endif /* WILTON_SUPPORT_SCRIPT_ENGINE_HPP */
+
