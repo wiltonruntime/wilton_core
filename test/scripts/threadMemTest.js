@@ -1,10 +1,11 @@
 
 define([
     "module",
+    "lodash/collection",
     "wilton/Channel",
     "wilton/Logger",
     "wilton/thread"
-], function(module, Channel, Logger, thread) {
+], function(module, collection, Channel, Logger, thread) {
     var logger = new Logger(module.id);
     
     return {

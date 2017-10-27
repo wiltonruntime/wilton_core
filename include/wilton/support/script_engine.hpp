@@ -23,21 +23,27 @@
 
 #include "wilton/support/buffer.hpp"
 #include "wilton/support/exception.hpp"
+#include "wilton/support/misc.hpp"
 
 namespace wilton {
 namespace support {
 
 namespace script_engine_detail {
 
+inline sl::json::value load_wilton_config() {
+    char* conf = nullptr;
+    int conf_len = 0;
+    auto err = wilton_config(std::addressof(conf), std::addressof(conf_len));
+    if (nullptr != err) support::throw_wilton_error(err, TRACEMSG(err));
+    const char* cconf = const_cast<const char*>(conf);
+    auto json = sl::json::load({cconf, conf_len});
+    wilton_free(conf);
+    return json;
+}
+
 inline sl::io::span<const char> load_init_code() {
     static const std::string code = [] {
-        char* conf = nullptr;
-        int conf_len = 0;
-        auto err = wilton_config(std::addressof(conf), std::addressof(conf_len));
-        if (nullptr != err) support::throw_wilton_error(err, TRACEMSG(err));
-        const char* cconf = const_cast<const char*>(conf);
-        auto json = sl::json::load({cconf, conf_len});
-        wilton_free(conf);
+        auto json = load_wilton_config();
         auto requirejs_dir_path = json["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl") + "/wilton-requirejs";
         auto code_path = requirejs_dir_path + "/wilton-require.js";
         char* code = nullptr;
@@ -52,6 +58,18 @@ inline sl::io::span<const char> load_init_code() {
         return res;
     }();
     return sl::io::make_span(code.data(), code.length());
+}
+
+inline std::string shorten_script_path(const std::string& path) {
+    static sl::json::value json = load_wilton_config();
+    auto& base_url = json["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl");
+    if (sl::utils::starts_with(path, base_url)) {
+        return path.substr(base_url.length());
+    }
+    if (sl::utils::starts_with(path, file_proto_prefix)) {
+        return path.substr(file_proto_prefix.length());
+    }
+    return path;
 }
 
 } // namespace
