@@ -29,8 +29,7 @@ define([
     "minimist/test/stop_early",
     "minimist/test/unknown",
     "minimist/test/whitespace",
-// slow in duktape
-//  "validator/test/sanitizers",
+    "validator/test/sanitizers",
     "validator/wilton-sanity-test",
     "moment/src/test/moment/add_subtract",
     "moment/src/test/moment/calendar",
