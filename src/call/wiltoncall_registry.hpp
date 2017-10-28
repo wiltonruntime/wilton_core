@@ -33,7 +33,7 @@ using map_type = std::unordered_map<std::string, fun_type>;
 class wiltoncall_registry {
     std::mutex mutex;
     map_type registry;
-    
+
 public:
     void put(const std::string& name, fun_type callback) {
         std::lock_guard<std::mutex> guard{mutex};
@@ -47,7 +47,7 @@ public:
                     "Invalid duplicate wilton_function name specified: [" + name + "]"));
         }
     }
-    
+
     void remove(const std::string& name) {
         std::lock_guard<std::mutex> guard{mutex};
         if (name.empty()) {
@@ -59,7 +59,7 @@ public:
                     "Invalid unknown wilton_function name specified: [" + name + "]"));
         }
     }
-    
+
     support::buffer invoke(const std::string& name, sl::io::span<const char> data) {
         if (name.empty()) {
             throw support::exception(TRACEMSG("Invalid empty wilton_function name specified"));

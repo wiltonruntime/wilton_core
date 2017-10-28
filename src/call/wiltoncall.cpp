@@ -43,7 +43,7 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
     if (nullptr == config_json) return wilton::support::alloc_copy(TRACEMSG("Null 'default_script_engine_name' parameter specified"));
     if (!sl::support::is_uint16_positive(config_json_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'config_json_len' parameter specified: [" + sl::support::to_string(config_json_len) + "]"));
-    
+
     try {
         // check called once
         bool the_false = false;
@@ -54,16 +54,16 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         // set static config
         auto config_json_str = std::string(config_json, static_cast<uint16_t> (config_json_len));
         wilton::internal::static_wiltoncall_config(config_json_str);
-                
+
         // registry
         auto& reg = static_registry();
-        
+
         // dyload
         reg.put("dyload_shared_library", wilton::dyload::dyload_shared_library);
         // misc
         reg.put("get_wiltoncall_config", wilton::misc::get_wiltoncall_config);
         reg.put("stdin_readline", wilton::misc::stdin_readline);
-        
+
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() +

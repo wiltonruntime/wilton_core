@@ -35,9 +35,11 @@ inline sl::json::value load_wilton_config() {
     int conf_len = 0;
     auto err = wilton_config(std::addressof(conf), std::addressof(conf_len));
     if (nullptr != err) support::throw_wilton_error(err, TRACEMSG(err));
+    auto deferred = sl::support::defer([conf] () STATICLIB_NOEXCEPT {
+        wilton_free(conf);
+    });
     const char* cconf = const_cast<const char*>(conf);
     auto json = sl::json::load({cconf, conf_len});
-    wilton_free(conf);
     return json;
 }
 
