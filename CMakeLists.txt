@@ -20,11 +20,8 @@ set ( ${PROJECT_NAME}_STATICLIB_VERSION 0.8.0 CACHE INTERNAL "" )
 set ( ${PROJECT_NAME}_DESCRIPTION "Wilton Core library" )
 set ( ${PROJECT_NAME}_URL https://github.com/wilton-web-toolkit/wilton_core )
 
-#options
-option ( ${PROJECT_NAME}_SHARED "Build shared library instead of a static one" ON )
-
 # dependencies add
-if ( STATICLIB_TOOLCHAIN MATCHES "windows_[^_]+_[^_]+" )
+if ( STATICLIB_TOOLCHAIN MATCHES "(android|windows)_.+" )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
 endif ( )
 staticlib_add_subdirectory ( ${STATICLIB_DEPS}/staticlib_config )
@@ -74,27 +71,24 @@ list ( APPEND ${PROJECT_NAME}_SRC ${${PROJECT_NAME}_SRC_MISC} )
 
 set ( ${PROJECT_NAME}_HEADERS ${CMAKE_CURRENT_LIST_DIR}/include/wilton/wilton.h )
 file ( GLOB_RECURSE ${PROJECT_NAME}_HEADERS_PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src/*.hpp )
-if ( ${PROJECT_NAME}_SHARED )
-    set ( ${PROJECT_NAME}_LIBTYPE SHARED )
-else ( )
-    set ( ${PROJECT_NAME}_LIBTYPE STATIC )
-endif ( )
 
 # library
 set ( ${PROJECT_NAME}_RESFILE )
 set ( ${PROJECT_NAME}_DEFFILE )
 set ( ${PROJECT_NAME}_ADDITIONAL_LIBS )
-if ( STATICLIB_TOOLCHAIN MATCHES "windows_[^_]+_[^_]+" )
+if ( STATICLIB_TOOLCHAIN MATCHES "android_.+" )
+    set ( ${PROJECT_NAME}_ADDITIONAL_LIBS dl )
+elseif ( STATICLIB_TOOLCHAIN MATCHES "windows_.+" )
     configure_file ( ${WILTON_DIR}/resources/buildres/wilton_module.rc
             ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc )
     set ( ${PROJECT_NAME}_RESFILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.rc )
     set ( ${PROJECT_NAME}_DEFFILE ${CMAKE_CURRENT_LIST_DIR}/resources/${PROJECT_NAME}.def )
     set ( ${PROJECT_NAME}_ADDITIONAL_LIBS wtsapi32 )
-elseif ( STATICLIB_TOOLCHAIN MATCHES "linux_[^_]+_[^_]+" )
+elseif ( STATICLIB_TOOLCHAIN MATCHES "linux_.+" )
     set ( ${PROJECT_NAME}_ADDITIONAL_LIBS pthread dl )
 endif ( )
 
-add_library ( ${PROJECT_NAME} ${${PROJECT_NAME}_LIBTYPE}
+add_library ( ${PROJECT_NAME} SHARED
         ${${PROJECT_NAME}_SRC} 
         ${${PROJECT_NAME}_HEADERS}
         ${${PROJECT_NAME}_HEADERS_PRIVATE}
@@ -104,25 +98,28 @@ add_library ( ${PROJECT_NAME} ${${PROJECT_NAME}_LIBTYPE}
 source_group ( "src" FILES ${${PROJECT_NAME}_SRC} )
 source_group ( "include" FILES ${${PROJECT_NAME}_HEADERS} )
 source_group ( "include_private" FILES ${${PROJECT_NAME}_HEADERS_PRIVATE} )
+
 target_include_directories ( ${PROJECT_NAME} BEFORE PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/src/
         ${CMAKE_CURRENT_LIST_DIR}/include
         ${${PROJECT_NAME}_DEPS_PC_INCLUDE_DIRS} )
-target_compile_options ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_CFLAGS_OTHER} )
-if ( ${PROJECT_NAME}_SHARED )
-    target_link_libraries ( ${PROJECT_NAME} PRIVATE
-            ${${PROJECT_NAME}_DEPS_PC_LIBRARIES}
-            ${${PROJECT_NAME}_ADDITIONAL_LIBS} )
-endif ( )
 
-if ( STATICLIB_TOOLCHAIN MATCHES "windows_[^_]+_[^_]+" )
+target_compile_options ( ${PROJECT_NAME} PRIVATE ${${PROJECT_NAME}_DEPS_PC_CFLAGS_OTHER} )
+
+target_link_libraries ( ${PROJECT_NAME} PRIVATE
+        ${${PROJECT_NAME}_DEPS_PC_LIBRARIES}
+        ${${PROJECT_NAME}_ADDITIONAL_LIBS} )
+
+if ( STATICLIB_TOOLCHAIN MATCHES "android_.+" )
+    set_property ( TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS "-Wl,-soname,lib${PROJECT_NAME}.so" )
+elseif ( STATICLIB_TOOLCHAIN MATCHES "windows_.+" )
     set_property ( TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
 endif ( )
 
 # pkg-config
 set ( ${PROJECT_NAME}_PC_CFLAGS "-I${CMAKE_CURRENT_LIST_DIR}/include" )
 set ( ${PROJECT_NAME}_PC_LIBS "-L${CMAKE_LIBRARY_OUTPUT_DIRECTORY} -l${PROJECT_NAME}" )
-if ( STATICLIB_TOOLCHAIN MATCHES "linux_[^_]+_[^_]+" )
+if ( STATICLIB_TOOLCHAIN MATCHES "linux_.+" )
     set ( ${PROJECT_NAME}_PC_LIBS "${${PROJECT_NAME}_PC_LIBS} -lpthread -ldl" )
 endif ( )
 staticlib_list_to_string ( ${PROJECT_NAME}_PC_REQUIRES_PRIVATE "" ${PROJECT_NAME}_DEPS )

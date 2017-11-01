@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <mutex>
 #include <string>
+#include <unordered_set>
 
 #include "staticlib/config.hpp"
 #include "staticlib/json.hpp"
@@ -50,19 +51,18 @@ char* wilton_dyload(const char* name, int name_len,
         uint32_t name_len_u32 = static_cast<uint32_t> (name_len);
         auto name_str = std::string(name, name_len_u32);
 
-        // find out directory
-        const std::string directory_str = [directory, directory_len] () -> std::string {
-            if (nullptr != directory && directory_len > 0) {
-                return std::string(directory, static_cast<uint16_t>(directory_len));
-            }
-            auto exepath = sl::utils::current_executable_path();
-            auto exedir_raw = sl::utils::strip_filename(exepath);
-            return sl::tinydir::normalize_path(exedir_raw);
-        } ();
-
         // call
         std::lock_guard<std::mutex> guard{static_mutex()};
-        if (0 == static_registry().count(name)) {
+        if (0 == static_registry().count(name_str)) {
+            // find out directory
+            const std::string directory_str = [directory, directory_len] () -> std::string {
+                if (nullptr != directory && directory_len > 0) {
+                    return std::string(directory, static_cast<uint16_t>(directory_len));
+                }
+                auto exepath = sl::utils::current_executable_path();
+                auto exedir_raw = sl::utils::strip_filename(exepath);
+                return sl::tinydir::normalize_path(exedir_raw);
+            } ();
             std::function<char*()> initializer = wilton::dyload::dyload_platform(directory_str, name_str);
             auto err = initializer();
             if (nullptr != err) {
