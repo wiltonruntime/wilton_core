@@ -1,2 +1,4 @@
 /build
 /nbproject
+/test/httpClientTest.response
+/test/test.db
