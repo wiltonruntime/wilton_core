@@ -29,7 +29,11 @@ std::string dlerr_str() {
 } // namespace
 
 std::function<char*()> dyload_platform(const std::string& directory, const std::string& name) {
+#ifdef STATICLIB_MAC
+    auto absolute_path = directory + "/lib" + name + ".dylib";
+#else // !STATICLIB_MAC
     auto absolute_path = directory + "/lib" + name + ".so";
+#endif
     auto handle = ::dlopen(absolute_path.c_str(), RTLD_LAZY);
     if (nullptr == handle) {
         throw support::exception(TRACEMSG(
