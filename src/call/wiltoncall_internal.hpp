@@ -9,6 +9,7 @@
 #define WILTON_CALL_WILTONCALL_INTERNAL_HPP
 
 #include <cstdint>
+#include <memory>
 #include <thread>
 #include <string>
 
@@ -48,7 +49,7 @@ support::buffer stdin_readline(sl::io::span<const char> data);
 
 namespace internal {
 
-const sl::json::value& static_wiltoncall_config(const std::string& cf_json = "");
+std::shared_ptr<sl::json::value> shared_wiltoncall_config(const std::string& cf_json = "");
 
 } // namespace
 

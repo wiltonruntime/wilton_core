@@ -8,6 +8,7 @@
 #include "wilton/wiltoncall.h"
 
 #include <atomic>
+#include <memory>
 
 #include "staticlib/config.hpp"
 #include "staticlib/tinydir.hpp"
@@ -21,8 +22,8 @@
 
 namespace { // anonymous
 
-wilton::call::wiltoncall_registry& static_registry() {
-    static wilton::call::wiltoncall_registry registry;
+std::shared_ptr<wilton::call::wiltoncall_registry> shared_registry() {
+    static auto registry = std::make_shared<wilton::call::wiltoncall_registry>();
     return registry;
 }
 
@@ -31,8 +32,8 @@ wilton::call::wiltoncall_registry& static_registry() {
 namespace wilton {
 namespace internal {
 
-const sl::json::value& static_wiltoncall_config(const std::string& cf_json) {
-    static sl::json::value cf = sl::json::loads(cf_json);
+std::shared_ptr<sl::json::value> shared_wiltoncall_config(const std::string& cf_json) {
+    static auto cf = std::make_shared<sl::json::value>(sl::json::loads(cf_json));
     return cf;
 }
 
@@ -53,16 +54,16 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         }
         // set static config
         auto config_json_str = std::string(config_json, static_cast<uint16_t> (config_json_len));
-        wilton::internal::static_wiltoncall_config(config_json_str);
+        wilton::internal::shared_wiltoncall_config(config_json_str);
 
         // registry
-        auto& reg = static_registry();
+        auto reg = shared_registry();
 
         // dyload
-        reg.put("dyload_shared_library", wilton::dyload::dyload_shared_library);
+        reg->put("dyload_shared_library", wilton::dyload::dyload_shared_library);
         // misc
-        reg.put("get_wiltoncall_config", wilton::misc::get_wiltoncall_config);
-        reg.put("stdin_readline", wilton::misc::stdin_readline);
+        reg->put("get_wiltoncall_config", wilton::misc::get_wiltoncall_config);
+        reg->put("stdin_readline", wilton::misc::stdin_readline);
 
         return nullptr;
     } catch (const std::exception& e) {
@@ -86,7 +87,8 @@ char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, 
     try {
         uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
         call_name_str = std::string(call_name, call_name_len_u16);
-        auto out = static_registry().invoke(call_name_str, {json_in, json_in_len_u32});
+        auto reg = shared_registry();
+        auto out = reg->invoke(call_name_str, {json_in, json_in_len_u32});
         if (out) {
             *json_out = out.value().data();
             *json_out_len = static_cast<int>(out.value().size());
@@ -131,7 +133,8 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
             }
             return wilton::support::make_empty_buffer();
         };
-        static_registry().put(call_name_str, fun);
+        auto reg = shared_registry();
+        reg->put(call_name_str, fun);
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -145,7 +148,8 @@ char* wiltoncall_remove(const char* call_name, int call_name_len) {
     try {
         uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
         std::string call_name_str{call_name, call_name_len_u16};
-        static_registry().remove(call_name_str);
+        auto reg = shared_registry();
+        reg->remove(call_name_str);
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -156,7 +160,7 @@ char* wiltoncall_remove(const char* call_name, int call_name_len) {
 
 char* wiltoncall_runscript(const char* script_engine_name, int script_engine_name_len,
         const char* json_in, int json_in_len, char** json_out, int* json_out_len) {
-    static std::string default_engine = wilton::internal::static_wiltoncall_config()["defaultScriptEngine"]
+    static std::string default_engine = wilton::internal::shared_wiltoncall_config()->getattr("defaultScriptEngine")
             .as_string_nonempty_or_throw("defaultScriptEngine");
     if (nullptr == script_engine_name) return wilton::support::alloc_copy(TRACEMSG("Null 'script_engine_name' parameter specified"));
     if (!sl::support::is_uint16(script_engine_name_len)) return wilton::support::alloc_copy(TRACEMSG(

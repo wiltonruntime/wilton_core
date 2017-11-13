@@ -8,6 +8,7 @@
 #include "wilton/wilton.h"
 
 #include <cstdint>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <unordered_set>
@@ -28,13 +29,13 @@
 
 namespace { // anonymous
 
-std::mutex& static_mutex() {
-    static std::mutex mutex;
+std::shared_ptr<std::mutex> shared_mutex() {
+    static auto mutex = std::make_shared<std::mutex>();
     return mutex;
 }
 
-std::unordered_set<std::string>& static_registry() {
-    static std::unordered_set<std::string> set;
+std::shared_ptr<std::unordered_set<std::string>> shared_registry() {
+    static auto set = std::make_shared<std::unordered_set<std::string>>();
     return set;
 }
 
@@ -52,8 +53,10 @@ char* wilton_dyload(const char* name, int name_len,
         auto name_str = std::string(name, name_len_u32);
 
         // call
-        std::lock_guard<std::mutex> guard{static_mutex()};
-        if (0 == static_registry().count(name_str)) {
+        auto mx = shared_mutex();
+        std::lock_guard<std::mutex> guard{*mx};
+        auto reg = shared_registry();
+        if (0 == reg->count(name_str)) {
             // find out directory
             const std::string directory_str = [directory, directory_len] () -> std::string {
                 if (nullptr != directory && directory_len > 0) {
@@ -68,7 +71,7 @@ char* wilton_dyload(const char* name, int name_len,
             if (nullptr != err) {
                 wilton::support::throw_wilton_error(err, TRACEMSG(err));
             }
-            static_registry().insert(name);
+            reg->insert(name);
         }
         
         return nullptr;

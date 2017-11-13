@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -22,13 +23,13 @@
 
 namespace { // anonymous
 
-std::mutex& static_mutex() {
-    static std::mutex mutex;
+std::shared_ptr<std::mutex> shared_mutex() {
+    static auto mutex = std::make_shared<std::mutex>();
     return mutex;
 }
 
-std::vector<std::function<void(const std::string&)>>& static_registry() {
-    static std::vector<std::function<void(const std::string&)>> registry;
+ std::shared_ptr<std::vector<std::function<void(const std::string&)>>> shared_cleaners_registry() {
+    static auto registry = std::make_shared<std::vector<std::function<void(const std::string&)>>>();
     return registry;
 }
 
@@ -49,8 +50,8 @@ char* wilton_config(char** conf_json_out, int* conf_json_len_out) /* noexcept */
     if (nullptr == conf_json_out) return wilton::support::alloc_copy(TRACEMSG("Null 'conf_json_out' parameter specified"));
     if (nullptr == conf_json_len_out) return wilton::support::alloc_copy(TRACEMSG("Null 'conf_json_len_out' parameter specified"));
     try {
-        auto& json = wilton::internal::static_wiltoncall_config();
-        auto buf = wilton::support::make_json_buffer(json);
+        auto ptr = wilton::internal::shared_wiltoncall_config();
+        auto buf = wilton::support::make_json_buffer(*ptr);
         *conf_json_out = buf.value().data();
         *conf_json_len_out = static_cast<int>(buf.value().size());
         return nullptr;
@@ -66,8 +67,10 @@ char* wilton_clean_tls(const char* thread_id, int thread_id_len) {
     try {
         uint16_t thread_id_len_u16 = static_cast<uint16_t> (thread_id_len);
         auto tid = std::string(thread_id, thread_id_len_u16);
-        std::lock_guard<std::mutex> guard{static_mutex()};
-        for (auto& fun : static_registry()) {
+        auto mx = shared_mutex();
+        std::lock_guard<std::mutex> guard{*mx};
+        auto reg = shared_cleaners_registry();
+        for (auto& fun : *reg) {
             fun(tid);
         }
         return nullptr;
@@ -80,11 +83,13 @@ char* wilton_register_tls_cleaner(void* cleaner_ctx, void (*cleaner_cb)
         (void* cleaner_ctx, const char* thread_id, int thread_id_len)) /* noexcept */ {
     if (nullptr == cleaner_cb) return wilton::support::alloc_copy(TRACEMSG("Null 'cleaner_cb' parameter specified"));
     try {
-        std::lock_guard<std::mutex> guard{static_mutex()};
         auto fun = [cleaner_ctx, cleaner_cb](const std::string& tid) STATICLIB_NOEXCEPT {
             cleaner_cb(cleaner_ctx, tid.c_str(), static_cast<int>(tid.length()));
         };
-        static_registry().emplace_back(std::move(fun));
+        auto mx = shared_mutex();
+        std::lock_guard<std::mutex> guard{*mx};
+        auto reg = shared_cleaners_registry();
+        reg->emplace_back(std::move(fun));
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));

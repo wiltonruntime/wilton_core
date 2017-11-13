@@ -77,7 +77,7 @@ inline std::string shorten_script_path(const std::string& path) {
 } // namespace
 
 template<typename Engine>
-class script_engine {
+class script_engine_map {
     std::mutex mutex;
     std::unordered_map<std::string, Engine> engines;
     

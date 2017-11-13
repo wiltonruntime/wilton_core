@@ -16,7 +16,7 @@ namespace wilton {
 namespace misc {
 
 support::buffer get_wiltoncall_config(sl::io::span<const char>) {
-    return support::make_json_buffer(internal::static_wiltoncall_config());
+    return support::make_json_buffer(*internal::shared_wiltoncall_config());
 }
 
 support::buffer stdin_readline(sl::io::span<const char>) {
