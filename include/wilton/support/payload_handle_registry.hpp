@@ -44,7 +44,11 @@ public:
     payload_handle_registry& operator=(const payload_handle_registry&) = delete;
 
     ~payload_handle_registry() STATICLIB_NOEXCEPT {
+#ifndef STATICLIB_WINDOWS
         std::lock_guard<std::mutex> lock{mtx};
+#else // STATICLIB_WINDOWS
+        // msvcr doesn't like that in JNI mode
+#endif // STATICLIB_WINDOWS
         if (destoyer) {
             for (auto& pa : registry) {
                 destoyer(pa.first);
