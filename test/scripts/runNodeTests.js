@@ -132,7 +132,8 @@ define([
     "cheerio/test/cheerio",
     "cheerio/test/parse",
     "cheerio/test/xml",
-    "utf8/tests/tests"
+    "utf8/tests/tests",
+    "filesize/test/filesize_test"
 ], function() {
     return {
         main: function() { }
