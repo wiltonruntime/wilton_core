@@ -46,6 +46,20 @@ inline buffer make_json_buffer(const sl::json::value& val) {
     return sl::support::make_optional(sink.release());
 }
 
+template<typename Source>
+buffer make_source_buffer(Source& src) {
+    auto sink = sl::io::make_array_sink(wilton_alloc, wilton_free);
+    sl::io::copy_all(src, sink);
+    return sl::support::make_optional(sink.release());
+}
+
+template<typename Source>
+buffer make_hex_buffer(Source& src) {
+    auto sink = sl::io::make_array_sink(wilton_alloc, wilton_free);
+    sl::io::copy_to_hex(src, sink);
+    return sl::support::make_optional(sink.release());
+}
+
 inline buffer wrap_wilton_buffer(char* buf, int buf_len) {
     if (nullptr != buf) {
         return sl::support::make_optional(sl::io::make_span(buf, buf_len));

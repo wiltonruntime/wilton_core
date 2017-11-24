@@ -28,7 +28,7 @@
 namespace wilton {
 namespace support {
 
-namespace script_engine_detail {
+namespace script_engine_map_detail {
 
 inline sl::json::value load_wilton_config() {
     char* conf = nullptr;
@@ -103,7 +103,7 @@ private:
         auto tid = sl::support::to_string_any(std::this_thread::get_id());
         auto it = engines.find(tid);
         if (engines.end() == it) {
-            auto code = script_engine_detail::load_init_code();
+            auto code = script_engine_map_detail::load_init_code();
             auto se = Engine(code);
             auto pa = engines.emplace(tid, std::move(se));
             it = pa.first;
