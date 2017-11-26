@@ -117,7 +117,14 @@ define([
     "cheerio/test/parse",
     "cheerio/test/xml",
     "utf8/tests/tests",
-    "filesize/test/filesize_test"
+    "filesize/test/filesize_test",
+    "statuses/test/test",
+    "sjcl/runAllTests",
+    "cuint/runAllTests",
+    "mime-db/test/index",
+    "weak-map/test/weak-map-test",
+    "collections/test/all",
+    "tinycolor/test/test"
 ], function() {
     return {
         main: function() { }
