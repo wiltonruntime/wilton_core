@@ -52,7 +52,6 @@ define([
     "iconv-lite/test/main-test",
     "qs/test/parse",
     "qs/test/utils",
-    "node-url/test",
     "events/tests/index",
     "readable-stream/test/browser",
     "domhandler/test/tests",
@@ -106,7 +105,15 @@ define([
     "xregexp/tests/spec/s-addons-unicode",
     "xregexp/tests/spec/s-xregexp-methods",
     "xregexp/tests/spec/s-xregexp-natives",
-    "xregexp/tests/spec/s-xregexp"
+    "xregexp/tests/spec/s-xregexp",
+    "querystring/test/index",
+    "url/test",
+    "ip/test/api-test",
+    "cookie/test/parse",
+    "cookie/test/serialize",
+    "sax/runAllTests",
+    "xml-writer/runAllTests",
+    "random/spec/uuid4Spec"
 ], function() {
     return {
         main: function() { }
