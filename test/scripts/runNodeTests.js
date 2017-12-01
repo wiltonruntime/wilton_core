@@ -113,7 +113,8 @@ define([
     "cookie/test/serialize",
     "sax/runAllTests",
     "xml-writer/runAllTests",
-    "random/spec/uuid4Spec"
+    "random/spec/uuid4Spec",
+    "json/test"
 ], function() {
     return {
         main: function() { }
