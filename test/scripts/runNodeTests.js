@@ -114,7 +114,19 @@ define([
     "sax/runAllTests",
     "xml-writer/runAllTests",
     "random/spec/uuid4Spec",
-    "json/test"
+    "json/test",
+    "saxpath/test/saxpath",
+    "saxpath/test/xml_recorder",
+    "typedarray/test/tarray",
+    "concat-stream/test/array",
+    "concat-stream/test/buffer",
+    "concat-stream/test/infer",
+    "concat-stream/test/nothing",
+    "concat-stream/test/objects",
+    "concat-stream/test/string",
+    "concat-stream/test/typedarray",
+    "string-to-stream/test/basic",
+    "process-nextick-args/test"
 ], function() {
     return {
         main: function() { }
