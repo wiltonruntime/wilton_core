@@ -55,6 +55,7 @@ define([
     "sanctuary-type-identifiers",
     "sax",
     "saxpath",
+    "spark-md5",
     "sprintf-js",
     "statuses",
     "string_decoder",

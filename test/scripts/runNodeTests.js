@@ -126,7 +126,8 @@ define([
     "concat-stream/test/string",
     "concat-stream/test/typedarray",
     "string-to-stream/test/basic",
-    "process-nextick-args/test"
+    "process-nextick-args/test",
+    "spark-md5/test/specs"
 ], function() {
     return {
         main: function() { }
