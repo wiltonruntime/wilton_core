@@ -8,7 +8,10 @@
 #include "wilton/wiltoncall.h"
 
 #include <atomic>
+#include <map>
 #include <memory>
+#include <mutex>
+#include <utility>
 
 #include "staticlib/config.hpp"
 #include "staticlib/tinydir.hpp"
@@ -16,15 +19,71 @@
 
 #include "wilton/support/exception.hpp"
 #include "wilton/support/misc.hpp"
+#include "wilton/support/registrar.hpp"
 
-#include "call/wiltoncall_registry.hpp"
 #include "call/wiltoncall_internal.hpp"
 
 namespace { // anonymous
 
-std::shared_ptr<wilton::call::wiltoncall_registry> shared_registry() {
-    static auto registry = std::make_shared<wilton::call::wiltoncall_registry>();
-    return registry;
+const size_t max_registry_entries_count = 1 << 16;
+
+using cb_ctx_type = void*;
+using cb_fun_type = char* (*)(void* call_ctx, const char* json_in, int json_in_len, char** json_out, int* json_out_len);
+
+class registry {
+    std::mutex mutex;
+    std::map<std::string, std::pair<cb_ctx_type, cb_fun_type>> map;
+
+public:
+    registry() { }
+
+    registry(const registry& other) = delete;
+
+    registry& operator=(const registry& other) = delete;
+
+    void put(const std::string& name, cb_ctx_type cb_ctx, cb_fun_type cb_fun) {
+        if (name.empty()) throw wilton::support::exception(TRACEMSG(
+                "Invalid empty 'wiltoncall' name specified"));
+        if (nullptr == cb_fun) throw wilton::support::exception(TRACEMSG(
+                "Invalid null 'wiltoncall' function specified for name: [" + name + "]"));
+        std::lock_guard<std::mutex> guard{mutex};
+        if (map.size() >= max_registry_entries_count) throw wilton::support::exception(TRACEMSG(
+                "'wiltoncall' registry size exceeded, max size: [" + sl::support::to_string(max_registry_entries_count) + "]"));
+        if (0 == map.count(name)) {
+            map.insert(std::make_pair(name, std::make_pair(cb_ctx, cb_fun)));
+        } else {
+            throw wilton::support::exception(TRACEMSG(
+                    "Invalid duplicate 'wiltoncall' name specified: [" + name + "]"));
+        }
+    }
+
+    std::pair<cb_ctx_type, cb_fun_type> get(const std::string& name) {
+        if (name.empty()) throw wilton::support::exception(TRACEMSG(
+                "Invalid empty 'wiltoncall' name specified"));
+        std::lock_guard<std::mutex> guard{mutex};
+        auto it = map.find(name);
+        if (map.end() == it) {
+            throw wilton::support::exception(TRACEMSG(
+                    "Invalid unknown 'wiltoncall' name specified: [" + name + "]"));
+        }
+        return it->second;
+    }
+
+    void remove(const std::string& name) {
+        if (name.empty()) throw wilton::support::exception(TRACEMSG(
+                "Invalid empty 'wiltoncall' name specified"));
+        std::lock_guard<std::mutex> guard{mutex};
+        auto res = map.erase(name);
+        if (0 == res) {
+            throw wilton::support::exception(TRACEMSG(
+                    "Invalid unknown 'wiltoncall' name specified: [" + name + "]"));
+        }
+    }
+};
+
+std::shared_ptr<registry> shared_registry() {
+    static auto reg = std::make_shared<registry>();
+    return reg;
 }
 
 } // namespace
@@ -56,14 +115,11 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         auto config_json_str = std::string(config_json, static_cast<uint16_t> (config_json_len));
         wilton::internal::shared_wiltoncall_config(config_json_str);
 
-        // registry
-        auto reg = shared_registry();
-
         // dyload
-        reg->put("dyload_shared_library", wilton::dyload::dyload_shared_library);
+        wilton::support::register_wiltoncall("dyload_shared_library", wilton::dyload::dyload_shared_library);
         // misc
-        reg->put("get_wiltoncall_config", wilton::misc::get_wiltoncall_config);
-        reg->put("stdin_readline", wilton::misc::stdin_readline);
+        wilton::support::register_wiltoncall("get_wiltoncall_config", wilton::misc::get_wiltoncall_config);
+        wilton::support::register_wiltoncall("stdin_readline", wilton::misc::stdin_readline);
 
         return nullptr;
     } catch (const std::exception& e) {
@@ -82,16 +138,31 @@ char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, 
             "Invalid 'json_in_len' parameter specified: [" + sl::support::to_string(json_in_len) + "]"));
     if (nullptr == json_out) return wilton::support::alloc_copy(TRACEMSG("Null 'json_out' parameter specified"));
     if (nullptr == json_out_len) return wilton::support::alloc_copy(TRACEMSG("Null 'json_out_len' parameter specified"));
-    std::string call_name_str = "";
-    uint32_t json_in_len_u32 = static_cast<uint32_t> (json_in_len);
+    auto call_name_str = std::string();
     try {
         uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
         call_name_str = std::string(call_name, call_name_len_u16);
+        // get entry
         auto reg = shared_registry();
-        auto out = reg->invoke(call_name_str, {json_in, json_in_len_u32});
-        if (out) {
-            *json_out = out.value().data();
-            *json_out_len = static_cast<int>(out.value().size());
+        auto en = reg->get(call_name_str);
+        // invoke function
+        cb_ctx_type cb_ctx = en.first;
+        cb_fun_type cb_fun = en.second;
+        char* out = nullptr;
+        int out_len = 0;
+        auto err = cb_fun(cb_ctx, json_in, json_in_len, std::addressof(out), std::addressof(out_len));
+        // check error
+        if (nullptr != err) {
+            wilton::support::throw_wilton_error(err, TRACEMSG(err));
+        }
+        // check result
+        if (nullptr != out) {
+            if (!sl::support::is_uint32(out_len)) {
+                throw wilton::support::exception(TRACEMSG(
+                        "Invalid result length value returned: [" + sl::support::to_string(out_len) + "]"));
+            }
+            *json_out = out;
+            *json_out_len = out_len;
         } else {
             *json_out = nullptr;
             *json_out_len = 0;
@@ -100,7 +171,7 @@ char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, 
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + 
                 "\n'wiltoncall' error for name: [" + call_name_str + "]," +
-                " data: [" + std::string(json_in, json_in_len_u32) + "]"));
+                " data: [" + std::string(json_in, static_cast<uint32_t> (json_in_len)) + "]"));
     }
 }
 
@@ -112,29 +183,9 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
             "Invalid 'call_name_len' parameter specified: [" + sl::support::to_string(call_name_len) + "]"));
     if (nullptr == call_cb) return wilton::support::alloc_copy(TRACEMSG("Null 'call_cb' parameter specified"));
     try {
-        uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
-        std::string call_name_str{call_name, call_name_len_u16};
-        auto fun = [call_ctx, call_cb](sl::io::span<const char> data) -> wilton::support::buffer {
-            char* out = nullptr;
-            int out_len = 0;
-            auto err = call_cb(call_ctx, data.data(), static_cast<int>(data.size()), 
-                    std::addressof(out), std::addressof(out_len));
-            if (nullptr != err) {
-                std::string msg = TRACEMSG(std::string(err));
-                wilton_free(err);
-                throw wilton::support::exception(msg);
-            }
-            if (nullptr != out) {
-                if (!sl::support::is_uint32(out_len)) {
-                    throw wilton::support::exception(TRACEMSG(
-                            "Invalid result length value returned: [" + sl::support::to_string(out_len) + "]"));
-                }
-                return wilton::support::wrap_wilton_buffer(out, out_len);
-            }
-            return wilton::support::make_empty_buffer();
-        };
+        auto call_name_str = std::string(call_name, static_cast<uint16_t> (call_name_len));
         auto reg = shared_registry();
-        reg->put(call_name_str, fun);
+        reg->put(call_name_str, call_ctx, call_cb);
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
@@ -146,8 +197,7 @@ char* wiltoncall_remove(const char* call_name, int call_name_len) {
     if (!sl::support::is_uint16_positive(call_name_len)) return wilton::support::alloc_copy(TRACEMSG(
             "Invalid 'call_name_len' parameter specified: [" + sl::support::to_string(call_name_len) + "]"));
     try {
-        uint16_t call_name_len_u16 = static_cast<uint16_t> (call_name_len);
-        std::string call_name_str{call_name, call_name_len_u16};
+        auto call_name_str = std::string(call_name, static_cast<uint16_t> (call_name_len));
         auto reg = shared_registry();
         reg->remove(call_name_str);
         return nullptr;
