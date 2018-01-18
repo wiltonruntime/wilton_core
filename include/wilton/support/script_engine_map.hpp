@@ -64,10 +64,23 @@ inline sl::io::span<const char> load_init_code() {
 
 inline std::string shorten_script_path(const std::string& path) {
     static sl::json::value json = load_wilton_config();
+    // check stdlib path
     auto& base_url = json["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl");
     if (sl::utils::starts_with(path, base_url)) {
         return path.substr(base_url.length());
     }
+    // check app paths
+    auto& paths_json = json["requireJs"]["paths"];
+    if (sl::json::type::object == paths_json.json_type()) {
+        for (auto& fi : paths_json.as_object()) {
+            const std::string& app_id = fi.name();
+            const std::string& app_dir = fi.as_string_nonempty_or_throw("requireJs.paths." + app_id);
+            if (sl::utils::starts_with(path, app_dir)) {
+                return app_id + path.substr(app_dir.length());
+            }
+        }
+    }
+    // gave up and only strip protocol prefix
     if (sl::utils::starts_with(path, file_proto_prefix)) {
         return path.substr(file_proto_prefix.length());
     }
