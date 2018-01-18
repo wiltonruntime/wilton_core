@@ -65,8 +65,12 @@ inline sl::io::span<const char> load_init_code() {
 inline std::string shorten_script_path(const std::string& path) {
     static sl::json::value json = load_wilton_config();
     auto& base_url = json["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl");
-    if (sl::utils::starts_with(path, base_url)) {
-        return path.substr(base_url.length());
+    if (sl::utils::starts_with(path, base_url) && path.length()) {
+        auto shortened = path.substr(base_url.length());
+        if (shortened.length() > 1 && '/' == shortened.at(0)) {
+            return shortened.substr(1);
+        }
+        return shortened;
     }
     if (sl::utils::starts_with(path, file_proto_prefix)) {
         return path.substr(file_proto_prefix.length());
