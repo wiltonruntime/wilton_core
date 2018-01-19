@@ -67,7 +67,11 @@ inline std::string shorten_script_path(const std::string& path) {
     // check stdlib path
     auto& base_url = json["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl");
     if (sl::utils::starts_with(path, base_url)) {
-        return path.substr(base_url.length());
+        auto shortened = path.substr(base_url.length());
+        if (shortened.length() > 1 && '/' == shortened.at(0)) {
+            return shortened.substr(1);
+        }
+        return shortened;
     }
     // check app paths
     auto& paths_json = json["requireJs"]["paths"];
