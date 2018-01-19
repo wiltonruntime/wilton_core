@@ -8,10 +8,10 @@
 #ifndef WILTON_SUPPORT_SCRIPT_ENGINE_HPP
 #define WILTON_SUPPORT_SCRIPT_ENGINE_HPP
 
+#include <map>
 #include <mutex>
 #include <string>
 #include <thread>
-#include <unordered_map>
 
 #include "staticlib/config.hpp"
 #include "staticlib/io.hpp"
@@ -96,7 +96,7 @@ inline std::string shorten_script_path(const std::string& path) {
 template<typename Engine>
 class script_engine_map {
     std::mutex mutex;
-    std::unordered_map<std::string, Engine> engines;
+    std::map<std::string, Engine> engines;
     
 public:
     support::buffer run_script(sl::io::span<const char> callback_script_json) {
@@ -122,7 +122,7 @@ private:
         if (engines.end() == it) {
             auto code = script_engine_map_detail::load_init_code();
             auto se = Engine(code);
-            auto pa = engines.emplace(tid, std::move(se));
+            auto pa = engines.insert(std::make_pair(tid, std::move(se)));
             it = pa.first;
         }
         return it->second;
