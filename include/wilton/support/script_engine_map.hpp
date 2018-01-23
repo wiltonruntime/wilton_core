@@ -50,7 +50,7 @@ inline sl::io::span<const char> load_init_code() {
         auto code_path = requirejs_dir_path + "/wilton-require.js";
         char* code = nullptr;
         int code_len = 0;
-        auto err_load = wilton_load_script(code_path.c_str(), static_cast<int>(code_path.length()),
+        auto err_load = wilton_load_resource(code_path.c_str(), static_cast<int>(code_path.length()),
                 std::addressof(code), std::addressof(code_len));
         if (nullptr != err_load) {
             support::throw_wilton_error(err_load, TRACEMSG(err_load));
