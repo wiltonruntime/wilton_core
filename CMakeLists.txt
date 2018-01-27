@@ -20,6 +20,9 @@ set ( ${PROJECT_NAME}_STATICLIB_VERSION 0.8.0 CACHE INTERNAL "" )
 set ( ${PROJECT_NAME}_DESCRIPTION "Wilton Core library" )
 set ( ${PROJECT_NAME}_URL https://github.com/wilton-web-toolkit/wilton_core )
 
+# options
+set ( external_jansson_ENABLE_PRECONFIGURATION ON CACHE BOOL "" )
+
 # dependencies add
 if ( STATICLIB_TOOLCHAIN MATCHES "(android|windows|macosx)_.+" )
     staticlib_add_subdirectory ( ${STATICLIB_DEPS}/external_jansson )
