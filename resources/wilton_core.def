@@ -8,8 +8,6 @@ EXPORTS
 
     wilton_dyload
 
-
-
     wiltoncall
     wiltoncall_register
     wiltoncall_remove
@@ -33,6 +31,8 @@ EXPORTS
     json_object_iter
     json_object_iter_next
     json_object_iter_key
+    json_object_iter_value
+    json_object_key_to_iter
     json_array_size
     json_array_get
     json_string_value
