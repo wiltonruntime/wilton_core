@@ -24,6 +24,8 @@
 #ifndef WILTON_SUPPORT_SPAN_OPERATIONS_HPP
 #define WILTON_SUPPORT_SPAN_OPERATIONS_HPP
 
+#include <cstring>
+
 #include "staticlib/io.hpp"
 #include "staticlib/json.hpp"
 #include "staticlib/support.hpp"
@@ -41,14 +43,28 @@ inline buffer make_empty_buffer() {
     return sl::support::optional<sl::io::span<char>>();
 }
 
-inline buffer make_array_buffer(const char* buf, int buf_len) {
-    if (nullptr != buf) {
-        auto span_src = sl::io::make_span(buf, buf_len);
-        auto span = alloc_copy_span(span_src);
-        return sl::support::make_optional(std::move(span));
+inline buffer make_buffer(uint32_t size) {
+    char* data = wilton_alloc(static_cast<int>(size + 1));
+    std::memset(data, '\0', size + 1);
+    return sl::support::make_optional(sl::io::make_span(data, size));
+}
+
+inline buffer make_const_span_buffer(sl::io::span<const char> span) {
+    if (!span.empty()) {
+        auto span_copied = alloc_copy_span(span);
+        return sl::support::make_optional(std::move(span_copied));
     } else {
         return make_empty_buffer();
     }
+}
+
+inline buffer make_span_buffer(sl::io::span<char> span) {
+    auto span_const = sl::io::make_span(const_cast<const char*>(span.data()), span.size());
+    return make_const_span_buffer(span_const);
+}
+
+inline buffer make_array_buffer(const char* buf, int buf_len) {
+    return make_const_span_buffer({buf, buf_len});
 }
 
 inline buffer make_string_buffer(const std::string& st) {
