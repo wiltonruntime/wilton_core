@@ -43,7 +43,7 @@ class handle_registry {
 public:
 
     handle_registry() { }
-    
+
     template<typename DestroyFunc>
     handle_registry(DestroyFunc destroyFunc):
     destoyer(destroyFunc) {
@@ -53,16 +53,15 @@ public:
                 "and mark the lambda as 'noexcept'.");
 #endif
     }
-    
+
     handle_registry(const handle_registry&) = delete;
-    
+
     handle_registry& operator=(const handle_registry&) = delete;
-    
+
     ~handle_registry() STATICLIB_NOEXCEPT {
+// msvcr doesn't like that in JNI mode
 #ifndef STATICLIB_WINDOWS
         std::lock_guard<std::mutex> lock{mtx};
-#else // STATICLIB_WINDOWS
-        // msvcr doesn't like that in JNI mode
 #endif // STATICLIB_WINDOWS
         if (destoyer) {
             for (T* ptr : registry) {
@@ -71,7 +70,7 @@ public:
         }
         registry.clear();
     }
-    
+
     int64_t put(T* ptr) {
         std::lock_guard<std::mutex> lock{mtx};
         auto pair = registry.insert(ptr);
@@ -115,4 +114,3 @@ std::string strhandle(T* ptr) {
 }
 
 #endif /* WILTON_SUPPORT_HANDLE_REGISTRY_HPP */
-

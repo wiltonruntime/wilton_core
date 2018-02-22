@@ -33,7 +33,7 @@
 #include "staticlib/config.hpp"
 #include "staticlib/utils.hpp"
 
-#include "wilton/support/alloc_copy.hpp"
+#include "wilton/support/alloc.hpp"
 
 #include "call/wiltoncall_internal.hpp"
 
@@ -68,8 +68,8 @@ char* wilton_config(char** conf_json_out, int* conf_json_len_out) /* noexcept */
     try {
         auto ptr = wilton::internal::shared_wiltoncall_config();
         auto buf = wilton::support::make_json_buffer(*ptr);
-        *conf_json_out = buf.value().data();
-        *conf_json_len_out = static_cast<int>(buf.value().size());
+        *conf_json_out = buf.data();
+        *conf_json_len_out = buf.size_int();
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));

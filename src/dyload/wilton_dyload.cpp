@@ -34,7 +34,7 @@
 #include "staticlib/tinydir.hpp"
 #include "staticlib/utils.hpp"
 
-#include "wilton/support/alloc_copy.hpp"
+#include "wilton/support/alloc.hpp"
 #include "wilton/support/exception.hpp"
 
 #ifdef STATICLIB_WINDOWS

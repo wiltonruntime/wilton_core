@@ -31,7 +31,7 @@
 #include "wilton/wilton.h"
 #include "wilton/wiltoncall.h"
 
-#include "wilton/support/alloc_copy.hpp"
+#include "wilton/support/alloc.hpp"
 #include "wilton/support/buffer.hpp"
 #include "wilton/support/exception.hpp"
 
@@ -53,9 +53,9 @@ inline char* cb_fun(void* call_ctx, const char* json_in, int json_in_len, char**
     auto fun = reinterpret_cast<fun_span_type> (call_ctx);
     try {
         auto out = fun({json_in, json_in_len});
-        if (out) {
-            *json_out = out.value().data();
-            *json_out_len = static_cast<int> (out.value().size());
+        if (!out.is_null()) {
+            *json_out = out.data();
+            *json_out_len = out.size_int();
         } else {
             *json_out = nullptr;
             *json_out_len = 0;

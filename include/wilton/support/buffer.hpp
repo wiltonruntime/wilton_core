@@ -32,29 +32,23 @@
 
 #include "wilton/wilton.h"
 
-#include "wilton/support/alloc_copy.hpp"
+#include "wilton/support/alloc.hpp"
 
 namespace wilton {
 namespace support {
 
-using buffer = sl::support::optional<sl::io::span<char>>;
+// allocated with wilton_alloc
+using buffer = sl::io::span<char>;
 
-inline buffer make_empty_buffer() {
-    return sl::support::optional<sl::io::span<char>>();
-}
-
-inline buffer make_buffer(uint32_t size) {
-    char* data = wilton_alloc(static_cast<int>(size + 1));
-    std::memset(data, '\0', size + 1);
-    return sl::support::make_optional(sl::io::make_span(data, size));
+inline buffer make_null_buffer() {
+    return sl::io::span<char>(nullptr, 0);
 }
 
 inline buffer make_const_span_buffer(sl::io::span<const char> span) {
-    if (!span.empty()) {
-        auto span_copied = alloc_copy_span(span);
-        return sl::support::make_optional(std::move(span_copied));
+    if (!span.is_null()) {
+        return alloc_copy_span(span);
     } else {
-        return make_empty_buffer();
+        return make_null_buffer();
     }
 }
 
@@ -64,39 +58,43 @@ inline buffer make_span_buffer(sl::io::span<char> span) {
 }
 
 inline buffer make_array_buffer(const char* buf, int buf_len) {
-    return make_const_span_buffer({buf, buf_len});
+    if (nullptr != buf) {
+        auto span = sl::io::make_span(buf, buf_len);
+        return make_const_span_buffer(std::move(span));
+    } else {
+        return make_null_buffer();
+    }
 }
 
 inline buffer make_string_buffer(const std::string& st) {
-    auto span = alloc_copy_span(st);
-    return sl::support::make_optional(std::move(span));
+    return alloc_copy_span(st);
 }
 
 inline buffer make_json_buffer(const sl::json::value& val) {
     auto sink = sl::io::make_array_sink(wilton_alloc, wilton_free);
     val.dump(sink);
-    return sl::support::make_optional(sink.release());
+    return sink.release();
 }
 
 template<typename Source>
 buffer make_source_buffer(Source& src) {
     auto sink = sl::io::make_array_sink(wilton_alloc, wilton_free);
     sl::io::copy_all(src, sink);
-    return sl::support::make_optional(sink.release());
+    return sink.release();
 }
 
 template<typename Source>
 buffer make_hex_buffer(Source& src) {
     auto sink = sl::io::make_array_sink(wilton_alloc, wilton_free);
     sl::io::copy_to_hex(src, sink);
-    return sl::support::make_optional(sink.release());
+    return sink.release();
 }
 
 inline buffer wrap_wilton_buffer(char* buf, int buf_len) {
     if (nullptr != buf) {
-        return sl::support::make_optional(sl::io::make_span(buf, buf_len));
+        return sl::io::make_span(buf, buf_len);
     } else {
-        return make_empty_buffer();
+        return make_null_buffer();
     }
 }
 

@@ -42,9 +42,9 @@ class payload_handle_registry {
     std::function<void(T*)> destoyer;
 
 public:
-    
+
     payload_handle_registry() { }
-    
+
     template<typename DestroyFunc>
     payload_handle_registry(DestroyFunc destroyFunc) :
     destoyer(destroyFunc) {
@@ -60,10 +60,9 @@ public:
     payload_handle_registry& operator=(const payload_handle_registry&) = delete;
 
     ~payload_handle_registry() STATICLIB_NOEXCEPT {
+// msvcr doesn't like that in JNI mode
 #ifndef STATICLIB_WINDOWS
         std::lock_guard<std::mutex> lock{mtx};
-#else // STATICLIB_WINDOWS
-        // msvcr doesn't like that in JNI mode
 #endif // STATICLIB_WINDOWS
         if (destoyer) {
             for (auto& pa : registry) {
@@ -72,7 +71,7 @@ public:
         }
         registry.clear();
     }
-    
+
     int64_t put(T* ptr, P&& ctx) {
         std::lock_guard<std::mutex> lock(mtx);
         auto pair = registry.emplace(ptr, std::move(ctx));

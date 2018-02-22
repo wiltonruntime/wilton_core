@@ -24,6 +24,8 @@
 #ifndef WILTON_SUPPORT_ALLOC_COPY_HPP
 #define WILTON_SUPPORT_ALLOC_COPY_HPP
 
+#include <cstring>
+
 #include "staticlib/io.hpp"
 #include "staticlib/support.hpp"
 
@@ -31,6 +33,12 @@
 
 namespace wilton {
 namespace support {
+
+inline sl::io::span<char> alloc_span(size_t size) {
+    char* data = wilton_alloc(static_cast<int>(size + 1));
+    std::memset(data, '\0', size + 1);
+    return sl::io::make_span(data, size);
+}
 
 template<typename Buffer>
 sl::io::span<char> alloc_copy_span(Buffer buf) {

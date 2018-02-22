@@ -60,7 +60,7 @@ support::buffer dyload_shared_library(sl::io::span<const char> data) {
     if (nullptr != err) {
         support::throw_wilton_error(err, TRACEMSG(err));
     }
-    return support::make_empty_buffer();
+    return support::make_null_buffer();
 }
 
 } // namespace
