@@ -53,6 +53,7 @@ define([
     "nth-check",
     "process-nextick-args",
     "punycode",
+    "pwdauth/sanity",
     "sjcl",
     "querystring",
     "qs",
