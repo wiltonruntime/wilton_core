@@ -139,7 +139,8 @@ define([
     "string-to-stream/test/basic",
     "process-nextick-args/test",
     "spark-md5/test/specs",
-    "pwdauth/test"
+    "pwdauth/test",
+    "xml-js/runAllTests"
 ], function() {
     return {
         main: function() { }

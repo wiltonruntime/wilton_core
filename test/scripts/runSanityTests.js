@@ -85,6 +85,7 @@ define([
     "validator/lib/isAlphanumeric",
     "wilton/Server",
     "weak-map",
+    "xml-js",
     "xml-writer",
     "xregexp"
 ], function() {
