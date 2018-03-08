@@ -113,11 +113,15 @@ target_link_libraries ( ${PROJECT_NAME} PRIVATE
         ${${PROJECT_NAME}_DEPS_PC_LIBRARIES}
         ${${PROJECT_NAME}_ADDITIONAL_LIBS} )
 
+# platform-specific link options
 if ( STATICLIB_TOOLCHAIN MATCHES "android_.+" )
     set_property ( TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS "-Wl,-soname,lib${PROJECT_NAME}.so" )
 elseif ( STATICLIB_TOOLCHAIN MATCHES "windows_.+" )
     set_property ( TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
 endif ( )
+
+# debuginfo
+staticlib_extract_debuginfo_shared ( ${PROJECT_NAME} )
 
 # pkg-config
 set ( ${PROJECT_NAME}_PC_CFLAGS "-I${CMAKE_CURRENT_LIST_DIR}/include" )
