@@ -140,7 +140,8 @@ define([
     "process-nextick-args/test",
     "spark-md5/test/specs",
     "pwdauth/test",
-    "xml-js/runAllTests"
+    "xml-js/runAllTests",
+    "uglify-js/test/min-process"
 ], function() {
     return {
         main: function() { }
