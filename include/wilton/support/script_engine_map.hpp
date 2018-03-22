@@ -46,22 +46,25 @@ namespace support {
 
 namespace script_engine_map_detail {
 
-inline sl::json::value load_wilton_config() {
-    char* conf = nullptr;
-    int conf_len = 0;
-    auto err = wilton_config(std::addressof(conf), std::addressof(conf_len));
-    if (nullptr != err) support::throw_wilton_error(err, TRACEMSG(err));
-    auto deferred = sl::support::defer([conf] () STATICLIB_NOEXCEPT {
-        wilton_free(conf);
-    });
-    const char* cconf = const_cast<const char*>(conf);
-    auto json = sl::json::load({cconf, conf_len});
+// initialized on engine init
+inline const sl::json::value& load_wilton_config() {
+    static const sl::json::value json = [] {
+        char* conf = nullptr;
+        int conf_len = 0;
+        auto err = wilton_config(std::addressof(conf), std::addressof(conf_len));
+        if (nullptr != err) support::throw_wilton_error(err, TRACEMSG(err));
+        auto deferred = sl::support::defer([conf] () STATICLIB_NOEXCEPT {
+            wilton_free(conf);
+        });
+        return sl::json::load({const_cast<const char*>(conf), conf_len});
+    } ();
     return json;
 }
 
+// initialized on engine init
 inline sl::io::span<const char> load_init_code() {
     static const std::string code = [] {
-        auto json = load_wilton_config();
+        auto& json = load_wilton_config();
         auto requirejs_dir_path = json["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl") + "/wilton-requirejs";
         auto code_path = requirejs_dir_path + "/wilton-require.js";
         char* code = nullptr;
@@ -71,15 +74,16 @@ inline sl::io::span<const char> load_init_code() {
         if (nullptr != err_load) {
             support::throw_wilton_error(err_load, TRACEMSG(err_load));
         }
-        auto res = std::string(code, code_len);
-        wilton_free(code);
-        return res;
+        auto deferred = sl::support::defer([code] () STATICLIB_NOEXCEPT {
+            wilton_free(code);
+        });
+        return std::string(code, code_len);
     }();
     return sl::io::make_span(code.data(), code.length());
 }
 
 inline std::string shorten_script_path(const std::string& path) {
-    static sl::json::value json = load_wilton_config();
+    auto& json = load_wilton_config();
     // check stdlib path
     auto& base_url = json["requireJs"]["baseUrl"].as_string_nonempty_or_throw("requireJs.baseUrl");
     if (sl::utils::starts_with(path, base_url)) {
@@ -113,7 +117,7 @@ template<typename Engine>
 class script_engine_map {
     std::mutex mutex;
     std::map<std::string, Engine> engines;
-    
+
 public:
     support::buffer run_script(sl::io::span<const char> callback_script_json) {
         auto& en = thread_local_engine();

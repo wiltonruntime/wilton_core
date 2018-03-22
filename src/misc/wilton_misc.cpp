@@ -39,12 +39,14 @@
 
 namespace { // anonymous
 
+// initialized from wiltoncall_init
 std::shared_ptr<std::mutex> shared_mutex() {
     static auto mutex = std::make_shared<std::mutex>();
     return mutex;
 }
 
- std::shared_ptr<std::vector<std::function<void(const std::string&)>>> shared_cleaners_registry() {
+// initialized from wiltoncall_init
+std::shared_ptr<std::vector<std::function<void(const std::string&)>>> shared_cleaners_registry() {
     static auto registry = std::make_shared<std::vector<std::function<void(const std::string&)>>>();
     return registry;
 }
@@ -110,4 +112,16 @@ char* wilton_register_tls_cleaner(void* cleaner_ctx, void (*cleaner_cb)
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
     }
+}
+
+namespace wilton {
+namespace internal {
+
+// local static init is not thread-safe in vs2013
+void init_tls_cleaners_registry() {
+    shared_mutex();
+    shared_cleaners_registry();
+}
+
+} // namespace
 }

@@ -41,6 +41,7 @@
 
 namespace { // anonymous
 
+std::atomic_flag initialized = ATOMIC_FLAG_INIT;
 const size_t max_registry_entries_count = 1 << 16;
 
 using cb_ctx_type = void*;
@@ -97,6 +98,7 @@ public:
     }
 };
 
+// initialized from wiltoncall_init
 std::shared_ptr<registry> shared_registry() {
     static auto reg = std::make_shared<registry>();
     return reg;
@@ -107,6 +109,7 @@ std::shared_ptr<registry> shared_registry() {
 namespace wilton {
 namespace internal {
 
+// initialized from wiltoncall_init
 std::shared_ptr<sl::json::value> shared_wiltoncall_config(const std::string& cf_json) {
     static auto cf = std::make_shared<sl::json::value>(sl::json::loads(cf_json));
     return cf;
@@ -122,14 +125,15 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
 
     try {
         // check called once
-        bool the_false = false;
-        static std::atomic<bool> initilized{false};
-        if (!initilized.compare_exchange_strong(the_false, true)) {
+        if (initialized.test_and_set(std::memory_order_acq_rel)) {
             throw wilton::support::exception(TRACEMSG("'wiltoncall' registry is already initialized"));
         }
         // set static config
         auto config_json_str = std::string(config_json, static_cast<uint16_t> (config_json_len));
         wilton::internal::shared_wiltoncall_config(config_json_str);
+
+        // init tls cleaners
+        wilton::internal::init_tls_cleaners_registry();
 
         // dyload
         wilton::support::register_wiltoncall("dyload_shared_library", wilton::dyload::dyload_shared_library);
@@ -226,6 +230,7 @@ char* wiltoncall_remove(const char* call_name, int call_name_len) {
 
 char* wiltoncall_runscript(const char* script_engine_name, int script_engine_name_len,
         const char* json_in, int json_in_len, char** json_out, int* json_out_len) {
+    // initialized from launcher
     static std::string default_engine = wilton::internal::shared_wiltoncall_config()->getattr("defaultScriptEngine")
             .as_string_nonempty_or_throw("defaultScriptEngine");
     if (nullptr == script_engine_name) return wilton::support::alloc_copy(TRACEMSG("Null 'script_engine_name' parameter specified"));

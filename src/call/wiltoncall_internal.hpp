@@ -57,7 +57,7 @@ namespace misc {
 support::buffer get_wiltoncall_config(sl::io::span<const char> data);
 
 support::buffer stdin_readline(sl::io::span<const char> data);
-    
+
 } // namespace
 
 
@@ -66,6 +66,8 @@ support::buffer stdin_readline(sl::io::span<const char> data);
 namespace internal {
 
 std::shared_ptr<sl::json::value> shared_wiltoncall_config(const std::string& cf_json = "");
+
+void init_tls_cleaners_registry();
 
 } // namespace
 

@@ -45,11 +45,13 @@
 
 namespace { // anonymous
 
+// initialized from main thread
 std::shared_ptr<std::mutex> shared_mutex() {
     static auto mutex = std::make_shared<std::mutex>();
     return mutex;
 }
 
+// initialized from main thread
 std::shared_ptr<std::unordered_set<std::string>> shared_registry() {
     static auto set = std::make_shared<std::unordered_set<std::string>>();
     return set;
