@@ -30,6 +30,7 @@
 #include <unordered_set>
 
 #include "staticlib/config.hpp"
+#include "staticlib/support.hpp"
 
 namespace wilton {
 namespace support {
