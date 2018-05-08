@@ -124,6 +124,11 @@ public:
         return en.run_callback_script(callback_script_json);
     }
 
+    void run_garbage_collector() {
+        auto& en = thread_local_engine();
+        en.run_garbage_collector();
+    }
+
     void clean_thread_local(const char* thread_id, int thread_id_len) STATICLIB_NOEXCEPT {
         std::lock_guard<std::mutex> guard{mutex};
         if (nullptr != thread_id && sl::support::is_uint16_positive(thread_id_len)) {

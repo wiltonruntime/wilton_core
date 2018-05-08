@@ -141,7 +141,8 @@ define([
     "spark-md5/test/specs",
     "pwdauth/test",
     "xml-js/runAllTests",
-    "uglify-js/test/min-process"
+    "uglify-js/test/min-process",
+    "arrays/test"
 ], function() {
     return {
         main: function() { }

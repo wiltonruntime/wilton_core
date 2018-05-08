@@ -16,6 +16,7 @@
 
 define([
     "argparse",
+    "arrays/sanity",
     "assert",
     "base64-js",
     "bluebird",

@@ -140,6 +140,7 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         // misc
         wilton::support::register_wiltoncall("get_wiltoncall_config", wilton::misc::get_wiltoncall_config);
         wilton::support::register_wiltoncall("stdin_readline", wilton::misc::stdin_readline);
+        wilton::support::register_wiltoncall("run_garbage_collector", wilton::misc::run_garbage_collector);
 
         return nullptr;
     } catch (const std::exception& e) {
@@ -189,9 +190,16 @@ char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, 
         }
         return nullptr;
     } catch (const std::exception& e) {
+        auto data_log = std::string();
+        if (json_in_len <= 1024) {
+            data_log = std::string(json_in, static_cast<uint32_t> (json_in_len));
+        } else {
+            data_log.append("length: ");
+            data_log.append(sl::support::to_string(json_in_len));
+        }
         return wilton::support::alloc_copy(TRACEMSG(e.what() + 
                 "\n'wiltoncall' error for name: [" + call_name_str + "]," +
-                " data: [" + std::string(json_in, static_cast<uint32_t> (json_in_len)) + "]"));
+                " data: [" + data_log + "]"));
     }
 }
 
