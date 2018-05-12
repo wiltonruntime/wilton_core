@@ -49,7 +49,7 @@ support::buffer run_garbage_collector(sl::io::span<const char> data) {
     char* out = nullptr;
     int out_len = 0;
     auto err = wiltoncall(callname.c_str(), static_cast<int>(callname.length()),
-            data.data(), data.size(),
+            data.data(), static_cast<int>(data.size()),
             std::addressof(out), std::addressof(out_len));
     if (nullptr != err) {
         support::throw_wilton_error(err, TRACEMSG(err));
