@@ -140,7 +140,6 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         // misc
         wilton::support::register_wiltoncall("get_wiltoncall_config", wilton::misc::get_wiltoncall_config);
         wilton::support::register_wiltoncall("stdin_readline", wilton::misc::stdin_readline);
-        wilton::support::register_wiltoncall("run_garbage_collector", wilton::misc::run_garbage_collector);
 
         return nullptr;
     } catch (const std::exception& e) {

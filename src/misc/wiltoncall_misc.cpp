@@ -41,22 +41,5 @@ support::buffer stdin_readline(sl::io::span<const char>) {
     return support::make_string_buffer(res);
 }
 
-support::buffer run_garbage_collector(sl::io::span<const char> data) {
-    const std::string& default_engine = internal::shared_wiltoncall_config()
-            ->getattr("defaultScriptEngine").as_string_nonempty_or_throw("defaultScriptEngine");
-    auto callname = "rungc_" + default_engine;
-    // call engine
-    char* out = nullptr;
-    int out_len = 0;
-    auto err = wiltoncall(callname.c_str(), static_cast<int>(callname.length()),
-            data.data(), static_cast<int>(data.size()),
-            std::addressof(out), std::addressof(out_len));
-    if (nullptr != err) {
-        support::throw_wilton_error(err, TRACEMSG(err));
-    }
-
-    return support::make_array_buffer(out, out_len);
-}
-
 } // namespace
 }
