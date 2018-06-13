@@ -85,9 +85,12 @@ buffer make_source_buffer(Source& src) {
 
 template<typename Source>
 buffer make_hex_buffer(Source& src) {
-    auto sink = sl::io::make_array_sink(wilton_alloc, wilton_free);
-    sl::io::copy_to_hex(src, sink);
-    return sink.release();
+    auto dest = sl::io::make_array_sink(wilton_alloc, wilton_free);
+    {
+        auto sink = sl::io::make_hex_sink(dest);
+        sl::io::copy_all(src, sink);
+    }
+    return dest.release();
 }
 
 inline buffer wrap_wilton_buffer(char* buf, int buf_len) {
