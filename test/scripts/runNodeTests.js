@@ -142,7 +142,15 @@ define([
     "pwdauth/test",
     "xml-js/runAllTests",
     "uglify-js/test/min-process",
-    "arrays/test"
+    "arrays/test",
+    "typed-function/runAllTests",
+    "tiny-emitter/test/index",
+    "seed-random/test/index",
+    "javascript-natural-sort/unit-test",
+    "fractionjs/tests/fraction.test",
+    "escape-latex/src/index.test",
+    "decimaljs/test/test",
+    "complexjs/tests/complex.test"
 ], function() {
     return {
         main: function() { }
