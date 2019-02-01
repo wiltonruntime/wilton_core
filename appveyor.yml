@@ -18,6 +18,14 @@ clone_folder: c:\projects\core
 
 build: off
 
+environment:
+  matrix:
+    - WILTON_WIN_ARCH: _x86.
+    - WILTON_WIN_ARCH: .
+
+matrix:
+  fast_finish: true
+
 install:
   - cd ..
   - git clone https://github.com/wilton-iot/wilton
@@ -25,6 +33,8 @@ install:
   - cmd /c resources\ci\appveyor-checkout.bat
 
 build_script:
+  - echo "Updading modules to master"
+  - resources\ci\master-modules.bat
   - echo "Replacing repo to test PR"
   - rd /s /q core
   - if exist core exit /b 1
@@ -32,4 +42,4 @@ build_script:
   - cd core
   - git rev-parse HEAD
   - cd ..
-  - cmd /c resources\ci\appveyor.bat
+  - cmd /c resources\ci\appveyor%WILTON_WIN_ARCH%bat

@@ -1,0 +1,45 @@
+# Copyright 2018, alex at staticlibs.net
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+task:
+  matrix:
+
+    container:
+      image: wiltoniot/xenial-armhf
+      cpu: 1
+      memory: 1G
+
+    container:
+      image: wiltoniot/stretch-aarch64
+      cpu: 1
+      memory: 1G
+
+    container:
+      image: wiltoniot/bionic-amd64
+      cpu: 1
+      memory: 1G
+
+  script: |
+    cd ..
+    git clone --quiet https://github.com/wilton-iot/wilton
+    cd wilton
+    bash ./resources/ci/cirrus-checkout.sh
+    echo "Updating modules to master"
+    bash ./resources/ci/master-modules.sh
+    echo "Replacing repo to test PR"
+    rm -r core
+    cp -a /tmp/cirrus-ci-build core
+    pushd core && git rev-parse HEAD && popd
+    bash ./resources/ci/cirrus.sh

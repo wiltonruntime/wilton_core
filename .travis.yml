@@ -20,6 +20,8 @@ os:
   - linux
   - osx
 
+osx_image: xcode9.2
+
 git:
   submodules: false
 
@@ -29,22 +31,6 @@ addons:
       - build-essential
       - pkg-config
       - zip
-      - zlib1g-dev
-      - libjansson-dev
-      - liblog4cplus-dev
-      - libssl-dev
-      - libcurl4-openssl-dev
-      - libpopt-dev
-      - libsqlite3-dev
-      - libpq-dev
-      - libpng12-dev
-      - libusb-1.0-0-dev
-      - libudev-dev
-      - libglib2.0-dev
-      - libjavascriptcoregtk-3.0-dev
-      - libgtk-3-dev
-      - libwebkitgtk-3.0-dev
-      - valgrind
 
 before_install:
   - export CC=
@@ -52,19 +38,19 @@ before_install:
 
 install:
   - cd ..
-  - git clone https://github.com/wilton-iot/wilton
+  - git clone --quiet https://github.com/wilton-iot/wilton
   - cd wilton
   - bash ./resources/ci/travis-checkout.sh
 
 before_script:
+  - echo "Updating modules to master"
+  - bash ./resources/ci/master-modules.sh
   - echo "Replacing repo to test PR"
   - set -e
   - rm -r core
   - mv ../wilton_core core
   - set +e
-  - pushd core
-  - git rev-parse HEAD
-  - popd
+  - pushd core && git rev-parse HEAD && popd
 
 script:
   - bash ./resources/ci/travis.sh
