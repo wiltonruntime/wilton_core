@@ -26,6 +26,8 @@
 
 #include "wilton/wilton_logging.h"
 
+#include <string>
+
 namespace wilton {
 namespace support {
 
