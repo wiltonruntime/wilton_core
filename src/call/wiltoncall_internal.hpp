@@ -38,8 +38,6 @@
 
 #include "wilton/support/buffer.hpp"
 #include "wilton/support/exception.hpp"
-#include "wilton/support/handle_registry.hpp"
-#include "wilton/support/payload_handle_registry.hpp"
 
 namespace wilton {
 

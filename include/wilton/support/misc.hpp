@@ -83,6 +83,14 @@ inline void check_json_callback_script(const sl::json::field& field) {
     }
 }
 
+template<typename T>
+std::string strhandle(T* ptr) {
+    if (nullptr != ptr) {
+        return sl::support::to_string(reinterpret_cast<int64_t>(ptr));
+    }
+    return "null";
+}
+
 } // namespace
 }
 
