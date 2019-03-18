@@ -28,6 +28,7 @@
 #include <memory>
 #include <mutex>
 #include <utility>
+#include <unordered_set>
 
 #include "staticlib/config.hpp"
 #include "staticlib/tinydir.hpp"
@@ -38,69 +39,16 @@
 #include "wilton/support/registrar.hpp"
 
 #include "call/wiltoncall_internal.hpp"
+#include "call/wiltoncall_registry.hpp"
 
 namespace { // anonymous
 
 std::atomic_flag initialized = ATOMIC_FLAG_INIT;
 const size_t max_registry_entries_count = 1 << 16;
 
-using cb_ctx_type = void*;
-using cb_fun_type = char* (*)(void* call_ctx, const char* json_in, int json_in_len, char** json_out, int* json_out_len);
-
-class registry {
-    std::mutex mutex;
-    std::map<std::string, std::pair<cb_ctx_type, cb_fun_type>> map;
-
-public:
-    registry() { }
-
-    registry(const registry& other) = delete;
-
-    registry& operator=(const registry& other) = delete;
-
-    void put(const std::string& name, cb_ctx_type cb_ctx, cb_fun_type cb_fun) {
-        if (name.empty()) throw wilton::support::exception(TRACEMSG(
-                "Invalid empty 'wiltoncall' name specified"));
-        if (nullptr == cb_fun) throw wilton::support::exception(TRACEMSG(
-                "Invalid null 'wiltoncall' function specified for name: [" + name + "]"));
-        std::lock_guard<std::mutex> guard{mutex};
-        if (map.size() >= max_registry_entries_count) throw wilton::support::exception(TRACEMSG(
-                "'wiltoncall' registry size exceeded, max size: [" + sl::support::to_string(max_registry_entries_count) + "]"));
-        if (0 == map.count(name)) {
-            map.insert(std::make_pair(name, std::make_pair(cb_ctx, cb_fun)));
-        } else {
-            throw wilton::support::exception(TRACEMSG(
-                    "Invalid duplicate 'wiltoncall' name specified: [" + name + "]"));
-        }
-    }
-
-    std::pair<cb_ctx_type, cb_fun_type> get(const std::string& name) {
-        if (name.empty()) throw wilton::support::exception(TRACEMSG(
-                "Invalid empty 'wiltoncall' name specified"));
-        std::lock_guard<std::mutex> guard{mutex};
-        auto it = map.find(name);
-        if (map.end() == it) {
-            throw wilton::support::exception(TRACEMSG(
-                    "Invalid unknown 'wiltoncall' name specified: [" + name + "]"));
-        }
-        return it->second;
-    }
-
-    void remove(const std::string& name) {
-        if (name.empty()) throw wilton::support::exception(TRACEMSG(
-                "Invalid empty 'wiltoncall' name specified"));
-        std::lock_guard<std::mutex> guard{mutex};
-        auto res = map.erase(name);
-        if (0 == res) {
-            throw wilton::support::exception(TRACEMSG(
-                    "Invalid unknown 'wiltoncall' name specified: [" + name + "]"));
-        }
-    }
-};
-
 // initialized from wiltoncall_init
-std::shared_ptr<registry> shared_registry() {
-    static auto reg = std::make_shared<registry>();
+std::shared_ptr<wilton::internal::wiltoncall_registry> shared_registry() {
+    static auto reg = std::make_shared<wilton::internal::wiltoncall_registry>(max_registry_entries_count);
     return reg;
 }
 
@@ -166,8 +114,8 @@ char* wiltoncall(const char* call_name, int call_name_len, const char* json_in, 
         auto reg = shared_registry();
         auto en = reg->get(call_name_str);
         // invoke function
-        cb_ctx_type cb_ctx = en.first;
-        cb_fun_type cb_fun = en.second;
+        wilton::internal::cb_ctx_type cb_ctx = en.first;
+        wilton::internal::cb_fun_type cb_fun = en.second;
         char* out = nullptr;
         int out_len = 0;
         auto err = cb_fun(cb_ctx, json_in, json_in_len, std::addressof(out), std::addressof(out_len));
@@ -268,3 +216,29 @@ char* wiltoncall_runscript(const char* script_engine_name, int script_engine_nam
 }
 
 #endif // WILTON_DISABLE_DEFAULT_RUNSCRIPT
+
+char* wilton_set_thread_capabilities(const char* capabilities_json, int capabilities_json_len) {
+    if (nullptr != capabilities_json && !sl::support::is_uint16_positive(capabilities_json_len)) {
+            return wilton::support::alloc_copy(TRACEMSG(
+                    "Invalid 'capabilities_json_len' parameter specified: [" + sl::support::to_string(capabilities_json_len) + "]"));
+    }
+    try {
+        auto span = sl::io::make_span(capabilities_json, capabilities_json_len);
+        auto json = sl::json::load(span);
+        auto& vec = json.as_array_or_throw("capabilities");
+        if (vec.empty()) throw wilton::support::exception(TRACEMSG(
+                "Invalid empty capabilities list specified"));
+        auto caps = std::unordered_set<std::string>();
+        for (auto& el : vec) {
+            auto st = el.as_string_nonempty_or_throw("empty capability");
+            auto it = caps.emplace(std::move(st));
+            if (!it.second) throw wilton::support::exception(TRACEMSG(
+                    "Invalid duplicate capability specified, name: [" + st + "]"));
+        }
+        auto reg = shared_registry();
+        reg->set_thread_caps(std::move(caps));
+        return nullptr;
+    } catch (const std::exception& e) {
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}

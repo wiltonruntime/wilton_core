@@ -18,6 +18,7 @@ EXPORTS
     wilton_config
     wilton_clean_tls
     wilton_register_tls_cleaner
+    wilton_set_thread_capabilities
 
     wilton_dyload
 

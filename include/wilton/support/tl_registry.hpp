@@ -49,7 +49,7 @@ public:
         std::lock_guard<std::mutex> guard{mtx};
         auto res = map.insert(std::make_pair(tid, std::move(value)));
         if (false == res.second) {
-            throw wilton::support::exception(TRACEMSG("Invalid duplicate TL entry ti put," + 
+            throw wilton::support::exception(TRACEMSG("Invalid duplicate TL entry to put," + 
                     " tid: [" + tid + "], keys: [" + dump() + "]"));
         }
     }

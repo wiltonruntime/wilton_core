@@ -36,6 +36,12 @@ char* wilton_dyload(
         const char* directory,
         int directory_len);
 
+// capabilities
+
+char* wilton_set_thread_capabilities(
+        const char* capabilities_json,
+        int capabilities_json_len);
+
 // misc
 
 char* wilton_alloc(
