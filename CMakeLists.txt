@@ -120,6 +120,15 @@ elseif ( STATICLIB_TOOLCHAIN MATCHES "windows_.+" )
     set_property ( TARGET ${PROJECT_NAME} APPEND_STRING PROPERTY LINK_FLAGS "/manifest:no" )
 endif ( )
 
+# mac dep paths
+if ( STATICLIB_TOOLCHAIN MATCHES "macosx_.+" )
+    add_custom_command ( TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND ${WILTON_DIR}/resources/scripts/mac-deps.sh
+                    ${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}
+            WORKING_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+            COMMENT "Rewriting dependency paths: [${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}]" )
+endif ( )
+
 # debuginfo
 staticlib_extract_debuginfo_shared ( ${PROJECT_NAME} )
 

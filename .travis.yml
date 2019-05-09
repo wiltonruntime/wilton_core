@@ -31,6 +31,7 @@ addons:
       - build-essential
       - pkg-config
       - zip
+      - qemu-user-static
 
 before_install:
   - export CC=
