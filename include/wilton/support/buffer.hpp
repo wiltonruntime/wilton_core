@@ -44,6 +44,10 @@ inline buffer make_null_buffer() {
     return sl::io::span<char>(nullptr, 0);
 }
 
+inline buffer make_empty_buffer() {
+    return alloc_span(0);
+}
+
 inline buffer make_const_span_buffer(sl::io::span<const char> span) {
     if (!span.is_null()) {
         return alloc_copy_span(span);
