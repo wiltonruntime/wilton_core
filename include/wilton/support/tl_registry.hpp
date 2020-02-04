@@ -50,7 +50,7 @@ public:
         auto res = map.insert(std::make_pair(tid, std::move(value)));
         if (false == res.second) {
             throw wilton::support::exception(TRACEMSG("Invalid duplicate TL entry to put," + 
-                    " tid: [" + tid + "], keys: [" + dump() + "]"));
+                    " tid: [" + tid + "], keys: [" + dump_internal() + "]"));
         }
     }
 
@@ -62,7 +62,7 @@ public:
             return it->second;
         } else {
             throw wilton::support::exception(TRACEMSG("Invalid unknown TL entry to peek," + 
-                    " tid: [" + tid + "], keys: [" + dump() + "]"));
+                    " tid: [" + tid + "], keys: [" + dump_internal() + "]"));
         }
     }
 
@@ -76,12 +76,17 @@ public:
             return res;
         } else {
             throw wilton::support::exception(TRACEMSG("Invalid unknown TL entry to remove," + 
-                    " tid: [" + tid + "], keys: [" + dump() + "]"));
+                    " tid: [" + tid + "], keys: [" + dump_internal() + "]"));
         }
     }
 
     std::string dump() {
         std::lock_guard<std::mutex> guard{mtx};
+        return dump_internal();
+    }
+
+private:
+    std::string dump_internal() {
         auto res = std::vector<sl::json::value>();
         for (const auto& en : map) {
             res.emplace_back(en.first);
