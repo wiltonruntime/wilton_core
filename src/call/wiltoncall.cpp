@@ -181,7 +181,7 @@ char* wiltoncall_list(char** json_list_out, int* json_list_out_len) {
         auto val = sl::json::value(std::move(list));
         auto buf = wilton::support::make_json_buffer(val);
         *json_list_out = buf.data();
-        *json_list_out_len = buf.size_signed();
+        *json_list_out_len = buf.size_int();
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
