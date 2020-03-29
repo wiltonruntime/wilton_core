@@ -88,6 +88,7 @@ char* wiltoncall_init(const char* config_json, int config_json_len) {
         // misc
         wilton::support::register_wiltoncall("get_wiltoncall_config", wilton::misc::get_wiltoncall_config);
         wilton::support::register_wiltoncall("stdin_readline", wilton::misc::stdin_readline);
+        wilton::support::register_wiltoncall("wiltoncall_list_registered", wilton::misc::wiltoncall_list_registered);
 
         return nullptr;
     } catch (const std::exception& e) {
@@ -161,6 +162,26 @@ char* wiltoncall_register(const char* call_name, int call_name_len, void* call_c
         auto call_name_str = std::string(call_name, static_cast<uint16_t> (call_name_len));
         auto reg = shared_registry();
         reg->put(call_name_str, call_ctx, call_cb);
+        return nullptr;
+    } catch (const std::exception& e) {
+        return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));
+    }
+}
+
+char* wiltoncall_list(char** json_list_out, int* json_list_out_len) {
+    if (nullptr == json_list_out) return wilton::support::alloc_copy(TRACEMSG("Null 'json_list_out' parameter specified"));
+    if (nullptr == json_list_out_len) return wilton::support::alloc_copy(TRACEMSG("Null 'json_list_out_len' parameter specified"));
+    try {
+        auto reg = shared_registry();
+        auto names = reg->list();
+        auto list = std::vector<sl::json::value>();
+        for (auto&& nm : names) {
+            list.emplace_back(sl::json::value(std::move(nm)));
+        }
+        auto val = sl::json::value(std::move(list));
+        auto buf = wilton::support::make_json_buffer(val);
+        *json_list_out = buf.data();
+        *json_list_out_len = buf.size_signed();
         return nullptr;
     } catch (const std::exception& e) {
         return wilton::support::alloc_copy(TRACEMSG(e.what() + "\nException raised"));

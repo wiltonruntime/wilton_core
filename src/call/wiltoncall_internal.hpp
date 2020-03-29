@@ -56,6 +56,8 @@ support::buffer get_wiltoncall_config(sl::io::span<const char> data);
 
 support::buffer stdin_readline(sl::io::span<const char> data);
 
+support::buffer wiltoncall_list_registered(sl::io::span<const char> data);
+
 } // namespace
 
 

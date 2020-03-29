@@ -108,6 +108,15 @@ public:
         return it->second;
     }
 
+    std::vector<std::string> list() {
+        std::lock_guard<std::mutex> guard{mutex};
+        auto vec = std::vector<std::string>();
+        for (auto& en : map) {
+            vec.push_back(en.first);
+        }
+        return vec;
+    }
+
     void remove(const std::string& name) {
         if (name.empty()) throw wilton::support::exception(TRACEMSG(
                 "Invalid empty 'wiltoncall' name specified"));

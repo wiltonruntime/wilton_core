@@ -53,6 +53,10 @@ char* wiltoncall_remove(
         const char* call_name,
         int call_name_len);
 
+char* wiltoncall_list(
+        char** json_list_out,
+        int* json_list_out_len);
+
 char* wiltoncall_init(
         const char* config_json,
         int config_json_len);

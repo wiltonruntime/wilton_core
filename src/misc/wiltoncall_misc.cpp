@@ -41,5 +41,13 @@ support::buffer stdin_readline(sl::io::span<const char>) {
     return support::make_string_buffer(res);
 }
 
+support::buffer wiltoncall_list_registered(sl::io::span<const char>) {
+    char* out = nullptr;
+    int out_len = 0;
+    auto err = wiltoncall_list(std::addressof(out), std::addressof(out_len));
+    if (nullptr != err) support::throw_wilton_error(err, TRACEMSG(err));
+    return support::wrap_wilton_buffer(out, out_len);
+}
+
 } // namespace
 }

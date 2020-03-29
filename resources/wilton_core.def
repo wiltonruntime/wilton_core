@@ -25,6 +25,7 @@ EXPORTS
     wiltoncall
     wiltoncall_register
     wiltoncall_remove
+    wiltoncall_list
     wiltoncall_init
     wiltoncall_runscript
 
