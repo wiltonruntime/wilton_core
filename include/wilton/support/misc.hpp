@@ -44,10 +44,20 @@ inline void check_json_callback_script(const sl::json::field& field) {
                 " type: [" + sl::json::stringify_json_type(field.json_type()) + "]," +
                 " value: [" + field.val().dumps() + "]"));
     }
+    bool esmodule = false;
     bool module = false;
+    bool func = false;
+    bool engine = false;
     for (const sl::json::field& fi : field.as_object()) {
         auto& name = fi.name();
-        if ("module" == name) {
+        if ("esmodule" == name) {
+            if (sl::json::type::string != fi.json_type()) {
+                throw support::exception(TRACEMSG("Invalid '" + fi.name() + "' field,"
+                        " type: [" + sl::json::stringify_json_type(fi.json_type()) + "]," +
+                        " value: [" + fi.val().dumps() + "]"));
+            }
+            esmodule = true;
+        } else if ("module" == name) {
             if (sl::json::type::string != fi.json_type()) {
                 throw support::exception(TRACEMSG("Invalid '" + fi.name() + "' field,"
                         " type: [" + sl::json::stringify_json_type(fi.json_type()) + "]," +
@@ -60,6 +70,7 @@ inline void check_json_callback_script(const sl::json::field& field) {
                         " type: [" + sl::json::stringify_json_type(fi.json_type()) + "]," +
                         " value: [" + fi.val().dumps() + "]"));
             }
+            func = true;
         } else if ("args" == name) {
             if (sl::json::type::array != fi.json_type()) {
                 throw support::exception(TRACEMSG("Invalid '" + fi.name() + "' field,"
@@ -72,14 +83,19 @@ inline void check_json_callback_script(const sl::json::field& field) {
                         " type: [" + sl::json::stringify_json_type(fi.json_type()) + "]," +
                         " value: [" + fi.val().dumps() + "]"));
             }
+            engine = true;
         } else {
             throw support::exception(TRACEMSG(
                     "Unknown data field: [" + name + "] in object: [" + field.name() + "]"));
         }
     }
-    if (!module) {
+    if (esmodule && (func || engine)) {
         throw support::exception(TRACEMSG(
-                "Required field: 'module' is not supplied in object: [" + field.name() + "]"));
+                "Invalid ES module callback: 'func' and 'engine' fields can not be used with 'esmodule', object: [" + field.name() + "]"));
+    }
+    if (!(module || esmodule)) {
+        throw support::exception(TRACEMSG(
+                "Required field: 'module' (or 'esmudule') is not supplied in object: [" + field.name() + "]"));
     }
 }
 
