@@ -50,7 +50,7 @@ std::function<char*()> dyload_platform(const std::string& directory, const std::
 #else // !STATICLIB_MAC
     auto absolute_path = directory + "/lib" + name + ".so";
 #endif
-    auto handle = ::dlopen(absolute_path.c_str(), RTLD_LAZY);
+    auto handle = ::dlopen(absolute_path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if (nullptr == handle) {
         throw support::exception(TRACEMSG(
                 "Error loading shared library on path: [" + absolute_path + "],"
