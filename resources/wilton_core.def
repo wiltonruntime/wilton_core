@@ -38,7 +38,6 @@ EXPORTS
     json_false
     json_null
     json_delete
-    json_delete
     json_object_set_new
     json_array_append_new
     json_object_size
